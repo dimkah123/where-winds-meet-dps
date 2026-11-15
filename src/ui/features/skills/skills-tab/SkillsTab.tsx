@@ -225,6 +225,28 @@ function buffAddOptions(
 
 const INNER_WAY_DOT_TAG = "source:innerWayDot"
 
+export type SkillCategory = "class" | "innerWay" | "mystic"
+export const ALL_SKILL_CATEGORIES: readonly SkillCategory[] = ["class", "innerWay", "mystic"]
+
+export function isMysticSkill(skill: Skill): boolean {
+  return skill.skillType === "mystic" || skill.id.startsWith("mystic-")
+}
+
+export function isInnerWaySkill(skill: Skill): boolean {
+  return (
+    skill.tags?.includes(INNER_WAY_DOT_TAG) === true ||
+    skill.skillType === "mindMethod" ||
+    skill.id.startsWith("innerWay-") ||
+    skill.id.includes("bitter-season")
+  )
+}
+
+export function getSkillCategory(skill: Skill): SkillCategory {
+  if (isInnerWaySkill(skill)) return "innerWay"
+  if (isMysticSkill(skill)) return "mystic"
+  return "class"
+}
+
 function typeBadge(skill: Skill, t: (key: string, fallback?: string) => string): string {
   if (skill.tags?.includes(INNER_WAY_DOT_TAG)) return t("skills.innerWayDot")
   if (skill.skillType === "mystic") return t("skills.mysticSkill")
@@ -289,23 +311,76 @@ export function SkillsTab({
     return trig.kind
   }
 
+  const school = getSchool(classId)
+  const classCategoryLabel = t(
+    attributeAttackKey(school.primaryAttribute),
+    school.primaryAttribute || "Class",
+  )
+
   const [search, setSearch] = useState("")
   const searchLower = search.trim().toLowerCase()
+
+  const [selectedCategories, setSelectedCategories] = useState<Set<SkillCategory>>(
+    () => new Set(ALL_SKILL_CATEGORIES),
+  )
+
+  const isAllSelected = ALL_SKILL_CATEGORIES.every((cat) => selectedCategories.has(cat))
+
+  function toggleCategory(cat: SkillCategory, e: React.MouseEvent) {
+    if (e.altKey) {
+      setSelectedCategories(new Set([cat]))
+      return
+    }
+    setSelectedCategories((prev) => {
+      const next = new Set(prev)
+      if (next.has(cat)) {
+        next.delete(cat)
+        if (next.size === 0) return new Set(ALL_SKILL_CATEGORIES)
+      } else {
+        next.add(cat)
+      }
+      return next
+    })
+  }
+
+  function selectAllCategories() {
+    setSelectedCategories(new Set(ALL_SKILL_CATEGORIES))
+  }
+
+  const allMatchingSkills = useMemo(() => {
+    return [
+      ...classSkills.filter((skill) => (skill.name || "").toLowerCase().includes(searchLower)),
+      ...builtinSkills.filter((skill) =>
+        t(skillKey(skill), skill.name).toLowerCase().includes(searchLower),
+      ),
+    ]
+  }, [classSkills, builtinSkills, searchLower, t])
+
+  const categoryCounts = useMemo(() => {
+    const counts = { all: allMatchingSkills.length, class: 0, innerWay: 0, mystic: 0 }
+    for (const skill of allMatchingSkills) {
+      counts[getSkillCategory(skill)]++
+    }
+    return counts
+  }, [allMatchingSkills])
+
   const filteredClassSkills = useMemo(
     () =>
       classSkills
         .filter((skill) => (skill.name || "").toLowerCase().includes(searchLower))
+        .filter((skill) => selectedCategories.has(getSkillCategory(skill)))
         .sort((skillA, skillB) => (skillA.name || "").localeCompare(skillB.name || "")),
-    [classSkills, searchLower],
+    [classSkills, searchLower, selectedCategories],
   )
   const filteredBuiltins = useMemo(
     () =>
       builtinSkills
         .filter((skill) => t(skillKey(skill), skill.name).toLowerCase().includes(searchLower))
+        .filter((skill) => selectedCategories.has(getSkillCategory(skill)))
         .sort((skillA, skillB) =>
           t(skillKey(skillA), skillA.name).localeCompare(t(skillKey(skillB), skillB.name)),
         ),
-    [builtinSkills, searchLower, t],
+    [builtinSkills, searchLower, t, selectedCategories],
   )
 
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
@@ -929,6 +1004,44 @@ export function SkillsTab({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+          <div className={styles.filterBar}>
+            <button
+              type="button"
+              className={`${styles.filterChip} ${isAllSelected ? styles.filterChipActive : ""}`}
+              onClick={selectAllCategories}
+              title={t("common.all")}
+            >
+              <span>{t("common.all")}</span>
+              <span className={styles.filterChipCount}>({categoryCounts.all})</span>
+            </button>
+            <button
+              type="button"
+              className={`${styles.filterChip} ${selectedCategories.has("class") ? styles.filterChipActive : ""}`}
+              onClick={(e) => toggleCategory("class", e)}
+              title={`${classCategoryLabel} (Alt+Click to solo)`}
+            >
+              <span>{classCategoryLabel}</span>
+              <span className={styles.filterChipCount}>({categoryCounts.class})</span>
+            </button>
+            <button
+              type="button"
+              className={`${styles.filterChip} ${selectedCategories.has("innerWay") ? styles.filterChipActive : ""}`}
+              onClick={(e) => toggleCategory("innerWay", e)}
+              title={`${t("common.innerWays")} (Alt+Click to solo)`}
+            >
+              <span>{t("common.innerWays")}</span>
+              <span className={styles.filterChipCount}>({categoryCounts.innerWay})</span>
+            </button>
+            <button
+              type="button"
+              className={`${styles.filterChip} ${selectedCategories.has("mystic") ? styles.filterChipActive : ""}`}
+              onClick={(e) => toggleCategory("mystic", e)}
+              title={`${t("skills.filterMystics")} (Alt+Click to solo)`}
+            >
+              <span>{t("skills.filterMystics")}</span>
+              <span className={styles.filterChipCount}>({categoryCounts.mystic})</span>
+            </button>
+          </div>
         </div>
         <div className={styles.listScroll}>
           <ul className={styles.listCard}>

@@ -63,7 +63,7 @@ export function OverviewTab({
         </div>
         <div className="panel">
           <div className="panel-head">
-            <h2>{t("overview.innerWays")}</h2>
+            <h2>{t("common.innerWays")}</h2>
             <span className="panel-head-meta">
               <span className="panel-head-meta-value">{slottedInnerWays}</span> /{" "}
               {inputs.mindMethods.length}
