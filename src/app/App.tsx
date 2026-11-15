@@ -28,6 +28,7 @@ import { ProfilePanel } from "../ui/features/profile/profile-panel/ProfilePanel"
 import { GearTab } from "../ui/features/gear/gear-tab/GearTab"
 import { TalentsOdditiesTab } from "../ui/features/talents/talents-oddities-tab/TalentsOdditiesTab"
 import { SkillsTab } from "../ui/features/skills/skills-tab/SkillsTab"
+import { AlertsTab } from "../ui/features/alerts/alerts-tab/AlertsTab"
 import { useGraduationRate } from "../ui/hooks/useGraduationRate"
 import { useGraduationQiLog } from "../ui/hooks/useGraduationQiLog"
 import { useParseSimulation, type ParseSimulationRequest } from "../ui/hooks/useParseSimulation"
@@ -310,13 +311,42 @@ function AppInner() {
     tabRefs.current[pathname]?.scrollIntoView({ block: "nearest", inline: "nearest" })
   }, [pathname])
 
-  const TABS: { path: string; label: string; align?: "right"; gapBefore?: true }[] = [
+  const [isAlertsDnd, setIsAlertsDnd] = useState(() => {
+    return localStorage.getItem("wwm.alertsDnd") === "true"
+  })
+
+  const toggleAlertsDnd = useCallback(() => {
+    setIsAlertsDnd((prev) => {
+      const next = !prev
+      localStorage.setItem("wwm.alertsDnd", String(next))
+      return next
+    })
+  }, [])
+
+  const activeAlertsCount = result.warnings.length + (result.qiEdgeWarnings?.length ?? 0)
+  const hasAlerts = activeAlertsCount > 0
+  const shouldPulseAlertsTab = hasAlerts && !isAlertsDnd && pathname !== "/alerts"
+
+  const TABS: {
+    path: string
+    label: string
+    align?: "right"
+    gapBefore?: true
+    badge?: number
+    pulsing?: boolean
+  }[] = [
     { path: "/overview", label: t("common.overview") },
     { path: "/gear", label: t("app.gear") },
     { path: "/rotation", label: t("common.rotation") },
     { path: "/rotation-editor", label: t("rotation.rotationEditor") },
     { path: "/simulation", label: t("app.simulation") },
     { path: "/skills", label: t("app.skillEditor") },
+    {
+      path: "/alerts",
+      label: t("app.alerts"),
+      pulsing: shouldPulseAlertsTab,
+      badge: hasAlerts ? activeAlertsCount : undefined,
+    },
     { path: "/talents", label: t("common.enhancementOdditiesTalents"), align: "right" },
     { path: "/profile", label: t("common.profiles"), gapBefore: true },
   ]
@@ -327,7 +357,12 @@ function AppInner() {
   return (
     <div className={styles.app}>
       <DpsActivityToast hidden={isSimulationRunning} />
-      <CornerToasts result={result} onCheckRotation={goToRotationEditorTab} />
+      <CornerToasts
+        result={result}
+        onCheckRotation={goToRotationEditorTab}
+        isAlertsDnd={isAlertsDnd}
+        onToggleDnd={toggleAlertsDnd}
+      />
       <SimulationToast
         status={simulation.status}
         done={simulation.progress.done}
@@ -442,10 +477,14 @@ function AppInner() {
                 styles.tab +
                 (isActive ? ` ${styles.active}` : "") +
                 (tab.align === "right" ? ` ${styles.tabRight}` : "") +
-                (tab.gapBefore ? ` ${styles.tabGapBefore}` : "")
+                (tab.gapBefore ? ` ${styles.tabGapBefore}` : "") +
+                (tab.pulsing ? ` ${styles.tabPulsing}` : "")
               }
             >
               {tab.label}
+              {typeof tab.badge === "number" && tab.badge > 0 && (
+                <span className={styles.alertBadge}>{tab.badge}</span>
+              )}
             </NavLink>
           ))}
         </nav>
@@ -515,6 +554,16 @@ function AppInner() {
                   onCustomSkillsChange={changeCustomSkills}
                   customBuffs={customBuffs}
                   customDebuffs={customDebuffs}
+                />
+              }
+            />
+            <Route
+              path="/alerts"
+              element={
+                <AlertsTab
+                  result={result}
+                  isDnd={isAlertsDnd}
+                  onToggleDnd={toggleAlertsDnd}
                 />
               }
             />

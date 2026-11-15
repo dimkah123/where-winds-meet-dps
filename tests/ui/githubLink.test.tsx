@@ -5,7 +5,7 @@ import { I18nProvider } from "../../src/i18n/I18nProvider"
 
 describe("GithubLink", () => {
   it("points at the where-winds-meet-dps repository", () => {
-    expect(GITHUB_REPO_URL).toBe("https://github.com/M1zuke/where-winds-meet-dps")
+    expect(GITHUB_REPO_URL).toBe("https://github.com/dimkah123/where-winds-meet-dps")
   })
 
   it("renders an accessible external link with a safe rel", () => {

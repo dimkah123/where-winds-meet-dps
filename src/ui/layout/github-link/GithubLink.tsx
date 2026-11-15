@@ -2,7 +2,7 @@ import { useI18n } from "../../../i18n/i18nContext"
 import { GithubIcon } from "../../components/github-icon/GithubIcon"
 import styles from "./GithubLink.module.scss"
 
-export const GITHUB_REPO_URL = "https://github.com/M1zuke/where-winds-meet-dps"
+export const GITHUB_REPO_URL = "https://github.com/dimkah123/where-winds-meet-dps"
 
 export function GithubLink() {
   const { t } = useI18n()

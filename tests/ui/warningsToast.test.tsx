@@ -74,4 +74,32 @@ describe("WarningsToast", () => {
 
     expect(screen.getByRole("status")).toHaveTextContent("Something is off")
   })
+
+  it("suppresses the toast when isDnd is true", () => {
+    render(
+      <I18nProvider>
+        <WarningsToast result={resultWith({ warnings: ["Critical warning"] })} isDnd={true} />
+      </I18nProvider>,
+    )
+
+    expect(screen.queryByRole("status")).not.toBeInTheDocument()
+  })
+
+  it("calls onToggleDnd when clicking the Do Not Disturb button", () => {
+    let toggled = false
+    render(
+      <I18nProvider>
+        <WarningsToast
+          result={resultWith({ warnings: ["Critical warning"] })}
+          onToggleDnd={() => {
+            toggled = true
+          }}
+        />
+      </I18nProvider>,
+    )
+
+    const dndBtn = screen.getByRole("button", { name: /not disturb/i })
+    fireEvent.click(dndBtn)
+    expect(toggled).toBe(true)
+  })
 })

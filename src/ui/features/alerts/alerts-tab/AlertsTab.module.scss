@@ -1,0 +1,232 @@
+@use "breakpoints";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px 8px;
+}
+
+.headerCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.25em;
+  font-weight: 600;
+  color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  font-size: 0.7em;
+  background: #d9534f;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.description {
+  margin: 0;
+  font-size: 0.9em;
+  color: var(--color-text-dim);
+}
+
+.dndButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(230, 160, 40, 0.12);
+  border: 1px solid var(--color-accent);
+  border-radius: 6px;
+  color: var(--color-accent);
+  font-size: 0.9em;
+  font-weight: 600;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(230, 160, 40, 0.22);
+    border-color: #ffd88a;
+    color: #ffd88a;
+  }
+}
+
+.dndButtonActive {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(80, 80, 80, 0.3);
+  border: 1px solid rgba(160, 160, 160, 0.4);
+  border-radius: 6px;
+  color: var(--color-text-dim);
+  font-size: 0.9em;
+  font-weight: 600;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(100, 100, 100, 0.4);
+    border-color: rgba(200, 200, 200, 0.6);
+    color: var(--color-text);
+  }
+}
+
+.dndIcon {
+  font-size: 1.1em;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1.05em;
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.alertCard {
+  background: #2b1f13;
+  border: 1px solid #aa6a30;
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.15s;
+
+  &:hover {
+    border-color: #e6a028;
+  }
+}
+
+.alertHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skillName {
+  font-size: 1.05em;
+  font-weight: 600;
+  color: #ffd88a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.timingTag {
+  font-size: 0.8em;
+  padding: 2px 8px;
+  background: rgba(220, 80, 50, 0.25);
+  border: 1px solid rgba(220, 80, 50, 0.5);
+  color: #ff9080;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.alertBody {
+  font-size: 0.92em;
+  color: #e8c898;
+  line-height: 1.45;
+}
+
+.alertFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-top: 1px solid rgba(170, 106, 48, 0.3);
+  padding-top: 8px;
+}
+
+.recommendation {
+  font-size: 0.85em;
+  color: var(--color-text-dim);
+  font-style: italic;
+  flex: 1;
+}
+
+.actionButton {
+  background: rgba(230, 160, 40, 0.15);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 0.85em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--color-accent);
+    color: #121212;
+  }
+}
+
+.emptyState {
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  padding: 40px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.emptyIcon {
+  font-size: 2.4em;
+  color: #5cb85c;
+  line-height: 1;
+}
+
+.emptyTitle {
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.emptyDescription {
+  margin: 0;
+  font-size: 0.9em;
+  color: var(--color-text-dim);
+  max-width: 560px;
+  line-height: 1.4;
+}

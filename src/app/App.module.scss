@@ -148,6 +148,47 @@
   font-weight: 600;
 }
 
+@keyframes alertTabPulse {
+  0% {
+    box-shadow: 0 0 4px rgba(230, 160, 40, 0.4);
+    border-color: rgba(230, 160, 40, 0.5);
+    color: #ffd88a;
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(245, 166, 35, 0.95), inset 0 0 8px rgba(245, 166, 35, 0.3);
+    border-color: #f5a623;
+    color: #ffffff;
+  }
+  100% {
+    box-shadow: 0 0 4px rgba(230, 160, 40, 0.4);
+    border-color: rgba(230, 160, 40, 0.5);
+    color: #ffd88a;
+  }
+}
+
+.tabPulsing {
+  animation: alertTabPulse 1.6s ease-in-out infinite;
+  border-top-color: #f5a623 !important;
+  font-weight: 600;
+}
+
+.alertBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #d9534f;
+  color: #fff;
+  font-size: 0.72em;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0 5px;
+  margin-left: 6px;
+  min-width: 17px;
+  height: 17px;
+  line-height: 1;
+  vertical-align: middle;
+}
+
 .tabRight {
   margin-left: auto;
 }

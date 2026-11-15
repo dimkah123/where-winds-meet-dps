@@ -5,16 +5,25 @@
   min-height: 0;
   box-sizing: border-box;
   display: flex;
+  flex-direction: column;
   gap: 8px;
   max-height: min(40vh, 320px);
-  padding: 8px 4px 8px 12px;
-  background: #3a2a1a;
-  border: 1px solid #aa6a30;
-  border-radius: 6px;
+  padding: 10px 12px;
+  background: #2b1c10;
+  border: 1px solid #c97a30;
+  border-radius: 8px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
   font-size: 0.85em;
   color: #e8b878;
   animation: slideIn 0.2s ease-out;
+  position: relative;
+}
+
+.topRow {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  justify-content: space-between;
 }
 
 .lines {
@@ -23,6 +32,44 @@
   min-height: 0;
   overflow-y: auto;
   overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(201, 122, 48, 0.25);
+  margin-top: 2px;
+}
+
+.alertsLink {
+  color: #ffd88a;
+  text-decoration: underline;
+  font-weight: 600;
+  font-size: 0.9em;
+  cursor: pointer;
+
+  &:hover {
+    color: #ffffff;
+  }
+}
+
+.dndToastButton {
+  background: rgba(200, 100, 40, 0.2);
+  border: 1px solid #c97a30;
+  color: #ffd88a;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 0.82em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: #c97a30;
+    color: #121212;
+  }
 }
 
 .closeButton {

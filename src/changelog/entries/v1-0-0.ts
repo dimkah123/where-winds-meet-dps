@@ -7,27 +7,27 @@ export const details: ChangelogEntryDetails = {
       items: [
         {
           text: "Exclusive Stonesplit Strength support: calculator is now dedicated to Stonesplit Strength (Mo Dao & Hengdao).",
-          authors: ["Dimka"],
+          authors: ["dimkah123"],
         },
         {
           text: "Interactive Panel Stats: manual stat editing directly in the character panel for instant DPS recalculation.",
-          authors: ["Dimka"],
+          authors: ["dimkah123"],
         },
         {
           text: "'Reset to gear' button in Panel Stats to instantly restore calculated equipment stats.",
-          authors: ["Dimka"],
+          authors: ["dimkah123"],
         },
         {
           text: "Frame-accurate Stonesplit combat rotation featuring Total Annihilation: Soul with exact skill timings.",
-          authors: ["Dimka"],
+          authors: ["dimkah123"],
         },
         {
           text: "Precise animation cancels: Toad cancel, Deflect cancel, and Flute cancel.",
-          authors: ["Dimka"],
+          authors: ["dimkah123"],
         },
         {
           text: "Heirloom gear matching now recognizes any foreign off-spec elemental attack (not only Bellstrike).",
-          authors: ["Dimka"],
+          authors: ["dimkah123"],
         },
       ],
     },
@@ -36,19 +36,19 @@ export const details: ChangelogEntryDetails = {
       items: [
         {
           text: "Default equipment enhancement level increased to 70 across all gear slots.",
-          authors: ["Dimka"],
+          authors: ["dimkah123"],
         },
         {
           text: "Compact dynamic stat input fields with clean integer rounding for Max HP.",
-          authors: ["Dimka"],
+          authors: ["dimkah123"],
         },
         {
           text: "Streamlined interface: hidden obsolete enhancement chances, removed redundant subtitles and external links.",
-          authors: ["Dimka"],
+          authors: ["dimkah123"],
         },
         {
           text: "Hidden all other classes from selectors and pickers to focus strictly on Stonesplit Strength.",
-          authors: ["Dimka"],
+          authors: ["dimkah123"],
         },
       ],
     },
@@ -57,11 +57,11 @@ export const details: ChangelogEntryDetails = {
       items: [
         {
           text: "Fixed stat override propagation so custom values correctly scale DPS and rate formulas in real-time.",
-          authors: ["Dimka"],
+          authors: ["dimkah123"],
         },
         {
           text: "Fixed Anxi Soldier skill rotation timing and cancel chain execution.",
-          authors: ["Dimka"],
+          authors: ["dimkah123"],
         },
       ],
     },
