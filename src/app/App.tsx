@@ -263,7 +263,7 @@ function AppInner() {
     if (!sourceProfile) return
     const copy: StoredProfile = {
       id: newProfileId(),
-      name: `${sourceProfile.name} ${t("app.copy")}`,
+      name: `${sourceProfile.name} ${t("common.copy")}`,
       inputs: sourceProfile.inputs,
     }
     const next: ProfilesState = {

@@ -74,6 +74,8 @@ import { useConfirm } from "../../../components/confirm-dialog/confirmContext"
 import { MultiSelect } from "../../../components/select/MultiSelect"
 import { Select } from "../../../components/select/Select"
 import { TextInput } from "../../../components/text-input/TextInput"
+import { ReadableRotationDialog } from "../readable-rotation-dialog/ReadableRotationDialog"
+import { readableRotationText } from "../readableRotation"
 import styles from "./RotationEditorPanel.module.scss"
 
 interface Props {
@@ -254,6 +256,17 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
   const selectedBuiltin = !isCustom
     ? builtinRotations.find((rotation) => rotation.id === inputs.selectedBuiltinRotationId)
     : undefined
+
+  const [readableDialogOpen, setReadableDialogOpen] = useState(false)
+  const readableRotation = useMemo(() => {
+    if (!activeRotation) return ""
+    return readableRotationText(activeRotation, result, skillsById)
+  }, [activeRotation, result, skillsById])
+  const readableRotationTitle = isCustom
+    ? effectiveName || t("common.unnamed")
+    : activeRotation?.name
+      ? t(rotationKey(activeRotation.id), activeRotation.name)
+      : t("common.unnamed")
 
   const computedDurationSec = result.rotationDuration
 
@@ -534,6 +547,14 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
           <span className={styles.builtinHint}>{selectedBuiltin.description}</span>
         )}
         <div className="spacer" />
+        <button
+          type="button"
+          className="btn"
+          onClick={() => setReadableDialogOpen(true)}
+          disabled={!activeRotation}
+        >
+          {t("rotation.editor.readableFormat")}
+        </button>
         <button type="button" className="btn" onClick={handleNew}>
           + {t("common.new")}
         </button>
@@ -916,6 +937,13 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
           )}
           <div className="hint">{t("rotation.editor.eachStepPicksHint")}</div>
         </div>
+      )}
+      {readableDialogOpen && activeRotation && (
+        <ReadableRotationDialog
+          title={readableRotationTitle}
+          readableText={readableRotation}
+          onClose={() => setReadableDialogOpen(false)}
+        />
       )}
     </div>
   )

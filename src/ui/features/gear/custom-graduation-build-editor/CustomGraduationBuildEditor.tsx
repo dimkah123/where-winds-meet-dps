@@ -216,7 +216,7 @@ export function CustomGraduationBuildEditor({
               className="btn"
               onClick={() => setDraft(draftFrom(classId, build))}
             >
-              {t("app.copy")} {build.name}
+              {t("common.copy")} {build.name}
             </button>
           ))}
           <button type="button" className="btn" onClick={() => fileRef.current?.click()}>

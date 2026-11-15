@@ -266,6 +266,7 @@ export interface Skill {
   id: string
   classId: string
   name: string
+  shortName?: string
   skillType: string
   weaponOrAttribute: string
   attributeAttack: string
