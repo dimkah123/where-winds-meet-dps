@@ -3,66 +3,68 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  max-width: 960px;
+  gap: 10px;
+  max-width: 860px;
   margin: 0 auto;
-  padding: 16px 8px;
+  padding: 12px 6px;
 }
 
 .headerCard {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 16px 20px;
+  border-radius: 6px;
+  padding: 10px 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .headerText {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .title {
   margin: 0;
-  font-size: 1.25em;
+  font-size: 0.9em;
   font-weight: 600;
   color: var(--color-accent);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  letter-spacing: 0.02em;
 }
 
 .badge {
   font-size: 0.7em;
   background: #d9534f;
   color: #fff;
-  padding: 2px 8px;
+  padding: 1px 6px;
   border-radius: 999px;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .description {
   margin: 0;
-  font-size: 0.9em;
+  font-size: 0.76em;
   color: var(--color-text-dim);
 }
 
 .dndButton {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: rgba(230, 160, 40, 0.12);
   border: 1px solid var(--color-accent);
-  border-radius: 6px;
+  border-radius: 4px;
   color: var(--color-accent);
-  font-size: 0.9em;
+  font-size: 0.76em;
   font-weight: 600;
-  padding: 8px 16px;
+  padding: 5px 12px;
   cursor: pointer;
   transition: all 0.15s ease;
 
@@ -76,14 +78,14 @@
 .dndButtonActive {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: rgba(80, 80, 80, 0.3);
   border: 1px solid rgba(160, 160, 160, 0.4);
-  border-radius: 6px;
+  border-radius: 4px;
   color: var(--color-text-dim);
-  font-size: 0.9em;
+  font-size: 0.76em;
   font-weight: 600;
-  padding: 8px 16px;
+  padding: 5px 12px;
   cursor: pointer;
   transition: all 0.15s ease;
 
@@ -95,38 +97,40 @@
 }
 
 .dndIcon {
-  font-size: 1.1em;
+  font-size: 1em;
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .sectionTitle {
   margin: 0;
-  font-size: 1.05em;
+  font-size: 0.8em;
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
 .alertCard {
-  background: #2b1f13;
-  border: 1px solid #aa6a30;
-  border-radius: 8px;
-  padding: 14px 18px;
+  background: #23180e;
+  border: 1px solid #995c25;
+  border-radius: 6px;
+  padding: 10px 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transition: border-color 0.15s;
 
   &:hover {
-    border-color: #e6a028;
+    border-color: #d88e28;
   }
 }
 
@@ -135,11 +139,11 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .skillName {
-  font-size: 1.05em;
+  font-size: 0.85em;
   font-weight: 600;
   color: #ffd88a;
   display: flex;
@@ -148,33 +152,34 @@
 }
 
 .timingTag {
-  font-size: 0.8em;
-  padding: 2px 8px;
-  background: rgba(220, 80, 50, 0.25);
-  border: 1px solid rgba(220, 80, 50, 0.5);
-  color: #ff9080;
-  border-radius: 4px;
+  font-size: 0.72em;
+  padding: 1px 6px;
+  background: rgba(220, 80, 50, 0.22);
+  border: 1px solid rgba(220, 80, 50, 0.45);
+  color: #ff9888;
+  border-radius: 3px;
   font-weight: 600;
 }
 
 .alertBody {
-  font-size: 0.92em;
-  color: #e8c898;
-  line-height: 1.45;
+  font-size: 0.78em;
+  color: #dfbe8e;
+  line-height: 1.4;
 }
 
 .alertFooter {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
-  border-top: 1px solid rgba(170, 106, 48, 0.3);
-  padding-top: 8px;
+  border-top: 1px solid rgba(153, 92, 37, 0.3);
+  padding-top: 6px;
+  margin-top: 2px;
 }
 
 .recommendation {
-  font-size: 0.85em;
+  font-size: 0.72em;
   color: var(--color-text-dim);
   font-style: italic;
   flex: 1;
@@ -185,8 +190,8 @@
   border: 1px solid var(--color-accent);
   color: var(--color-accent);
   border-radius: 4px;
-  padding: 6px 12px;
-  font-size: 0.85em;
+  padding: 3px 10px;
+  font-size: 0.74em;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -201,32 +206,32 @@
 .emptyState {
   background: var(--color-surface);
   border: 1px dashed var(--color-border);
-  border-radius: 8px;
-  padding: 40px 24px;
+  border-radius: 6px;
+  padding: 24px 16px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .emptyIcon {
-  font-size: 2.4em;
+  font-size: 1.6em;
   color: #5cb85c;
   line-height: 1;
 }
 
 .emptyTitle {
   margin: 0;
-  font-size: 1.2em;
+  font-size: 0.9em;
   font-weight: 600;
   color: var(--color-text);
 }
 
 .emptyDescription {
   margin: 0;
-  font-size: 0.9em;
+  font-size: 0.76em;
   color: var(--color-text-dim);
-  max-width: 560px;
+  max-width: 500px;
   line-height: 1.4;
 }
