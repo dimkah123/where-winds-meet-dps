@@ -344,6 +344,8 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
   const warnings: string[] = []
   const invalidStepIds: string[] = []
   const invalidStepReasons: Record<string, ConditionFailureReason[]> = {}
+  const fallbackStepIds: string[] = []
+  const fallbackSkillsWarned = new Set<string>()
 
   interface CastRecord {
     resolved: ResolvedStep
@@ -360,6 +362,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
     // same way `hitLandingFrame` itself is shared rather than reimplemented.
     midCastExtraFrames: number
     hitDistanceMeters: HitDistance
+    fallbackFromSkillId?: string
   }
 
   const openingBuffsById = new Map(buffs.map((b) => [b.id, b] as const))
@@ -1743,6 +1746,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
     writtenDistance: number | null
     current: Skill
     gateIndex: number
+    fallbackFromSkillId?: string
   }
 
   function scheduleCastStart(stepIndex: number, cursor: number): void {
@@ -1809,20 +1813,28 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
         !hasBuffEngineSource(condition) && !readsLateMeter(condition) && !holdsHere(condition),
     )
     const breakthroughFloorForStep = breakthroughFloor(resolvedStep.skill, inputs.breakthrough)
+    let fallbackFromSkillId: string | undefined
     if (failedCastConditions.length > 0 || breakthroughFloorForStep !== null) {
       const fallback =
         breakthroughFloorForStep === null && resolvedStep.skill.fallbackSkillId
           ? skillsById.get(resolvedStep.skill.fallbackSkillId)
           : undefined
       if (fallback) {
-        const reasons: ConditionFailureReason[] = failedCastConditions.map((condition) =>
-          describeConditionFailure(condition, startFrame),
-        )
-        recordTimedWarning(
-          startFrame,
-          (relSec) =>
-            `${resolvedStep.skill.name || resolvedStep.skill.id} at ${relSec.toFixed(2)}s: calculated damage is too low for rotation timing — ${reasons.map(englishConditionFailure).join(" and ")}; used ${fallback.name || fallback.id} instead.`,
-        )
+        if (!fallbackStepIds.includes(resolvedStep.step.id)) {
+          fallbackStepIds.push(resolvedStep.step.id)
+        }
+        if (!fallbackSkillsWarned.has(resolvedStep.skill.id)) {
+          fallbackSkillsWarned.add(resolvedStep.skill.id)
+          const reasons: ConditionFailureReason[] = failedCastConditions.map((condition) =>
+            describeConditionFailure(condition, startFrame),
+          )
+          recordTimedWarning(
+            startFrame,
+            (relSec) =>
+              `${resolvedStep.skill.name || resolvedStep.skill.id} at ${relSec.toFixed(2)}s: calculated damage is too low for rotation timing — ${reasons.map(englishConditionFailure).join(" and ")}; used ${fallback.name || fallback.id} instead.`,
+          )
+        }
+        fallbackFromSkillId = resolvedStep.skill.id
         resolvedStep = { step: resolvedStep.step, skill: fallback }
         const fbWeapon = weaponTagOf(fallback)
         if (fbWeapon && fbWeapon !== drawnWeapon) {
@@ -1870,6 +1882,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
       writtenDistance: null,
       current: resolvedStep.skill,
       gateIndex: 0,
+      fallbackFromSkillId,
     }
     if (!prePull && (resolvedStep.skill.releaseGates?.length ?? 0) > 0) {
       writeCastDistance(cast, resolvedStep.skill)
@@ -2016,6 +2029,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
       meterMarkAtStart: cast.meterMarkAtStart,
       midCastExtraFrames,
       hitDistanceMeters,
+      fallbackFromSkillId: cast.fallbackFromSkillId,
     })
     walkCastStart({
       skill: castResolution.skill,
@@ -2385,6 +2399,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
         inWindow: inWindow(castRecord.startFrame),
         prePull: castRecord.prePull,
         attachedToStepId: deflectCancelAttachedToStepId.get(castRecord.resolved.step.id),
+        fallbackFromSkillId: castRecord.fallbackFromSkillId,
         buffs,
         meterLevels:
           (classDef?.meters ?? []).length > 0
@@ -3600,6 +3615,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
     warnings,
     ...(qiEdgeWarnings.length > 0 ? { qiEdgeWarnings } : {}),
     ...(invalidStepIds.length > 0 ? { invalidStepIds } : {}),
+    ...(fallbackStepIds.length > 0 ? { fallbackStepIds } : {}),
     ...(Object.keys(invalidStepReasons).length > 0 ? { invalidStepReasons } : {}),
     timeline: reportedTimeline,
     buffWindows,

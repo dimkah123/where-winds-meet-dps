@@ -2414,6 +2414,8 @@
   "rotation.dpsGraph.rotationDps": "Rotation DPS",
   "rotation.editor.addSkill": "Add skill",
   "rotation.editor.addSkillAfterThisLine": "Add skill after this line",
+  "rotation.editor.autoFallback": "Auto-Fallback 🔄",
+  "rotation.editor.autoFallbackTitle": "Forgetfulness was on cooldown; automatically cast standard charged attack instead.",
   "rotation.editor.charges": "Charges",
   "rotation.editor.computedBreak": "Computed break",
   "rotation.editor.computedFirstBreakNone": "No break",

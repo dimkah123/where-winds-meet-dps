@@ -445,6 +445,7 @@ export interface Result {
   qiEdgeWarnings?: QiEdgeWarning[]
   invalidStepIds?: string[]
   invalidStepReasons?: Record<string, import("./skill").ConditionFailureReason[]>
+  fallbackStepIds?: string[]
   timeline?: TimelineEvent[]
   buffWindows?: BuffWindow[]
   qiBreakWindow?: { startSec: number; endSec: number } | null
@@ -499,6 +500,8 @@ export interface RotationCast {
   // Set on an automatic Deflect Cancel: the `stepId` of the cancel-form cast
   // it is attached to — docs/TIMELINE.md § "Identity and tags".
   attachedToStepId?: string
+  // Set on an automatic fallback cast (e.g. SnowpartingCharged[Forgetfulness] -> SnowpartingCharged)
+  fallbackFromSkillId?: string
 }
 
 export interface SkillTickResult {

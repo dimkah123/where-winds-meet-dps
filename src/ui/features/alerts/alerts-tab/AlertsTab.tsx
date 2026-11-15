@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import type { QiEdgeWarning, Result } from "../../../../engine/types"
 import { useI18n } from "../../../../i18n/i18nContext"
@@ -28,7 +29,19 @@ export function AlertsTab({
 
   const warnings = result.warnings
   const qiEdgeWarnings = result.qiEdgeWarnings ?? []
-  const totalAlerts = warnings.length + qiEdgeWarnings.length
+  const uniqueWarnings = useMemo(() => {
+    const seen = new Set<string>()
+    return warnings.filter((w) => {
+      const key = w.includes("calculated damage is too low for rotation timing")
+        ? "fallback-damage-low"
+        : w
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+  }, [warnings])
+  const totalAlerts = uniqueWarnings.length + qiEdgeWarnings.length
+  const fallbackCount = result.fallbackStepIds?.length ?? 0
 
   return (
     <div className={styles.container}>
@@ -104,13 +117,13 @@ export function AlertsTab({
             </div>
           )}
 
-          {warnings.length > 0 && (
+          {uniqueWarnings.length > 0 && (
             <div className={styles.section}>
               <h3 className={styles.sectionTitle}>
                 <span>⚠️</span>
                 <span>{t("alerts.generalWarningsTitle")}</span>
               </h3>
-              {warnings.map((warning: string, index: number) => {
+              {uniqueWarnings.map((warning: string, index: number) => {
                 if (warning.includes("calculated damage is too low for rotation timing")) {
                   return (
                     <div key={index} className={styles.alertCard}>
@@ -121,6 +134,7 @@ export function AlertsTab({
                         </span>
                         <span className={styles.timingTag}>
                           {t("alerts.damageLowTag")}
+                          {fallbackCount > 1 ? ` (${fallbackCount}×)` : ""}
                         </span>
                       </div>
                       <div className={styles.alertBody}>

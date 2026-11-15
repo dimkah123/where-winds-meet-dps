@@ -102,6 +102,15 @@
   border-color: #553030;
 }
 
+.entryFallback {
+  border-color: rgba(229, 154, 59, 0.4);
+  background: rgba(229, 154, 59, 0.05);
+}
+
+.entryFallback .time {
+  color: #e59a3b;
+}
+
 .entryAttached {
   margin-left: 24px;
   opacity: 0.75;
@@ -111,12 +120,34 @@
   color: #c87878;
 }
 
+.skillStaticWrap,
+.skillInputWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
 .skillStatic {
   color: #ddd;
   font-size: 0.88em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.fallbackBadge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(229, 154, 59, 0.16);
+  border: 1px solid rgba(229, 154, 59, 0.55);
+  color: #f0a855;
+  font-size: 0.72em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
 }
 
 .buffsCell {

@@ -323,7 +323,18 @@ function AppInner() {
     })
   }, [])
 
-  const activeAlertsCount = result.warnings.length + (result.qiEdgeWarnings?.length ?? 0)
+  const uniqueWarningsCount = useMemo(() => {
+    const seen = new Set<string>()
+    return result.warnings.filter((w) => {
+      const key = w.includes("calculated damage is too low for rotation timing")
+        ? "fallback-damage-low"
+        : w
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    }).length
+  }, [result.warnings])
+  const activeAlertsCount = uniqueWarningsCount + (result.qiEdgeWarnings?.length ?? 0)
   const hasAlerts = activeAlertsCount > 0
   const shouldPulseAlertsTab = hasAlerts && !isAlertsDnd && pathname !== "/alerts"
 

@@ -244,6 +244,14 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
     return resolveRotation(activeRotation, classSkills, [...classBuffs, ...classDebuffs]).warnings
   }, [isCustom, activeRotation, classSkills, classBuffs, classDebuffs])
 
+  const allWarnings = useMemo(() => {
+    const list = [...diagnostics]
+    for (const w of result.warnings) {
+      if (!list.includes(w)) list.push(w)
+    }
+    return list
+  }, [diagnostics, result.warnings])
+
   const castsByStepId = useMemo(() => {
     const map = new Map<string, RotationCast>()
     for (const cast of result.casts ?? []) map.set(cast.stepId, cast)
@@ -271,6 +279,10 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
     [result.invalidStepIds],
   )
   const invalidStepReasons = result.invalidStepReasons ?? {}
+  const fallbackStepIds = useMemo(
+    () => new Set(result.fallbackStepIds ?? []),
+    [result.fallbackStepIds],
+  )
 
   const hiddenBuffIds = useMemo(() => hiddenTimelineBuffIds(inputs.classId), [inputs.classId])
   const buffOrder = useMemo(
@@ -679,6 +691,7 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
                   ? `${t("rotation.editor.invalidInGameTitle")} ${conditionFailureReasonsText(invalidReasons, t)}`
                   : t("rotation.editor.invalidInGameTitle")
                 : undefined
+              const isFallback = fallbackStepIds.has(step.id)
               const shownBuffs = cast ? visibleCastBuffs(cast.buffs, hiddenBuffIds, buffOrder) : []
               const attachedCast = attachedCastsByParentStepId.get(step.id)
               const qiCell = qiCellOf(cast)
@@ -689,25 +702,52 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
                     className={
                       styles.entry +
                       (isCustom ? "" : ` ${styles.entryReadonly}`) +
-                      (invalid ? ` ${styles.entryInvalid}` : "")
+                      (invalid ? ` ${styles.entryInvalid}` : "") +
+                      (isFallback && !invalid ? ` ${styles.entryFallback}` : "")
                     }
                   >
                     <div className={styles.idx}>{idx + 1}</div>
-                    <span className={styles.time} title={invalidTitle}>
+                    <span
+                      className={styles.time}
+                      title={
+                        invalidTitle ??
+                        (isFallback ? t("rotation.editor.autoFallbackTitle") : undefined)
+                      }
+                    >
                       {cast ? `${fightClockSec(result, cast.timeSec).toFixed(2)}s` : "—"}
-                      {invalid ? " ⚠" : ""}
+                      {invalid ? " ⚠" : isFallback ? " 🔄" : ""}
                     </span>
                     {isCustom ? (
-                      <Combobox
-                        value={step.skillId}
-                        options={skillOpts}
-                        onChange={(skillId) => updateStep(idx, { skillId })}
-                        placeholder={t("rotation.editor.selectSkill")}
-                      />
+                      <div className={styles.skillInputWrap}>
+                        <Combobox
+                          value={step.skillId}
+                          options={skillOpts}
+                          onChange={(skillId) => updateStep(idx, { skillId })}
+                          placeholder={t("rotation.editor.selectSkill")}
+                        />
+                        {isFallback && (
+                          <span
+                            className={styles.fallbackBadge}
+                            title={t("rotation.editor.autoFallbackTitle")}
+                          >
+                            {t("rotation.editor.autoFallback")}
+                          </span>
+                        )}
+                      </div>
                     ) : (
-                      <span className={styles.skillStatic}>
-                        {skill ? t(skillKey(skill), skill.name) : step.skillId}
-                      </span>
+                      <div className={styles.skillStaticWrap}>
+                        <span className={styles.skillStatic}>
+                          {skill ? t(skillKey(skill), skill.name) : step.skillId}
+                        </span>
+                        {isFallback && (
+                          <span
+                            className={styles.fallbackBadge}
+                            title={t("rotation.editor.autoFallbackTitle")}
+                          >
+                            {t("rotation.editor.autoFallback")}
+                          </span>
+                        )}
+                      </div>
                     )}
                     <span className={styles.castReadonly}>
                       {maxHits} {t("common.hits")}
@@ -849,9 +889,9 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
             )
           )}
 
-          {diagnostics.length > 0 && (
+          {allWarnings.length > 0 && (
             <div className="warnings">
-              {diagnostics.map((warning, index) => (
+              {allWarnings.map((warning, index) => (
                 <div key={index}>⚠ {warning}</div>
               ))}
             </div>

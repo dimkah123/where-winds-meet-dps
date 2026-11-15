@@ -2414,6 +2414,8 @@
   "rotation.dpsGraph.rotationDps": "循环 DPS",
   "rotation.editor.addSkill": "添加技能",
   "rotation.editor.addSkillAfterThisLine": "在此行后添加技能",
+  "rotation.editor.autoFallback": "自动回退 🔄",
+  "rotation.editor.autoFallbackTitle": "忘念（Forgetfulness）仍在冷却中，已自动执行普通蓄力。",
   "rotation.editor.charges": "层数",
   "rotation.editor.computedBreak": "计算的气竭",
   "rotation.editor.computedFirstBreakNone": "无气竭",
