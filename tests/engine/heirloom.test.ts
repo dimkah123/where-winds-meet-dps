@@ -8,7 +8,7 @@ import type { GearPiece, GearWordId } from "../../src/engine/types"
 import { GEAR_SLOTS } from "../../src/engine/types"
 
 const MULTI_BUILD_CLASS = "bellstrikeUmbra"
-const SINGLE_BUILD_CLASS = "stonesplitStrength"
+const SINGLE_BUILD_CLASS = "bellstrikeSplendor"
 
 function helmOf(classId: string): GearPiece {
   return classDefinition(classId)!.graduationBuilds[0].gear.find((piece) => piece.slot === "helm")!
@@ -385,5 +385,28 @@ describe("heirloom — foreign attribute attack matching", () => {
       currentWord: "power",
       word: "foreignAttributeAttack",
     })
+  })
+
+  it("recognizes stonesplit weapons carrying maxFormless as heirlooms matching Min Build", () => {
+    const minBuild = classDefinition("stonesplitStrength")!.graduationBuilds.find(
+      (b) => b.name === "Min Build",
+    )!
+    const weapon = minBuild.gear.find((p) => p.slot === "leftWeapon")!
+    expect(weapon.words.map((w) => w.word)).toContain("maxFormless")
+    expect(weapon.words.map((w) => w.word)).not.toContain("maxStonesplit")
+
+    const userWeapon = pieceFrom(weapon, [
+      "minPhys",
+      "agility",
+      "modaoBoost",
+      "maxFormless",
+      "minPhys",
+    ])
+    expect(
+      isHeirloom(userWeapon, {
+        classId: "stonesplitStrength",
+        graduationBuildId: minBuild.id,
+      }),
+    ).toBe(true)
   })
 })

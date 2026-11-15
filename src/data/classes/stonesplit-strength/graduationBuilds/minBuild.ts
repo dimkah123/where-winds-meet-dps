@@ -13,13 +13,13 @@ export default defineGraduationBuild({
     createGraduationGearPiece({
       idPrefix,
       slot: "leftWeapon",
-      words: ["minPhys", "agility", "maxStonesplit", "minPhys", "modaoBoost"],
+      words: ["minPhys", "agility", "maxFormless", "minPhys", "modaoBoost"],
       attunement: "physPen",
     }),
     createGraduationGearPiece({
       idPrefix,
       slot: "rightWeapon",
-      words: ["minPhys", "agility", "maxStonesplit", "crit", "minPhys"],
+      words: ["minPhys", "agility", "maxFormless", "crit", "minPhys"],
       attunement: "physPen",
     }),
     createGraduationGearPiece({
