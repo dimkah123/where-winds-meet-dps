@@ -6,6 +6,18 @@ export const details: ChangelogEntryDetails = {
       label: "Added",
       items: [
         {
+          text: "Pure Heng build archetype alongside Mix Build in Setup Wizard and Graduation selector.",
+          authors: ["dimkah123"],
+        },
+        {
+          text: "Pure Heng Max Build and Pure Heng Min Build godroll equipment specifications with full attunements.",
+          authors: ["dimkah123"],
+        },
+        {
+          text: "Pure Heng 1-minute combat rotation with precise skill timings, Flute cancels, and Toad cancels.",
+          authors: ["dimkah123"],
+        },
+        {
           text: "Max Build graduation: full godroll gear spec with optimal attunements and stat lines.",
           authors: ["dimkah123"],
         },

@@ -151,7 +151,7 @@ export function defaultGraduationBuildId(classId: string): string | null {
 }
 
 export function repairGraduationBuildId(classId: string, stored: unknown): string | null {
-  const fallback = defaultGraduationBuildId(classId)
+  const fallback = soleGraduationBuildId(classId)
   if (typeof stored !== "string" || stored === "") return fallback
   const known = allGraduationBuilds().find((build) => build.id === stored)
   return known && known.classId !== classId ? fallback : stored

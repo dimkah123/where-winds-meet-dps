@@ -34,9 +34,7 @@ describe("SetupWizard", () => {
   it("step 1 shows the class picker, and Next lands on the gear import step", () => {
     renderWizard()
 
-    fireEvent.click(
-      screen.getByRole("button", { name: new RegExp(CURRENT_CLASS.displayName) }),
-    )
+    fireEvent.click(screen.getByRole("button", { name: /Mix Build/i }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
     expect(screen.getByText("Import your gear")).toBeInTheDocument()
@@ -45,9 +43,7 @@ describe("SetupWizard", () => {
   it("the manual button leads to a name step, and finishing there reports the typed name and chosen class", () => {
     const onFinish = renderWizard()
 
-    fireEvent.click(
-      screen.getByRole("button", { name: new RegExp(CURRENT_CLASS.displayName) }),
-    )
+    fireEvent.click(screen.getByRole("button", { name: /Mix Build/i }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     fireEvent.click(screen.getByRole("button", { name: "I'd rather do it manually" }))
 

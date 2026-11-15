@@ -1,7 +1,6 @@
-import { SELECTABLE_CLASS_DEFS, classDefinition } from "../../../../definitions/classes/registry"
-import { graduationBuildsFor } from "../../../../definitions/graduationBuilds/registry"
+import { classDefinition } from "../../../../definitions/classes/registry"
 import { useI18n } from "../../../../i18n/i18nContext"
-import { classKey, graduationBuildKey, martialArtKey } from "../../../../i18n/contentKeys"
+import { martialArtKey } from "../../../../i18n/contentKeys"
 import styles from "./ClassPicker.module.scss"
 
 interface Props {
@@ -11,25 +10,72 @@ interface Props {
   onSelectBuild?: (buildId: string) => void
 }
 
+interface ArchetypeOption {
+  id: "mix" | "pureHeng"
+  nameKey: string
+  defaultName: string
+  maxBuildId: string
+  minBuildId: string
+}
+
+const ARCHETYPES: readonly ArchetypeOption[] = [
+  {
+    id: "mix",
+    nameKey: "setup.archetype.mix",
+    defaultName: "Mix Build",
+    maxBuildId: "graduation-stonesplitStrength-max-build",
+    minBuildId: "graduation-stonesplitStrength-cleftpeak-crit",
+  },
+  {
+    id: "pureHeng",
+    nameKey: "setup.archetype.pureHeng",
+    defaultName: "Pure Heng",
+    maxBuildId: "graduation-stonesplitStrength-pureHeng-max-build",
+    minBuildId: "graduation-stonesplitStrength-pureHeng-min-build",
+  },
+]
+
 export function ClassPicker({ value, onChange, selectedBuildId, onSelectBuild }: Props) {
   const { t } = useI18n()
-  const classDefs = SELECTABLE_CLASS_DEFS()
-  const builds = graduationBuildsFor(value)
+  const currentClassDef = classDefinition(value || "stonesplitStrength")
+  const martialArts = currentClassDef?.martialArts ?? []
+  const icon = martialArts.find((martialArt) => martialArt.icon)?.icon
+
+  const isPureHeng =
+    selectedBuildId === "graduation-stonesplitStrength-pureHeng-max-build" ||
+    selectedBuildId === "graduation-stonesplitStrength-pureHeng-min-build"
+
+  const currentArchetypeId = isPureHeng ? "pureHeng" : "mix"
+  const currentArchetype =
+    ARCHETYPES.find((arch) => arch.id === currentArchetypeId) ?? ARCHETYPES[0]
+
+  const isMin =
+    selectedBuildId === "graduation-stonesplitStrength-cleftpeak-crit" ||
+    selectedBuildId === "graduation-stonesplitStrength-pureHeng-min-build"
+
+  function handleSelectArchetype(arch: ArchetypeOption) {
+    onChange("stonesplitStrength")
+    const nextBuildId = isMin ? arch.minBuildId : arch.maxBuildId
+    onSelectBuild?.(nextBuildId)
+  }
+
+  function handleSelectVariant(variant: "max" | "min") {
+    const nextBuildId = variant === "min" ? currentArchetype.minBuildId : currentArchetype.maxBuildId
+    onSelectBuild?.(nextBuildId)
+  }
 
   return (
     <div className={styles.pickerRoot}>
       <div className={styles.classTileContainer}>
-        {classDefs.map((classDef) => {
-          const martialArts = classDefinition(classDef.id)!.martialArts
-          const icon = martialArts.find((martialArt) => martialArt.icon)?.icon
-          const selected = classDef.id === value
+        {ARCHETYPES.map((arch) => {
+          const isSelected = arch.id === currentArchetypeId
           return (
             <button
               type="button"
-              key={classDef.id}
-              className={styles.tile + (selected ? ` ${styles.selected}` : "")}
-              aria-current={selected}
-              onClick={() => onChange(classDef.id)}
+              key={arch.id}
+              className={styles.tile + (isSelected ? ` ${styles.selected}` : "")}
+              aria-current={isSelected}
+              onClick={() => handleSelectArchetype(arch)}
             >
               {icon ? (
                 <img className={styles.icon} src={icon} alt="" />
@@ -38,9 +84,7 @@ export function ClassPicker({ value, onChange, selectedBuildId, onSelectBuild }:
               )}
               <div className={styles.info}>
                 <div className={styles.nameRow}>
-                  <span className={styles.name}>
-                    {t(classKey(classDef.id), classDef.displayName)}
-                  </span>
+                  <span className={styles.name}>{t(arch.nameKey, arch.defaultName)}</span>
                 </div>
                 {martialArts.map((martialArt, index) => (
                   <div key={martialArt.id} className={styles.weaponRow}>
@@ -58,40 +102,43 @@ export function ClassPicker({ value, onChange, selectedBuildId, onSelectBuild }:
         })}
       </div>
 
-      {builds.length > 0 && (
-        <div className={styles.buildPickerSection}>
-          <div className={styles.buildGrid}>
-            {builds.map((build) => {
-              const isSelected = selectedBuildId
-                ? build.id === selectedBuildId
-                : build.id === builds[0]?.id
-              return (
-                <button
-                  type="button"
-                  key={build.id}
-                  className={`${styles.buildTile} ${isSelected ? styles.buildSelected : ""}`}
-                  onClick={() => onSelectBuild?.(build.id)}
-                  aria-current={isSelected}
-                >
-                  <span className={styles.buildRadio}>
-                    <span
-                      className={`${styles.radioDot} ${isSelected ? styles.radioDotSelected : ""}`}
-                    />
-                    <span className={styles.buildName}>
-                      {t(graduationBuildKey(build.id), build.name)}
-                    </span>
-                  </span>
-                  {isSelected && (
-                    <span className={styles.buildFollowing}>
-                      {t("gear.graduationBuildPicker.following")}
-                    </span>
-                  )}
-                </button>
-              )
-            })}
-          </div>
+      <div className={styles.buildPickerSection}>
+        <div className={styles.buildGrid}>
+          <button
+            type="button"
+            className={`${styles.buildTile} ${!isMin ? styles.buildSelected : ""}`}
+            onClick={() => handleSelectVariant("max")}
+            aria-current={!isMin}
+          >
+            <span className={styles.buildRadio}>
+              <span className={`${styles.radioDot} ${!isMin ? styles.radioDotSelected : ""}`} />
+              <span className={styles.buildName}>{t("setup.wizard.maxBuild", "Max Build")}</span>
+            </span>
+            {!isMin && (
+              <span className={styles.buildFollowing}>
+                {t("gear.graduationBuildPicker.following")}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            className={`${styles.buildTile} ${isMin ? styles.buildSelected : ""}`}
+            onClick={() => handleSelectVariant("min")}
+            aria-current={isMin}
+          >
+            <span className={styles.buildRadio}>
+              <span className={`${styles.radioDot} ${isMin ? styles.radioDotSelected : ""}`} />
+              <span className={styles.buildName}>{t("setup.wizard.minBuild", "Min Build")}</span>
+            </span>
+            {isMin && (
+              <span className={styles.buildFollowing}>
+                {t("gear.graduationBuildPicker.following")}
+              </span>
+            )}
+          </button>
         </div>
-      )}
+      </div>
     </div>
   )
 }

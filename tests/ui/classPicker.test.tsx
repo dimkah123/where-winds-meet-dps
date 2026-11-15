@@ -2,94 +2,114 @@ import { describe, it, expect, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
 import { ClassPicker } from "../../src/ui/features/setup/class-picker/ClassPicker"
 import { I18nProvider } from "../../src/i18n/I18nProvider"
-import { SELECTABLE_CLASS_DEFS, classDefinition } from "../../src/definitions/classes/registry"
+import { classDefinition } from "../../src/definitions/classes/registry"
 
 describe("ClassPicker", () => {
-  it("offers one tile per registered class, and each names its martial arts", () => {
-    const classDefs = SELECTABLE_CLASS_DEFS()
+  it("offers Mix Build and Pure Heng tiles, and each names the martial arts", () => {
     render(
       <I18nProvider>
-        <ClassPicker value={classDefs[0].id} onChange={() => {}} />
+        <ClassPicker value="stonesplitStrength" onChange={() => {}} />
       </I18nProvider>,
     )
 
-    for (const classDef of classDefs) {
-      const martialArts = classDefinition(classDef.id)!.martialArts
-      const tile = screen.getByRole("button", {
-        name: new RegExp(classDef.displayName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
-      })
-      for (const martialArt of martialArts) {
-        expect(tile).toHaveTextContent(martialArt.name)
-      }
+    const mixTile = screen.getByRole("button", { name: /Mix Build/i })
+    const pureHengTile = screen.getByRole("button", { name: /Pure Heng/i })
+    expect(mixTile).toBeInTheDocument()
+    expect(pureHengTile).toBeInTheDocument()
+
+    const martialArts = classDefinition("stonesplitStrength")!.martialArts
+    for (const martialArt of martialArts) {
+      expect(mixTile).toHaveTextContent(martialArt.name)
+      expect(pureHengTile).toHaveTextContent(martialArt.name)
     }
   })
 
-  it("clicking a tile reports that class's id", () => {
+  it("clicking an archetype tile reports class id and selects corresponding build", () => {
     const onChange = vi.fn()
-    const classDefs = SELECTABLE_CLASS_DEFS()
-    render(
-      <I18nProvider>
-        <ClassPicker value={classDefs[0].id} onChange={onChange} />
-      </I18nProvider>,
-    )
-
-    const target = classDefs[0]
-    screen.getByRole("button", { name: new RegExp(target.displayName) }).click()
-    expect(onChange).toHaveBeenCalledWith(target.id)
-  })
-
-  it("marks the selected class's tile as current", () => {
-    const classDefs = SELECTABLE_CLASS_DEFS()
-    render(
-      <I18nProvider>
-        <ClassPicker value={classDefs[0].id} onChange={() => {}} />
-      </I18nProvider>,
-    )
-
-    const selectedTile = screen.getByRole("button", { name: new RegExp(classDefs[0].displayName) })
-    expect(selectedTile).toHaveAttribute("aria-current", "true")
-
-    if (classDefs.length > 1) {
-      const otherTile = screen.getByRole("button", { name: new RegExp(classDefs[1].displayName) })
-      expect(otherTile).toHaveAttribute("aria-current", "false")
-    }
-  })
-
-  it("offers Min Build and Max Build options instead of the external link", () => {
     const onSelectBuild = vi.fn()
     render(
       <I18nProvider>
         <ClassPicker
-          value={SELECTABLE_CLASS_DEFS()[0].id}
+          value="stonesplitStrength"
+          selectedBuildId="graduation-stonesplitStrength-max-build"
+          onChange={onChange}
+          onSelectBuild={onSelectBuild}
+        />
+      </I18nProvider>,
+    )
+
+    screen.getByRole("button", { name: /Pure Heng/i }).click()
+    expect(onChange).toHaveBeenCalledWith("stonesplitStrength")
+    expect(onSelectBuild).toHaveBeenCalledWith("graduation-stonesplitStrength-pureHeng-max-build")
+  })
+
+  it("marks the active archetype tile as current", () => {
+    const { rerender } = render(
+      <I18nProvider>
+        <ClassPicker
+          value="stonesplitStrength"
+          selectedBuildId="graduation-stonesplitStrength-max-build"
+          onChange={() => {}}
+        />
+      </I18nProvider>,
+    )
+
+    const mixTile = screen.getByRole("button", { name: /Mix Build/i })
+    const pureHengTile = screen.getByRole("button", { name: /Pure Heng/i })
+    expect(mixTile).toHaveAttribute("aria-current", "true")
+    expect(pureHengTile).toHaveAttribute("aria-current", "false")
+
+    rerender(
+      <I18nProvider>
+        <ClassPicker
+          value="stonesplitStrength"
+          selectedBuildId="graduation-stonesplitStrength-pureHeng-min-build"
+          onChange={() => {}}
+        />
+      </I18nProvider>,
+    )
+
+    expect(mixTile).toHaveAttribute("aria-current", "false")
+    expect(pureHengTile).toHaveAttribute("aria-current", "true")
+  })
+
+  it("offers Min Build and Max Build options for Mix Build", () => {
+    const onSelectBuild = vi.fn()
+    render(
+      <I18nProvider>
+        <ClassPicker
+          value="stonesplitStrength"
+          selectedBuildId="graduation-stonesplitStrength-max-build"
           onChange={() => {}}
           onSelectBuild={onSelectBuild}
         />
       </I18nProvider>,
     )
 
-    expect(screen.queryByRole("link")).not.toBeInTheDocument()
     const minBuildBtn = screen.getByRole("button", { name: /Min Build/i })
     const maxBuildBtn = screen.getByRole("button", { name: /Max Build/i })
     expect(minBuildBtn).toBeInTheDocument()
     expect(maxBuildBtn).toBeInTheDocument()
 
-    maxBuildBtn.click()
-    expect(onSelectBuild).toHaveBeenCalledWith("graduation-stonesplitStrength-max-build")
+    minBuildBtn.click()
+    expect(onSelectBuild).toHaveBeenCalledWith("graduation-stonesplitStrength-cleftpeak-crit")
   })
 
-  it("badges every unvalidated class as WIP, and no validated one", () => {
+  it("offers Min Build and Max Build options for Pure Heng", () => {
+    const onSelectBuild = vi.fn()
     render(
       <I18nProvider>
-        <ClassPicker value={SELECTABLE_CLASS_DEFS()[0].id} onChange={() => {}} />
+        <ClassPicker
+          value="stonesplitStrength"
+          selectedBuildId="graduation-stonesplitStrength-pureHeng-max-build"
+          onChange={() => {}}
+          onSelectBuild={onSelectBuild}
+        />
       </I18nProvider>,
     )
 
-    for (const classDef of SELECTABLE_CLASS_DEFS()) {
-      const tile = screen.getByRole("button", {
-        name: new RegExp(classDef.displayName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
-      })
-      if (classDef.validated) expect(tile).not.toHaveTextContent("WIP")
-      else expect(tile).toHaveTextContent("WIP")
-    }
+    const minBuildBtn = screen.getByRole("button", { name: /Min Build/i })
+    minBuildBtn.click()
+    expect(onSelectBuild).toHaveBeenCalledWith("graduation-stonesplitStrength-pureHeng-min-build")
   })
 })

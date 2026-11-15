@@ -34,7 +34,7 @@ import {
 } from "../../src/engine/types"
 
 const GRADUATION_LEVEL: GearLevel = 96
-const SINGLE_BUILD_CLASS = "stonesplitStrength"
+const SINGLE_BUILD_CLASS = "bellstrikeSplendor"
 
 const BUILDS = CLASS_DEFS().flatMap((classDef) =>
   classDefinition(classDef.id)!.graduationBuilds.map(
