@@ -19,7 +19,8 @@ describe("readableRotation", () => {
     )
 
     const text = readableRotationText(rotation, result, skillsById)
-    expect(text).toContain("Mo Special at")
+    expect(text).not.toContain(" at ")
+    expect(text).toContain("Mo Special >")
     expect(text).toContain("Heng Special (start")
     expect(text).toContain("Mo Charged")
     expect(text).toContain("Mo QQ")

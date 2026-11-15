@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react"
+import { useId, useState } from "react"
 import { Dialog, DialogBody, DialogFooter, DialogHeader } from "../../../components/dialog/Dialog"
 import { useI18n } from "../../../../i18n/i18nContext"
 import styles from "./ReadableRotationDialog.module.scss"
@@ -12,26 +12,26 @@ interface Props {
 export function ReadableRotationDialog({ title, readableText, onClose }: Props) {
   const { t } = useI18n()
   const titleId = useId()
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [copyStatus, setCopyStatus] = useState("")
-
-  useEffect(() => {
-    textareaRef.current?.focus()
-    textareaRef.current?.select()
-  }, [])
 
   async function handleCopy() {
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(readableText)
       } else {
-        textareaRef.current?.select()
+        const temp = document.createElement("textarea")
+        temp.value = readableText
+        temp.style.position = "fixed"
+        temp.style.opacity = "0"
+        document.body.appendChild(temp)
+        temp.select()
         document.execCommand("copy")
+        document.body.removeChild(temp)
       }
       setCopyStatus(t("rotation.editor.copied"))
       setTimeout(() => setCopyStatus(""), 3000)
     } catch {
-      textareaRef.current?.select()
+      // Ignored
     }
   }
 
@@ -58,12 +58,10 @@ export function ReadableRotationDialog({ title, readableText, onClose }: Props) 
       </DialogHeader>
       <DialogBody className={styles.body}>
         <textarea
-          ref={textareaRef}
           readOnly
           value={readableText}
           className={styles.textarea}
           aria-label={t("rotation.editor.readableFormat")}
-          onFocus={(e) => e.currentTarget.select()}
         />
       </DialogBody>
       <DialogFooter>

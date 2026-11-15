@@ -24,7 +24,9 @@ describe("ReadableRotationDialog", () => {
     expect(screen.getByText("READABLE FORMAT")).toBeInTheDocument()
     expect(screen.getByText("Mixed Dummy 1 Min")).toBeInTheDocument()
     expect(
-      screen.getByText("Skills before the start use a rounded pre-fight countdown in 0.5-second increments."),
+      screen.getByText(
+        "(start) marks fight start, (break) marks Qi break. Consecutive skills are grouped with xN.",
+      ),
     ).toBeInTheDocument()
 
     const textarea = screen.getByLabelText("Readable format") as HTMLTextAreaElement

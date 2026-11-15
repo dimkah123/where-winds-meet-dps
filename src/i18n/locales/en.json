@@ -2453,7 +2453,7 @@
   "rotation.editor.qiLedgerRefill": "Refill",
   "rotation.editor.readableFormat": "Readable format",
   "rotation.editor.readableFormatKicker": "READABLE FORMAT",
-  "rotation.editor.readableFormatSubtitle": "Skills before the start use a rounded pre-fight countdown in 0.5-second increments.",
+  "rotation.editor.readableFormatSubtitle": "(start) marks fight start, (break) marks Qi break. Consecutive skills are grouped with xN.",
   "rotation.editor.reasonActive": "active",
   "rotation.editor.reasonAnd": "and",
   "rotation.editor.reasonDrawn": "drawn",

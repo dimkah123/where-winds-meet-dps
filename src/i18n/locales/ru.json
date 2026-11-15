@@ -2453,7 +2453,7 @@
   "rotation.editor.qiLedgerRefill": "Восстановление",
   "rotation.editor.readableFormat": "Читабельный формат",
   "rotation.editor.readableFormatKicker": "ЧИТАБЕЛЬНЫЙ ФОРМАТ",
-  "rotation.editor.readableFormatSubtitle": "Навыки до начала боя используют округлённый обратный отсчёт с шагом 0,5 секунды.",
+  "rotation.editor.readableFormatSubtitle": "(start) — начало боя, (break) — истощение Ци. Повторяющиеся навыки сгруппированы через xN.",
   "rotation.editor.reasonActive": "Эффективное",
   "rotation.editor.reasonAnd": "и",
   "rotation.editor.reasonDrawn": "обнажено",

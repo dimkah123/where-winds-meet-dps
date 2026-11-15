@@ -4,6 +4,7 @@ import react, { reactCompilerPreset } from "@vitejs/plugin-react"
 import babel from "@rolldown/plugin-babel"
 
 export default defineConfig({
+  base: "./",
   plugins: [react(), babel({ presets: [reactCompilerPreset({ target: "19" })] })],
   server: { port: 5173, strictPort: true },
   css: {

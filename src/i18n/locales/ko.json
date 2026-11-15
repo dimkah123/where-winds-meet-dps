@@ -2453,7 +2453,7 @@
   "rotation.editor.qiLedgerRefill": "",
   "rotation.editor.readableFormat": "가독 형식",
   "rotation.editor.readableFormatKicker": "가독 형식",
-  "rotation.editor.readableFormatSubtitle": "시작 전 스킬은 0.5초 단위로 반올림된 전투 전 카운트다운을 사용합니다.",
+  "rotation.editor.readableFormatSubtitle": "(start)는 전투 시작, (break)는 기파 파괴를 나타냅니다. 연속된 스킬은 xN으로 묶입니다.",
   "rotation.editor.reasonActive": "",
   "rotation.editor.reasonAnd": "",
   "rotation.editor.reasonDrawn": "",

@@ -2453,7 +2453,7 @@
   "rotation.editor.qiLedgerRefill": "回复",
   "rotation.editor.readableFormat": "易读格式",
   "rotation.editor.readableFormatKicker": "易读格式",
-  "rotation.editor.readableFormatSubtitle": "战斗开始前的技能使用以0.5秒为步长取整的倒计时。",
+  "rotation.editor.readableFormatSubtitle": "（start）表示战斗开始，（break）表示气绝。连续技能以 xN 合并。",
   "rotation.editor.reasonActive": "生效",
   "rotation.editor.reasonAnd": "且",
   "rotation.editor.reasonDrawn": "已出鞘",

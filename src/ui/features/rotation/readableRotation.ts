@@ -2,8 +2,6 @@ import type { Result } from "../../../engine/types"
 import type { Rotation, RotationStep } from "../../../engine/rotation"
 import type { Skill } from "../../../engine/skill"
 
-const formatHalfSecond = (value: number) => (Number.isInteger(value) ? String(value) : value.toFixed(1))
-
 export const SKILL_SHORT_NAMES: Record<string, string> = {
   // Stonesplit Strength — Phalanx
   "stonesplitStrength-phalanxspecial": "Mo Special",
@@ -257,13 +255,6 @@ export function readableRotationText(
 
     if (breakCastStepIds.has(cast.stepId)) {
       entries.push(`${name} (break)`)
-      continue
-    }
-
-    if (cast.timeSec < anchorTime - 0.05) {
-      const diff = Math.max(0, anchorTime - cast.timeSec)
-      const countdown = Math.round(diff * 2) / 2
-      entries.push(`${name} at ${formatHalfSecond(countdown)}`)
       continue
     }
 
