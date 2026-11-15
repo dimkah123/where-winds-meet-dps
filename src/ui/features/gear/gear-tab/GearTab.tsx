@@ -275,7 +275,7 @@ export function GearTab({
   return (
     <>
       <div className="panel">
-        <div className="panel-head">
+        <div className={`panel-head ${styles.equippedHead}`}>
           <h2>{t("gear.equipped")}</h2>
           <button type="button" className="btn primary" onClick={() => setImportOpen(true)}>
             {t("gear.importGear")}
