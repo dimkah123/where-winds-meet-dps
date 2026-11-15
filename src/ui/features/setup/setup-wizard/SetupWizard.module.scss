@@ -3,6 +3,10 @@
   overflow: hidden;
 }
 
+.wizardSurface.surfaceClass {
+  width: min(96vw, 1200px);
+}
+
 .wizardSurface.surfaceImport {
   width: min(95vw, 940px);
 }

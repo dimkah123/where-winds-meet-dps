@@ -126,7 +126,9 @@ export function SetupWizard({ initialName, initialInputs, mode, onFinish, onCanc
       labelledBy={headingId}
       layer="wizard"
       surfaceClassName={
-        styles.wizardSurface + (step === "import" ? ` ${styles.surfaceImport}` : "")
+        styles.wizardSurface +
+        (step === "class" ? ` ${styles.surfaceClass}` : "") +
+        (step === "import" ? ` ${styles.surfaceImport}` : "")
       }
     >
       <div className={styles.wizardHeader}>
