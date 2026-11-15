@@ -9,4 +9,9 @@ describe("wizardSteps", () => {
   it("appends name step for manual path", () => {
     expect(wizardSteps(1, true)).toEqual(["language", "class", "import", "name"])
   })
+
+  it("omits language step when includeLanguage is false", () => {
+    expect(wizardSteps(1, false, false)).toEqual(["class", "import"])
+    expect(wizardSteps(1, true, false)).toEqual(["class", "import", "name"])
+  })
 })

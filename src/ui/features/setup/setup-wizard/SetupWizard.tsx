@@ -12,10 +12,13 @@ import { GearImportPreview } from "../../gear/import-gear-dialog/GearImportPrevi
 import { useGearImportDraft } from "../../gear/import-gear-dialog/useGearImportDraft"
 import { equippedFromImported } from "../../gear/import-gear-dialog/importedGearPieces"
 import { TextInput } from "../../../components/text-input/TextInput"
+import { kvStore } from "../../../../kvStore"
 import { wizardSteps, type WizardStep } from "./wizardSteps"
 import styles from "./SetupWizard.module.scss"
 
 export type SetupMode = "first-run" | "new-profile"
+
+const LANGUAGE_CHOSEN_KEY = "wwm.languageChosen"
 
 const STEP_HEADING_KEYS: Record<WizardStep, string> = {
   language: "setup.wizard.chooseYourLanguage",
@@ -44,7 +47,7 @@ interface Props {
 export function SetupWizard({ initialName, initialInputs, mode, onFinish, onCancel }: Props) {
   const { locale, setLocale, t } = useI18n()
   const headingId = useId()
-  const [step, setStep] = useState<WizardStep>("language")
+  const includeLanguage = mode === "first-run" && !kvStore.get(LANGUAGE_CHOSEN_KEY)
   const [manual, setManual] = useState(false)
   const [name, setName] = useState(initialName)
   const [draft, setDraft] = useState<Inputs>(() => {
@@ -58,7 +61,8 @@ export function SetupWizard({ initialName, initialInputs, mode, onFinish, onCanc
   const importDraft = useGearImportDraft(draft)
 
   const graduationBuilds = graduationBuildsFor(draft.classId)
-  const steps = wizardSteps(graduationBuilds.length, manual)
+  const steps = wizardSteps(graduationBuilds.length, manual, includeLanguage)
+  const [step, setStep] = useState<WizardStep>(() => steps[0])
   const stepIndex = steps.indexOf(step)
   const hasChosenGraduationBuild = graduationBuilds.some(
     (build) => build.id === draft.graduationBuildId,
@@ -68,6 +72,9 @@ export function SetupWizard({ initialName, initialInputs, mode, onFinish, onCanc
     mode === "first-run" ? t("setup.wizard.finishSetup") : t("setup.wizard.createProfile")
 
   function goForward(): void {
+    if (step === "language") {
+      kvStore.set(LANGUAGE_CHOSEN_KEY, "true")
+    }
     const next = steps[stepIndex + 1]
     if (next) setStep(next)
   }
@@ -84,6 +91,7 @@ export function SetupWizard({ initialName, initialInputs, mode, onFinish, onCanc
 
   function finishImportPath(): void {
     if (!importDraft.result || !importDraft.pieces.length) return
+    kvStore.set(LANGUAGE_CHOSEN_KEY, "true")
     const finishedInputs: Inputs = {
       ...draft,
       inventory: importDraft.pieces,
@@ -98,6 +106,7 @@ export function SetupWizard({ initialName, initialInputs, mode, onFinish, onCanc
 
   function finishManualPath(): void {
     if (!trimmedName) return
+    kvStore.set(LANGUAGE_CHOSEN_KEY, "true")
     onFinish(trimmedName, draft)
   }
 
@@ -141,7 +150,13 @@ export function SetupWizard({ initialName, initialInputs, mode, onFinish, onCanc
 
       <div className={styles.wizardBody}>
         {step === "language" && (
-          <LanguagePicker value={locale} onChange={setLocale} />
+          <LanguagePicker
+            value={locale}
+            onChange={(nextLocale) => {
+              setLocale(nextLocale)
+              kvStore.set(LANGUAGE_CHOSEN_KEY, "true")
+            }}
+          />
         )}
 
         {step === "class" && (

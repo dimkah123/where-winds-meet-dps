@@ -6,11 +6,11 @@ interface Props {
   onChange(locale: Locale): void
 }
 
-const LANGUAGE_DETAILS: Record<Locale, { subname: string; flag: string }> = {
-  ru: { subname: "Русский язык", flag: "🇷🇺" },
-  en: { subname: "English language", flag: "🇬🇧" },
-  zh: { subname: "简体中文", flag: "🇨🇳" },
-  ko: { subname: "한국어", flag: "🇰🇷" },
+const LANGUAGE_FLAGS: Record<Locale, string> = {
+  ru: "🇷🇺",
+  en: "🇬🇧",
+  zh: "🇨🇳",
+  ko: "🇰🇷",
 }
 
 export function LanguagePicker({ value, onChange }: Props) {
@@ -19,7 +19,7 @@ export function LanguagePicker({ value, onChange }: Props) {
       <div className={styles.languageGrid}>
         {LOCALES.map((localeKey) => {
           const isSelected = localeKey === value
-          const meta = LANGUAGE_DETAILS[localeKey]
+          const flag = LANGUAGE_FLAGS[localeKey]
           return (
             <button
               type="button"
@@ -30,12 +30,9 @@ export function LanguagePicker({ value, onChange }: Props) {
             >
               <div className={styles.left}>
                 <span className={styles.flag} aria-hidden="true">
-                  {meta.flag}
+                  {flag}
                 </span>
-                <div className={styles.text}>
-                  <span className={styles.name}>{LOCALE_LABELS[localeKey]}</span>
-                  <span className={styles.subname}>{meta.subname}</span>
-                </div>
+                <span className={styles.name}>{LOCALE_LABELS[localeKey]}</span>
               </div>
               <span className={styles.radioDot} />
             </button>

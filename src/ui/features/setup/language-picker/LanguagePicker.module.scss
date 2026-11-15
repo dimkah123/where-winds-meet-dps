@@ -26,11 +26,11 @@
   justify-content: space-between;
   gap: 12px;
   width: 100%;
-  padding: 14px 16px;
+  padding: 16px 20px;
   background: var(--color-bg);
   border: 1px solid var(--color-border-strong);
   border-left: 3px solid var(--color-border-strong);
-  border-radius: 4px;
+  border-radius: 6px;
   color: var(--color-text);
   font: inherit;
   text-align: left;
@@ -72,14 +72,8 @@
   line-height: 1;
 }
 
-.text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
 .name {
-  font-size: 1em;
+  font-size: 1.05em;
   font-weight: 500;
   color: var(--color-text);
 }
@@ -87,11 +81,6 @@
 .tile.selected .name {
   color: var(--color-accent);
   font-weight: 600;
-}
-
-.subname {
-  font-size: 0.8em;
-  color: var(--color-text-muted);
 }
 
 .radioDot {

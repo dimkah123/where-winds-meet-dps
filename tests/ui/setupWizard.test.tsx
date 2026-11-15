@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect, vi, beforeEach } from "vitest"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { SetupWizard } from "../../src/ui/features/setup/setup-wizard/SetupWizard"
 import { I18nProvider } from "../../src/i18n/I18nProvider"
@@ -31,6 +31,10 @@ function pasteCapture() {
 }
 
 describe("SetupWizard", () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
   it("step 1 shows the language picker, and Next lands on the class picker step", () => {
     renderWizard()
 
@@ -137,5 +141,21 @@ describe("SetupWizard", () => {
     fireEvent.click(screen.getByRole("button", { name: /Русский/i }))
     expect(screen.getByText("Выберите язык")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Далее" })).toBeInTheDocument()
+  })
+
+  it("omits language step and starts on class step when mode is new-profile", () => {
+    render(
+      <I18nProvider>
+        <SetupWizard
+          initialName="Profile 2"
+          initialInputs={blankInputs}
+          mode="new-profile"
+          onFinish={vi.fn()}
+        />
+      </I18nProvider>,
+    )
+    expect(screen.queryByText("Choose your language")).not.toBeInTheDocument()
+    expect(screen.getByText("Choose your playstyle")).toBeInTheDocument()
+    expect(screen.getByText("Step 1 / 2")).toBeInTheDocument()
   })
 })
