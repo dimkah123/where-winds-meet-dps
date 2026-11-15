@@ -1,4 +1,9 @@
 import { useI18n } from "../../../i18n/i18nContext"
+import {
+  translateHeadline,
+  translateItemText,
+  translateSectionLabel,
+} from "../../../changelog/i18n"
 import type {
   ChangelogEntry,
   ChangelogEntryDetails,
@@ -23,7 +28,7 @@ export function ChangelogDetails({
   isLoading: boolean
   hasFailed: boolean
 }) {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
 
   return (
     <div className={styles.details}>
@@ -31,18 +36,24 @@ export function ChangelogDetails({
         <span className={styles.version}>{`v${entry.version}`}</span>
         <span className={styles.date}>{entry.date}</span>
       </div>
-      <h3 className={styles.headline}>{entry.headline}</h3>
+      <h3 className={styles.headline}>
+        {translateHeadline(entry.version, entry.headline, locale)}
+      </h3>
       {isLoading && <p className={styles.status}>{t("layout.changelogDetails.loading")}</p>}
       {hasFailed && (
         <p className={styles.status}>{t("layout.changelogDetails.failedToLoadThisEntry")}</p>
       )}
       {details?.sections.map((section) => (
         <section key={section.label} className={`${styles.section} ${SECTION_TONE[section.label]}`}>
-          <div className={styles.sectionLabel}>{section.label}</div>
+          <div className={styles.sectionLabel}>
+            {translateSectionLabel(section.label, locale)}
+          </div>
           <ul className={styles.changes}>
             {section.items.map((item) => (
               <li key={item.text} className={styles.change}>
-                <span className={styles.changeText}>{item.text}</span>
+                <span className={styles.changeText}>
+                  {translateItemText(item.text, locale)}
+                </span>
                 {item.authors.length > 0 && (
                   <span className={styles.credit}>
                     <span className={styles.creditLabel}>
