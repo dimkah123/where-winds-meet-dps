@@ -56,6 +56,30 @@
   }
 }
 
+.actionButtons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.acknowledgeToastButton {
+  background: rgba(92, 184, 92, 0.15);
+  border: 1px solid rgba(92, 184, 92, 0.5);
+  color: #7cd97c;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 0.82em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(92, 184, 92, 0.3);
+    border-color: #90ee90;
+    color: #ffffff;
+  }
+}
+
 .dndToastButton {
   background: rgba(200, 100, 40, 0.2);
   border: 1px solid #c97a30;

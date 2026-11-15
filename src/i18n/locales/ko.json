@@ -1,4 +1,7 @@
 {
+  "alerts.acknowledge": "확인함",
+  "alerts.acknowledgeAll": "모두 확인",
+  "alerts.acknowledged": "확인함",
   "alerts.clickToToggle": "클릭하여 전환",
   "alerts.damageLowBody": "현재 장비의 기력 피해가 해당 로테이션 타이밍에 비해 부족합니다. 기절이 아직 발생하지 않아 망각(Forgetfulness)이 쿨다운 상태였습니다. 일반 차징 공격(Grave Frost)으로 자동 대체되었습니다.",
   "alerts.damageLowRecommendation": "권장: 공격력 및 기력 피해를 높여 기절을 앞당기거나 로테이션 에ди터에서 타이밍을 조정하세요.",

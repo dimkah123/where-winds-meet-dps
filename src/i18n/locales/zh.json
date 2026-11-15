@@ -1,4 +1,7 @@
 {
+  "alerts.acknowledge": "知道了",
+  "alerts.acknowledgeAll": "全部知道了",
+  "alerts.acknowledged": "知道了",
   "alerts.clickToToggle": "点击切换",
   "alerts.damageLowBody": "当前配装的真气伤害不足以支撑此时机的循环：气竭尚未发生，导致忘念（Forgetfulness）仍在冷却中。系统已自动回退为普通蓄力斩（Grave Frost）。",
   "alerts.damageLowRecommendation": "建议：提升装备的攻击与真气伤害使气竭提前到来，或在循环编辑器中微调技能时机。",

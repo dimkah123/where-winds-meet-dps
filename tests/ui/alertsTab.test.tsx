@@ -90,4 +90,65 @@ describe("AlertsTab", () => {
 
     expect(screen.getByText(/do not disturb: active/i)).toBeInTheDocument()
   })
+
+  it("calls onToggleAcknowledge when clicking the acknowledge button on an alert", () => {
+    const onToggleAcknowledge = vi.fn()
+    render(
+      <MemoryRouter>
+        <I18nProvider>
+          <AlertsTab
+            result={resultWith({ qiEdgeWarnings: [qiEdgeWarning] })}
+            isDnd={false}
+            onToggleDnd={() => {}}
+            onToggleAcknowledge={onToggleAcknowledge}
+          />
+        </I18nProvider>
+      </MemoryRouter>,
+    )
+
+    const ackButton = screen.getByRole("button", { name: /^got it$/i })
+    expect(ackButton).toBeInTheDocument()
+    fireEvent.click(ackButton)
+    expect(onToggleAcknowledge).toHaveBeenCalledWith(
+      "qi-edge:PhalanxCharged-S3[InnerPassion]:end:before",
+    )
+  })
+
+  it("shows acknowledged state when alert key is in acknowledgedAlerts", () => {
+    render(
+      <MemoryRouter>
+        <I18nProvider>
+          <AlertsTab
+            result={resultWith({ qiEdgeWarnings: [qiEdgeWarning] })}
+            isDnd={false}
+            onToggleDnd={() => {}}
+            acknowledgedAlerts={new Set(["qi-edge:PhalanxCharged-S3[InnerPassion]:end:before"])}
+            onToggleAcknowledge={() => {}}
+          />
+        </I18nProvider>
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole("button", { name: /✓ got it/i })).toBeInTheDocument()
+  })
+
+  it("calls onAcknowledgeAll when clicking mark all as read", () => {
+    const onAcknowledgeAll = vi.fn()
+    render(
+      <MemoryRouter>
+        <I18nProvider>
+          <AlertsTab
+            result={resultWith({ qiEdgeWarnings: [qiEdgeWarning] })}
+            isDnd={false}
+            onToggleDnd={() => {}}
+            onAcknowledgeAll={onAcknowledgeAll}
+          />
+        </I18nProvider>
+      </MemoryRouter>,
+    )
+
+    const ackAllButton = screen.getByRole("button", { name: /mark all as read/i })
+    fireEvent.click(ackAllButton)
+    expect(onAcknowledgeAll).toHaveBeenCalledTimes(1)
+  })
 })

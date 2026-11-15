@@ -54,6 +54,34 @@
   color: var(--color-text-dim);
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.acknowledgeAllButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(92, 184, 92, 0.12);
+  border: 1px solid rgba(92, 184, 92, 0.45);
+  border-radius: 4px;
+  color: #7cd97c;
+  font-size: 0.76em;
+  font-weight: 600;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(92, 184, 92, 0.22);
+    border-color: #90ee90;
+    color: #90ee90;
+  }
+}
+
 .dndButton {
   display: inline-flex;
   align-items: center;
@@ -127,10 +155,20 @@
   flex-direction: column;
   gap: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, opacity 0.15s, background 0.15s;
 
   &:hover {
     border-color: #d88e28;
+  }
+}
+
+.alertCardAcknowledged {
+  background: rgba(35, 24, 14, 0.45);
+  border-color: rgba(153, 92, 37, 0.35);
+  box-shadow: none;
+
+  &:hover {
+    border-color: rgba(153, 92, 37, 0.6);
   }
 }
 
@@ -140,6 +178,22 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+.headerTags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.acknowledgedTag {
+  font-size: 0.72em;
+  padding: 1px 6px;
+  background: rgba(92, 184, 92, 0.15);
+  border: 1px solid rgba(92, 184, 92, 0.4);
+  color: #7cd97c;
+  border-radius: 3px;
+  font-weight: 600;
 }
 
 .skillName {
@@ -183,6 +237,50 @@
   color: var(--color-text-dim);
   font-style: italic;
   flex: 1;
+}
+
+.footerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.acknowledgeButton {
+  background: rgba(230, 160, 40, 0.12);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 0.74em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(230, 160, 40, 0.25);
+    border-color: #ffd88a;
+    color: #ffd88a;
+  }
+}
+
+.acknowledgedButton {
+  background: rgba(92, 184, 92, 0.12);
+  border: 1px solid rgba(92, 184, 92, 0.4);
+  color: #7cd97c;
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 0.74em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(92, 184, 92, 0.22);
+    border-color: #90ee90;
+    color: #90ee90;
+  }
 }
 
 .actionButton {

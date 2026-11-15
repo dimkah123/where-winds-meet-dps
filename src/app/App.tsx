@@ -29,6 +29,7 @@ import { GearTab } from "../ui/features/gear/gear-tab/GearTab"
 import { TalentsOdditiesTab } from "../ui/features/talents/talents-oddities-tab/TalentsOdditiesTab"
 import { SkillsTab } from "../ui/features/skills/skills-tab/SkillsTab"
 import { AlertsTab } from "../ui/features/alerts/alerts-tab/AlertsTab"
+import { getAllAlertKeys } from "../ui/features/alerts/alertKeys"
 import { useGraduationRate } from "../ui/hooks/useGraduationRate"
 import { useGraduationQiLog } from "../ui/hooks/useGraduationQiLog"
 import { useParseSimulation, type ParseSimulationRequest } from "../ui/hooks/useParseSimulation"
@@ -323,20 +324,53 @@ function AppInner() {
     })
   }, [])
 
-  const uniqueWarningsCount = useMemo(() => {
-    const seen = new Set<string>()
-    return result.warnings.filter((w) => {
-      const key = w.includes("calculated damage is too low for rotation timing")
-        ? "fallback-damage-low"
-        : w
-      if (seen.has(key)) return false
-      seen.add(key)
-      return true
-    }).length
-  }, [result.warnings])
-  const activeAlertsCount = uniqueWarningsCount + (result.qiEdgeWarnings?.length ?? 0)
-  const hasAlerts = activeAlertsCount > 0
-  const shouldPulseAlertsTab = hasAlerts && !isAlertsDnd && pathname !== "/alerts"
+  const [acknowledgedAlerts, setAcknowledgedAlerts] = useState<Set<string>>(() => {
+    try {
+      const raw = localStorage.getItem("wwm.acknowledgedAlerts")
+      return raw ? new Set(JSON.parse(raw)) : new Set()
+    } catch {
+      return new Set()
+    }
+  })
+
+  const toggleAcknowledgeAlert = useCallback((key: string) => {
+    setAcknowledgedAlerts((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) {
+        next.delete(key)
+      } else {
+        next.add(key)
+      }
+      try {
+        localStorage.setItem("wwm.acknowledgedAlerts", JSON.stringify([...next]))
+      } catch {
+        // ignore
+      }
+      return next
+    })
+  }, [])
+
+  const activeAlertKeys = useMemo(() => getAllAlertKeys(result), [result])
+
+  const acknowledgeAllAlerts = useCallback(() => {
+    setAcknowledgedAlerts((prev) => {
+      const next = new Set(prev)
+      for (const k of activeAlertKeys) next.add(k)
+      try {
+        localStorage.setItem("wwm.acknowledgedAlerts", JSON.stringify([...next]))
+      } catch {
+        // ignore
+      }
+      return next
+    })
+  }, [activeAlertKeys])
+
+  const unacknowledgedAlertsCount = useMemo(() => {
+    return activeAlertKeys.filter((key) => !acknowledgedAlerts.has(key)).length
+  }, [activeAlertKeys, acknowledgedAlerts])
+
+  const hasUnacknowledgedAlerts = unacknowledgedAlertsCount > 0
+  const shouldPulseAlertsTab = hasUnacknowledgedAlerts && !isAlertsDnd && pathname !== "/alerts"
 
   const TABS: {
     path: string
@@ -356,7 +390,7 @@ function AppInner() {
       path: "/alerts",
       label: t("app.alerts"),
       pulsing: shouldPulseAlertsTab,
-      badge: hasAlerts ? activeAlertsCount : undefined,
+      badge: unacknowledgedAlertsCount > 0 ? unacknowledgedAlertsCount : undefined,
     },
     { path: "/talents", label: t("common.enhancementOdditiesTalents"), align: "right" },
     { path: "/profile", label: t("common.profiles"), gapBefore: true },
@@ -373,6 +407,8 @@ function AppInner() {
         onCheckRotation={goToRotationEditorTab}
         isAlertsDnd={isAlertsDnd}
         onToggleDnd={toggleAlertsDnd}
+        acknowledgedAlerts={acknowledgedAlerts}
+        onAcknowledgeAlerts={acknowledgeAllAlerts}
       />
       <SimulationToast
         status={simulation.status}
@@ -575,6 +611,9 @@ function AppInner() {
                   result={result}
                   isDnd={isAlertsDnd}
                   onToggleDnd={toggleAlertsDnd}
+                  acknowledgedAlerts={acknowledgedAlerts}
+                  onToggleAcknowledge={toggleAcknowledgeAlert}
+                  onAcknowledgeAll={acknowledgeAllAlerts}
                 />
               }
             />

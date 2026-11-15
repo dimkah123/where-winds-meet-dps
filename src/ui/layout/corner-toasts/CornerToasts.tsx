@@ -9,17 +9,27 @@ export function CornerToasts({
   now,
   isAlertsDnd,
   onToggleDnd,
+  acknowledgedAlerts,
+  onAcknowledgeAlerts,
 }: {
   result: Result
   onCheckRotation: () => void
   now?: () => number
   isAlertsDnd?: boolean
   onToggleDnd?: () => void
+  acknowledgedAlerts?: Set<string>
+  onAcknowledgeAlerts?: () => void
 }) {
   return (
     <div className={styles.stack}>
       <QiBreakToast onCheckRotation={onCheckRotation} now={now} />
-      <WarningsToast result={result} isDnd={isAlertsDnd} onToggleDnd={onToggleDnd} />
+      <WarningsToast
+        result={result}
+        isDnd={isAlertsDnd}
+        onToggleDnd={onToggleDnd}
+        acknowledgedAlerts={acknowledgedAlerts}
+        onAcknowledgeAlerts={onAcknowledgeAlerts}
+      />
     </div>
   )
 }
