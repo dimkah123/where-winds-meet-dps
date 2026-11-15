@@ -94,6 +94,7 @@ type TalentEffectLine =
   | {
       kind: "mechanic"
       id: string
+      textKey?: string
       noteKey?: string
       currentValue?: (minPhysAttack: number) => number
     }
@@ -140,6 +141,7 @@ const CLASS_TALENT_COLUMNS: Record<string, WeaponColumnConfig[]> = {
             {
               kind: "mechanic",
               id: "bellstrikeUmbraBleedPen",
+              textKey: "talents.effect.bellstrikeBleedPen",
               noteKey: "talents.note.scalesWithMaxPhysFullAt1500",
             },
           ],
@@ -190,6 +192,7 @@ const CLASS_TALENT_COLUMNS: Record<string, WeaponColumnConfig[]> = {
             {
               kind: "mechanic",
               id: "bellstrikeUmbraBleedingDamage",
+              textKey: "talents.effect.bellstrikeBleedingDamage",
               noteKey: "talents.note.affinityDmg18On1500",
             },
           ],
@@ -345,6 +348,7 @@ const CLASS_TALENT_COLUMNS: Record<string, WeaponColumnConfig[]> = {
             {
               kind: "mechanic",
               id: "swordEnergyHpDamage",
+              textKey: "talents.effect.swordEnergyHpDamage",
               noteKey: "talents.note.scalesWithMaxPhysFullAt1000",
             },
           ],
@@ -359,6 +363,7 @@ const CLASS_TALENT_COLUMNS: Record<string, WeaponColumnConfig[]> = {
             {
               kind: "mechanic",
               id: "swordEnergyEnhancement",
+              textKey: "talents.effect.swordEnergyEnhancement",
               noteKey: "talents.note.scalesWithMaxPhysFullAt1500",
             },
           ],
@@ -463,6 +468,7 @@ const CLASS_TALENT_COLUMNS: Record<string, WeaponColumnConfig[]> = {
             {
               kind: "mechanic",
               id: "inebriateSkillCritDamage",
+              textKey: "talents.effect.inebriateSkillCritDamage",
               noteKey: "talents.note.scalesWithMinPhysFullAt750",
               currentValue: inebriateCritDamageBoostAt,
             },
@@ -518,6 +524,7 @@ const CLASS_TALENT_COLUMNS: Record<string, WeaponColumnConfig[]> = {
             {
               kind: "mechanic",
               id: "inebriateDamageScaling",
+              textKey: "talents.effect.inebriateDamageScaling",
               noteKey: "talents.note.scalesWithMinPhysFullAt750",
               currentValue: inebriateDamageBoostAt,
             },
@@ -623,7 +630,13 @@ const CLASS_TALENT_COLUMNS: Record<string, WeaponColumnConfig[]> = {
         },
         {
           nameKey: "talents.card.criticalDmgUp",
-          lines: [{ kind: "mechanic", id: "stonesplitStrengthSkillCritDamage" }],
+          lines: [
+            {
+              kind: "mechanic",
+              id: "stonesplitStrengthSkillCritDamage",
+              textKey: "talents.effect.stonesplitSkillCritDamage",
+            },
+          ],
         },
         {
           nameKey: "talents.card.stonesplitAttributeUp",
@@ -739,7 +752,9 @@ export function TalentsTab({ inputs }: Props) {
     return (
       <div className={styles.classBuffLine} key={`mechanic:${line.id}`}>
         <div className={styles.classBuffHead}>
-          <span className={styles.classBuffEffect}>{buff.effect}</span>
+          <span className={styles.classBuffEffect}>
+            {line.textKey ? t(line.textKey) : buff.effect}
+          </span>
           {current !== undefined && (
             <span className={styles.classBuffCurrent}>
               {t("talents.current")}: {formatSignedPercent(current)}
