@@ -216,7 +216,14 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
   )
   const skillOpts: ComboboxOption[] = useMemo(
     () =>
-      classSkills.map((skill) => ({ value: skill.id, label: skill.name || t("common.unnamed2") })),
+      classSkills.map((skill) => {
+        const localized = t(skillKey(skill), skill.name) || t("common.unnamed2")
+        return {
+          value: skill.id,
+          label: localized,
+          detail: skill.name && skill.name !== localized ? skill.name : undefined,
+        }
+      }),
     [classSkills, t],
   )
 

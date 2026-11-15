@@ -42,7 +42,11 @@ export function Combobox({
     if (!open) return options
     const queryLower = query.trim().toLowerCase()
     if (!queryLower) return options
-    return options.filter((opt) => opt.label.toLowerCase().includes(queryLower))
+    return options.filter(
+      (opt) =>
+        opt.label.toLowerCase().includes(queryLower) ||
+        (opt.detail && opt.detail.toLowerCase().includes(queryLower)),
+    )
   }, [open, query, options])
 
   const maxFilteredIndex = Math.max(0, filtered.length - 1)
