@@ -4,6 +4,7 @@ import { graduationBuildsFor } from "../../../../definitions/graduationBuilds/re
 import { useI18n } from "../../../../i18n/i18nContext"
 import { Dialog } from "../../../components/dialog/Dialog"
 import { syncClassPermanent } from "../../../utils/classSetup"
+import { LanguagePicker } from "../language-picker/LanguagePicker"
 import { ClassPicker } from "../class-picker/ClassPicker"
 import { GraduationBuildPicker } from "../../gear/graduation-build-picker/GraduationBuildPicker"
 import { GearImportInstructions } from "../../gear/import-gear-dialog/GearImportInstructions"
@@ -17,6 +18,7 @@ import styles from "./SetupWizard.module.scss"
 export type SetupMode = "first-run" | "new-profile"
 
 const STEP_HEADING_KEYS: Record<WizardStep, string> = {
+  language: "setup.wizard.chooseYourLanguage",
   class: "setup.wizard.chooseYourClass",
   graduation: "setup.wizard.chooseYourGraduationBuild",
   import: "setup.wizard.importYourGear",
@@ -24,6 +26,7 @@ const STEP_HEADING_KEYS: Record<WizardStep, string> = {
 }
 
 const STEP_INSTRUCTION_KEYS: Record<WizardStep, string> = {
+  language: "setup.wizard.chooseLanguageHint",
   class: "setup.wizard.pickTheClassHint",
   graduation: "setup.wizard.yourGraduationRateComparesHint",
   import: "setup.wizard.pasteACaptureHint",
@@ -39,9 +42,9 @@ interface Props {
 }
 
 export function SetupWizard({ initialName, initialInputs, mode, onFinish, onCancel }: Props) {
-  const { t } = useI18n()
+  const { locale, setLocale, t } = useI18n()
   const headingId = useId()
-  const [step, setStep] = useState<WizardStep>("class")
+  const [step, setStep] = useState<WizardStep>("language")
   const [manual, setManual] = useState(false)
   const [name, setName] = useState(initialName)
   const [draft, setDraft] = useState<Inputs>(() => {
@@ -98,8 +101,9 @@ export function SetupWizard({ initialName, initialInputs, mode, onFinish, onCanc
     onFinish(trimmedName, draft)
   }
 
-  const canGoBack = step !== "class" || !!onCancel
-  const backLabel = step === "class" && onCancel ? t("common.cancel") : t("common.back")
+  const isFirstStep = step === steps[0]
+  const canGoBack = !isFirstStep || !!onCancel
+  const backLabel = isFirstStep && onCancel ? t("common.cancel") : t("common.back")
   const isLastStep = stepIndex === steps.length - 1
 
   const primaryDisabled =
@@ -134,6 +138,10 @@ export function SetupWizard({ initialName, initialInputs, mode, onFinish, onCanc
       </div>
 
       <div className={styles.wizardBody}>
+        {step === "language" && (
+          <LanguagePicker value={locale} onChange={setLocale} />
+        )}
+
         {step === "class" && (
           <ClassPicker
             value={draft.classId}
