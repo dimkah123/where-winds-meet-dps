@@ -62,7 +62,8 @@
       "workerd"
     ],
     "ignoredBuiltDependencies": [
-      "@parcel/watcher"
+      "@parcel/watcher",
+      "tesseract.js"
     ]
   }
 }
