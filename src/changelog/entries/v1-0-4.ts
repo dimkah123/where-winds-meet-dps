@@ -1,0 +1,33 @@
+import type { ChangelogEntryDetails } from "../types"
+
+export const details: ChangelogEntryDetails = {
+  sections: [
+    {
+      label: "Added",
+      items: [
+        {
+          text: "Multi-select category filter panel in Skill Editor for Class weapons, Inner Ways, and Mystic Arts with live counts.",
+          authors: ["dimkah123"],
+        },
+      ],
+    },
+    {
+      label: "Changed",
+      items: [
+        {
+          text: "Skill list search and counts dynamically update across active path filters with support for Alt-click category soloing.",
+          authors: ["dimkah123"],
+        },
+      ],
+    },
+    {
+      label: "Fixed",
+      items: [
+        {
+          text: "Restored fast Forgetfulness strikes during Qi break in Pure Heng 1 Min rotation, eliminating illegal cast warnings.",
+          authors: ["dimkah123"],
+        },
+      ],
+    },
+  ],
+}
