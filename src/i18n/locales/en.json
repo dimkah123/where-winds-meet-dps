@@ -2198,6 +2198,7 @@
   "layout.breakthroughDataDialog.screenshotTheWholePanel": "Capture the whole panel like this, at the tier you actually run — name, tier and the full Attribute Buff block at the bottom, which is where the Based on Breakthrough lines live.",
   "layout.breakthroughDataDialog.yourClass": "Your class",
   "layout.changelogButton.loading": "Loading…",
+  "layout.changelogButton.update": "Update",
   "layout.changelogButton.viewTheChangelog": "View the changelog",
   "layout.changelogContributors.contributors": "Contributors",
   "layout.changelogDetails.doneBy": "done by",

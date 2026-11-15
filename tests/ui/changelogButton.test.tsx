@@ -27,19 +27,19 @@ describe("ChangelogButton", () => {
 
   it("shows the New marker with empty storage", () => {
     renderButton()
-    expect(screen.getByText("New")).toBeInTheDocument()
+    expect(screen.getByText("Update")).toBeInTheDocument()
   })
 
   it("hides the New marker when the current version is stored", () => {
     localStorage.setItem("wwm.lastSeenVersion", APP_VERSION)
     renderButton()
-    expect(screen.queryByText("New")).not.toBeInTheDocument()
+    expect(screen.queryByText("Update")).not.toBeInTheDocument()
   })
 
   it("shows the New marker when an older version is stored", () => {
     localStorage.setItem("wwm.lastSeenVersion", "0.0.1")
     renderButton()
-    expect(screen.getByText("New")).toBeInTheDocument()
+    expect(screen.getByText("Update")).toBeInTheDocument()
   })
 
   it("records no last-seen version until the changelog is opened", () => {
@@ -50,7 +50,7 @@ describe("ChangelogButton", () => {
   it("keeps the New marker across visits while the changelog stays unopened", () => {
     renderButton().unmount()
     renderButton()
-    expect(screen.getByText("New")).toBeInTheDocument()
+    expect(screen.getByText("Update")).toBeInTheDocument()
   })
 
   it("records the current version as the last-seen version once opened", () => {
@@ -69,9 +69,9 @@ describe("ChangelogButton", () => {
 
   it("clears the New marker on click", () => {
     renderButton()
-    expect(screen.getByText("New")).toBeInTheDocument()
+    expect(screen.getByText("Update")).toBeInTheDocument()
     fireEvent.click(screen.getByRole("button", { name: new RegExp(APP_VERSION) }))
-    expect(screen.queryByText("New")).not.toBeInTheDocument()
+    expect(screen.queryByText("Update")).not.toBeInTheDocument()
   })
 
   it("reaches the dialog only through a dynamic import, never a static one", () => {

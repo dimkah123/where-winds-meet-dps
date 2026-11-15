@@ -2198,6 +2198,7 @@
   "layout.breakthroughDataDialog.screenshotTheWholePanel": "실제로 사용하는 단계에서 이 예시처럼 전체 패널을 촬영해 주세요. 이름, 단계, 그리고 하단의 전체 '돌파 기반' 능력치 증가 항목이 모두 보여야 합니다.",
   "layout.breakthroughDataDialog.yourClass": "현재 유파",
   "layout.changelogButton.loading": "불러오는 중…",
+  "layout.changelogButton.update": "업데이트",
   "layout.changelogButton.viewTheChangelog": "변경 내역 보기",
   "layout.changelogContributors.contributors": "기여자",
   "layout.changelogDetails.doneBy": "기여: ",

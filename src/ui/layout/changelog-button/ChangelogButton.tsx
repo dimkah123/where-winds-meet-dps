@@ -34,7 +34,9 @@ export function ChangelogButton() {
         onClick={handleClick}
       >
         {`v${APP_VERSION}`}
-        {hasUnseenVersion && <span className={styles.marker}>{t("common.new")}</span>}
+        {hasUnseenVersion && (
+          <span className={styles.marker}>{t("layout.changelogButton.update")}</span>
+        )}
       </button>
       {isOpen && (
         <Suspense

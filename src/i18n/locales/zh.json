@@ -2198,6 +2198,7 @@
   "layout.breakthroughDataDialog.screenshotTheWholePanel": "请像这样截取完整面板，使用你实际使用的重数——包括名称、重数和底部完整的属性增益区，“基于突破”的条目就在那里。",
   "layout.breakthroughDataDialog.yourClass": "你的门派",
   "layout.changelogButton.loading": "加载中…",
+  "layout.changelogButton.update": "更新",
   "layout.changelogButton.viewTheChangelog": "查看更新日志",
   "layout.changelogContributors.contributors": "贡献者",
   "layout.changelogDetails.doneBy": "完成者",
