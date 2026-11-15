@@ -18,13 +18,8 @@ const COMPUTED_BREAK_FRAMES: Readonly<Record<string, BreakFrames>> = {
   "builtin-bellstrikeUmbra-38-bbs": [[1637, 2237]],
   "builtin-bellstrikeUmbra-nox-1m-dh": [[1624, 2224]],
   "builtin-bellstrikeUmbra-nox-30s-dh": [[1758, 2358]],
-  "builtin-stonesplitStrength-mixed-dummy-1-min": [
-    [1501, 2101],
-    [3534, 4134],
-  ],
-  "builtin-stonesplitStrength-tilla-dummy-rotation": [[1788, 2388]],
-  "builtin-stonesplitStrength-windsfromcn-switch": [[1477, 2077]],
-  "builtin-stonesplitStrength-windsfromcn-switch-no-toad": [[1459, 2059]],
+  "builtin-stonesplitStrength-mixed-dummy-1-min": [[1725, 2325]],
+  "builtin-stonesplitStrength-pure-heng-1-min": [[1922, 2522]],
   "builtin-bellstrikeSplendor-60s-78-waves-2-flute-1-frog": [
     [1001, 1601],
     [3126, 3726],

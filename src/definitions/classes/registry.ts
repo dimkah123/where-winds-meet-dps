@@ -106,7 +106,7 @@ export function SELECTABLE_CLASS_IDS(): readonly string[] {
 }
 
 export function CLASS_IDS(): readonly string[] {
-  return AVAILABLE_CLASSES.map((classDef) => classDef.id)
+  return CLASSES.map((classDef) => classDef.id)
 }
 
 export interface ClassDefinition extends ClassDef {
