@@ -87,6 +87,7 @@ vi.mock("../../src/definitions/graduationBuilds/registry", async (importOriginal
 // so breakthrough 16 (gear level 96) keeps them meaningful.
 const inputs = {
   ...defaultInputs,
+  classId: "bellstrikeUmbra",
   breakthrough: 16,
   graduationBuildId: "graduation-bellstrikeUmbra-test-relayed-bow-set",
 }
@@ -299,7 +300,7 @@ describe("GraduationBuildDialog", () => {
   })
 
   it("names the only build of a single-build class and offers no build choice", () => {
-    const singleBuildInputs = { ...inputs, classId: "stonesplitStrength" }
+    const singleBuildInputs = { ...inputs, classId: "bellstrikeSplendor" }
     const [onlyBuild] = classDefinition(singleBuildInputs.classId)!.graduationBuilds
     render(
       <I18nProvider>

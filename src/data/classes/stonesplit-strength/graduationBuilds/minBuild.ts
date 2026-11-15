@@ -65,7 +65,9 @@ export default defineGraduationBuild({
   rotationId: graduationRotation.id,
   standardized: {
     encounter: {
+      dummyMode: true,
       food: "bestAvailable",
+      script: "wraithstrikeScript",
       divinecraft: "fire",
     },
     innerWays: [
