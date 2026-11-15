@@ -98,10 +98,12 @@ describe("changelog translation depending on selected language", () => {
     )
 
     // Headline in Chinese
-    expect(screen.getByText("气绝术语与布局优化，清晰的循环行")).toBeInTheDocument()
+    expect(
+      screen.getByText("\u6c14\u7edd\u672f\u8bed\u4e0e\u5e03\u5c40\u4f18\u5316\uff0c\u6e05\u6670\u7684\u5faa\u73af\u884c"),
+    ).toBeInTheDocument()
 
     // Section labels in Chinese
-    expect(screen.getByText("新增")).toBeInTheDocument()
-    expect(screen.getByText("变更")).toBeInTheDocument()
+    expect(screen.getByText("\u65b0\u589e")).toBeInTheDocument()
+    expect(screen.getByText("\u53d8\u66f4")).toBeInTheDocument()
   })
 })

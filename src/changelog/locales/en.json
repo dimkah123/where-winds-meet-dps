@@ -1,0 +1,18 @@
+{
+  "sections": {
+    "Added": "Added",
+    "Changed": "Changed",
+    "Fixed": "Fixed"
+  },
+  "headlines": {
+    "1.1.2": "Qi Break Terminology & Layout Polish, Clean Rotation Rows",
+    "1.1.1": "Talents Localization & Setup Wizard Experience Improvements",
+    "1.1.0": "Russian Localization & Rotation Auto-Fallback Badges",
+    "1.0.4": "Skill Editor Path Filters & Pure Heng Break Fixes",
+    "1.0.3": "Charged Attack Auto-Fallback & Build Polish",
+    "1.0.2": "Pure Heng Archetype, Builds & Standard Rotation",
+    "1.0.1": "Max Build Graduation & Alerts Tab",
+    "1.0.0": "Stonesplit Strength DPS Calculator Release"
+  },
+  "items": {}
+}
