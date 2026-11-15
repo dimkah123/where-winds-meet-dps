@@ -1,5 +1,8 @@
 {
   "alerts.clickToToggle": "Click to toggle",
+  "alerts.damageLowBody": "Calculated Qi damage is too low for this rotation timing: the Qi break has not occurred yet, so Forgetfulness was on cooldown. Standard charged attack (Grave Frost) was automatically used instead.",
+  "alerts.damageLowRecommendation": "Recommendation: Increase gear Qi damage / attack stats so the break lands earlier, or adjust rotation timing in Rotation Editor.",
+  "alerts.damageLowTag": "Low Damage Timing • Auto-Fallback",
   "alerts.description": "Real-time diagnostics for skill rotation timings, Qi break edge fragility, and combat state conflicts.",
   "alerts.dndActive": "Do Not Disturb: Active (popups muted)",
   "alerts.dndButton": "Okay, do not disturb",

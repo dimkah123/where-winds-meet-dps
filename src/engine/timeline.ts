@@ -1248,6 +1248,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
     if (reachableSkillIds.has(skillId)) return
     reachableSkillIds.add(skillId)
     const skill = skillsById.get(skillId)
+    if (skill?.fallbackSkillId) reachSkill(skill.fallbackSkillId)
     for (const gate of skill?.releaseGates ?? []) reachSkill(gate.fallbackSkillId)
     for (const drain of skill?.meterDrains ?? [])
       if (drain.chargeRelease) reachSkill(drain.chargeRelease.fallbackSkillId)
@@ -1776,7 +1777,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
 
   function beginCast(event: Extract<MergedEvent, { kind: "castStart" }>): void {
     const { stepIndex, cursor } = event
-    const resolvedStep = resolvedSteps[stepIndex]
+    let resolvedStep = resolvedSteps[stepIndex]
     const prePull = isPrePullSkill(resolvedStep.skill)
     const isWeaponSwapCast = resolvedStep.skill.isWeaponSwap === true
     const isDirectSwapCast = directSwapSkills.has(resolvedStep.skill)
@@ -1809,24 +1810,46 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
     )
     const breakthroughFloorForStep = breakthroughFloor(resolvedStep.skill, inputs.breakthrough)
     if (failedCastConditions.length > 0 || breakthroughFloorForStep !== null) {
-      const reasons: ConditionFailureReason[] = failedCastConditions.map((condition) =>
-        describeConditionFailure(condition, startFrame),
-      )
-      if (breakthroughFloorForStep !== null) {
-        reasons.push({
-          kind: "breakthrough",
-          id: resolvedStep.skill.id,
-          name: resolvedStep.skill.name || resolvedStep.skill.id,
-          required: breakthroughFloorForStep,
-          actual: inputs.breakthrough,
-        })
+      const fallback =
+        breakthroughFloorForStep === null && resolvedStep.skill.fallbackSkillId
+          ? skillsById.get(resolvedStep.skill.fallbackSkillId)
+          : undefined
+      if (fallback) {
+        const reasons: ConditionFailureReason[] = failedCastConditions.map((condition) =>
+          describeConditionFailure(condition, startFrame),
+        )
+        recordTimedWarning(
+          startFrame,
+          (relSec) =>
+            `${resolvedStep.skill.name || resolvedStep.skill.id} at ${relSec.toFixed(2)}s: calculated damage is too low for rotation timing — ${reasons.map(englishConditionFailure).join(" and ")}; used ${fallback.name || fallback.id} instead.`,
+        )
+        resolvedStep = { step: resolvedStep.step, skill: fallback }
+        const fbWeapon = weaponTagOf(fallback)
+        if (fbWeapon && fbWeapon !== drawnWeapon) {
+          if (drawnWeapon !== null) ledger.recordStack(drawnWeaponStatusId(drawnWeapon), startFrame, 0)
+          ledger.recordStack(drawnWeaponStatusId(fbWeapon), startFrame, 1)
+          drawnWeapon = fbWeapon
+        }
+      } else {
+        const reasons: ConditionFailureReason[] = failedCastConditions.map((condition) =>
+          describeConditionFailure(condition, startFrame),
+        )
+        if (breakthroughFloorForStep !== null) {
+          reasons.push({
+            kind: "breakthrough",
+            id: resolvedStep.skill.id,
+            name: resolvedStep.skill.name || resolvedStep.skill.id,
+            required: breakthroughFloorForStep,
+            actual: inputs.breakthrough,
+          })
+        }
+        recordInvalidStep(resolvedStep.step.id, reasons)
+        recordTimedWarning(
+          startFrame,
+          (relSec) =>
+            `${resolvedStep.skill.name || resolvedStep.skill.id} at ${relSec.toFixed(2)}s would be illegal in the game: ${reasons.map(englishConditionFailure).join(" and ")}.`,
+        )
       }
-      recordInvalidStep(resolvedStep.step.id, reasons)
-      recordTimedWarning(
-        startFrame,
-        (relSec) =>
-          `${resolvedStep.skill.name || resolvedStep.skill.id} at ${relSec.toFixed(2)}s would be illegal in the game: ${reasons.map(englishConditionFailure).join(" and ")}.`,
-      )
     }
     checkBuffEngineCastConditions(resolvedStep, startFrame)
     flagSummonLock(resolvedStep, startFrame)

@@ -293,6 +293,7 @@ export interface Skill {
   triggersBuffsAtFrame?: Record<string, number>
   hits: SkillHit[]
   castConditions?: TriggerCondition[]
+  fallbackSkillId?: string
   castFrames: number
   triggerable: boolean
   // Target-distance simulation — docs/TIMELINE.md § "Target distance".

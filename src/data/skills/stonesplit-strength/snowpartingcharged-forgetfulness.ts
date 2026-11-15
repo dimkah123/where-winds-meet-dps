@@ -28,6 +28,7 @@ export const snowpartingchargedForgetfulness = defineSkill({
     { buffId: BUFF.forgetfulness, op: "gte", stacks: 1 },
     { buffId: BUFF.forgetfulnessCooldown, op: "eq", stacks: 0 },
   ],
+  fallbackSkillId: SKILL.snowpartingcharged,
   receives: SNOWPARTING_BLADE_RECEIVES,
   triggersBuffs: [],
   castFrames: 57,

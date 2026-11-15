@@ -110,11 +110,44 @@ export function AlertsTab({
                 <span>⚠️</span>
                 <span>{t("alerts.generalWarningsTitle")}</span>
               </h3>
-              {warnings.map((warning: string, index: number) => (
-                <div key={index} className={styles.alertCard}>
-                  <div className={styles.alertBody}>⚠️ {warning}</div>
-                </div>
-              ))}
+              {warnings.map((warning: string, index: number) => {
+                if (warning.includes("calculated damage is too low for rotation timing")) {
+                  return (
+                    <div key={index} className={styles.alertCard}>
+                      <div className={styles.alertHeader}>
+                        <span className={styles.skillName}>
+                          <span>⚔</span>
+                          <span>SnowpartingCharged[Forgetfulness]</span>
+                        </span>
+                        <span className={styles.timingTag}>
+                          {t("alerts.damageLowTag")}
+                        </span>
+                      </div>
+                      <div className={styles.alertBody}>
+                        {t("alerts.damageLowBody")}
+                      </div>
+                      <div className={styles.alertFooter}>
+                        <span className={styles.recommendation}>
+                          {t("alerts.damageLowRecommendation")}
+                        </span>
+                        <button
+                          type="button"
+                          className={styles.actionButton}
+                          onClick={() => navigate("/rotation-editor")}
+                        >
+                          {t("alerts.openRotationEditor")} →
+                        </button>
+                      </div>
+                    </div>
+                  )
+                }
+
+                return (
+                  <div key={index} className={styles.alertCard}>
+                    <div className={styles.alertBody}>⚠️ {warning}</div>
+                  </div>
+                )
+              })}
             </div>
           )}
         </>

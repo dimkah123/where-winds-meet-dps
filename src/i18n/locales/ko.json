@@ -1,5 +1,8 @@
 {
   "alerts.clickToToggle": "클릭하여 전환",
+  "alerts.damageLowBody": "현재 장비의 기력 피해가 해당 로테이션 타이밍에 비해 부족합니다. 기절이 아직 발생하지 않아 망각(Forgetfulness)이 쿨다운 상태였습니다. 일반 차징 공격(Grave Frost)으로 자동 대체되었습니다.",
+  "alerts.damageLowRecommendation": "권장: 공격력 및 기력 피해를 높여 기절을 앞당기거나 로테이션 에ди터에서 타이밍을 조정하세요.",
+  "alerts.damageLowTag": "계산 피해 부족 • 자동 대체",
   "alerts.description": "스킬 사이클 타이밍, 기절 경계 취약성 및 전투 상태 충돌에 대한 실시간 진단입니다.",
   "alerts.dndActive": "방해 금지: 활성화됨 (팝업 음소거)",
   "alerts.dndButton": "확인, 방해 금지",
