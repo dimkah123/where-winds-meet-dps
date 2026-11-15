@@ -43,7 +43,7 @@ export default defineGraduationBuild({
     createGraduationGearPiece({
       idPrefix,
       slot: "armor",
-      words: ["crit", "agility", "maxStonesplit", "minBellstrike", "minPhys"],
+      words: ["crit", "agility", "maxStonesplit", "minStonesplit", "minPhys"],
       attunement: "phalanxChargeDamage",
     }),
     createGraduationGearPiece({

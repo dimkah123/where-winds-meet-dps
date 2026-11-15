@@ -4,10 +4,11 @@ import { kvStore } from "../../../kvStore"
 import styles from "./QiBreakToast.module.scss"
 
 export const QI_BREAK_TOAST_HIDDEN_UNTIL_KEY = "wwm.qiBreakToastHiddenUntil"
-const HIDE_DURATION_MS = 7 * 24 * 60 * 60 * 1000
 
 function readHiddenUntil(): number {
-  const hiddenUntil = Number(kvStore.get(QI_BREAK_TOAST_HIDDEN_UNTIL_KEY))
+  const raw = kvStore.get(QI_BREAK_TOAST_HIDDEN_UNTIL_KEY)
+  if (raw === "forever") return Number.MAX_SAFE_INTEGER
+  const hiddenUntil = Number(raw)
   return Number.isFinite(hiddenUntil) ? hiddenUntil : 0
 }
 
@@ -21,7 +22,6 @@ export function QiBreakToast({
   const { t } = useI18n()
   const [hiddenUntil, setHiddenUntil] = useState(readHiddenUntil)
   const [isClosed, setIsClosed] = useState(false)
-  const [hideForWeek, setHideForWeek] = useState(false)
   const [checkRotationBefore = "", checkRotationAfter = ""] = t(
     "layout.outputPanel.qiBreakNoticeCheck",
   ).split("{link}")
@@ -29,11 +29,12 @@ export function QiBreakToast({
   if (isClosed || now() < hiddenUntil) return null
 
   function close(): void {
-    if (hideForWeek) {
-      const until = now() + HIDE_DURATION_MS
-      kvStore.set(QI_BREAK_TOAST_HIDDEN_UNTIL_KEY, String(until))
-      setHiddenUntil(until)
-    }
+    setIsClosed(true)
+  }
+
+  function dismissForever(): void {
+    kvStore.set(QI_BREAK_TOAST_HIDDEN_UNTIL_KEY, "forever")
+    setHiddenUntil(Number.MAX_SAFE_INTEGER)
     setIsClosed(true)
   }
 
@@ -53,14 +54,15 @@ export function QiBreakToast({
             {checkRotationAfter}
           </span>
         </span>
-        <label className={styles.hideOption}>
-          <input
-            type="checkbox"
-            checked={hideForWeek}
-            onChange={(event) => setHideForWeek(event.target.checked)}
-          />
-          {t("layout.qiBreakToast.dontShowForSevenDays")}
-        </label>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.dontShowAgainButton}
+            onClick={dismissForever}
+          >
+            {t("layout.qiBreakToast.dontShowAgain")}
+          </button>
+        </div>
       </div>
       <button
         type="button"

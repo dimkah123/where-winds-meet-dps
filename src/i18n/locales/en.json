@@ -2235,6 +2235,7 @@
   "layout.outputPanel.qiEdgeAfterStart": "{skill} lands {seconds} s after the Qi break starts at {edge} s — a small change in damage moves it out of the break (≈ {share} % of the run's damage at stake).",
   "layout.outputPanel.qiEdgeBeforeEnd": "{skill} lands {seconds} s before the Qi break ends at {edge} s — a small change in damage moves it out of the break (≈ {share} % of the run's damage at stake).",
   "layout.outputPanel.qiEdgeBeforeStart": "{skill} lands {seconds} s before the Qi break starts at {edge} s — a small change in damage moves it into the break (≈ {share} % of the run's damage at stake).",
+  "layout.qiBreakToast.dontShowAgain": "Don't show again",
   "layout.qiBreakToast.dontShowForSevenDays": "Don't show for 7 days",
   "layout.simulationToast.checkoutResults": "Checkout results",
   "layout.simulationToast.simulating": "Simulating…",

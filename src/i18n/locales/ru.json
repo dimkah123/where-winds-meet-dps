@@ -2235,6 +2235,7 @@
   "layout.outputPanel.qiEdgeAfterStart": "{skill} срабатывает через {seconds} с после начала истощения Ци ({edge} с) — небольшое изменение урона выведет его из окна истощения (≈ {share}% общего урона).",
   "layout.outputPanel.qiEdgeBeforeEnd": "{skill} срабатывает за {seconds} с до окончания истощения Ци ({edge} с) — небольшое изменение урона выведет его из окна истощения (≈ {share}% общего урона).",
   "layout.outputPanel.qiEdgeBeforeStart": "{skill} срабатывает за {seconds} с до начала истощения Ци ({edge} с) — небольшое изменение урона перенесёт его в окно истощения (≈ {share}% общего урона).",
+  "layout.qiBreakToast.dontShowAgain": "Больше не показывать",
   "layout.qiBreakToast.dontShowForSevenDays": "Не показывать 7 дней",
   "layout.simulationToast.checkoutResults": "Смотреть результаты",
   "layout.simulationToast.simulating": "Симуляция…",

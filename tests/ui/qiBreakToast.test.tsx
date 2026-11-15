@@ -11,7 +11,6 @@ import {
 import { CornerToasts } from "../../src/ui/layout/corner-toasts/CornerToasts"
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000
-const HIDE_LABEL = "Don't show for 7 days"
 
 function toastAt(nowMs: number, onCheckRotation: () => void = () => {}) {
   return (
@@ -39,7 +38,7 @@ describe("QiBreakToast", () => {
     expect(onCheckRotation).toHaveBeenCalledTimes(1)
   })
 
-  it("hides for the session on an unchecked close and returns after a remount", () => {
+  it("hides for the session on dismiss and returns after a remount", () => {
     const first = render(toastAt(1_000))
     closeToast()
     expect(screen.queryByRole("status")).not.toBeInTheDocument()
@@ -50,26 +49,15 @@ describe("QiBreakToast", () => {
     expect(screen.getByRole("status")).toBeInTheDocument()
   })
 
-  it("stays hidden across a remount for seven days after a checked close", () => {
+  it("stays hidden forever across remounts after clicking don't show again", () => {
     const first = render(toastAt(1_000))
-    fireEvent.click(screen.getByRole("checkbox", { name: HIDE_LABEL }))
-    closeToast()
+    fireEvent.click(screen.getByRole("button", { name: "Don't show again" }))
+    expect(screen.queryByRole("status")).not.toBeInTheDocument()
     first.unmount()
 
-    render(toastAt(1_000 + WEEK_MS - 1))
+    render(toastAt(1_000 + 100 * WEEK_MS))
 
     expect(screen.queryByRole("status")).not.toBeInTheDocument()
-  })
-
-  it("shows again once seven days have passed", () => {
-    const first = render(toastAt(1_000))
-    fireEvent.click(screen.getByRole("checkbox", { name: HIDE_LABEL }))
-    closeToast()
-    first.unmount()
-
-    render(toastAt(1_000 + WEEK_MS))
-
-    expect(screen.getByRole("status")).toBeInTheDocument()
   })
 
   it("counts a corrupt stored value as not hidden", () => {

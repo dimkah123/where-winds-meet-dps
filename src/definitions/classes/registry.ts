@@ -198,5 +198,6 @@ export function isOwnAttributeWord(word: string, classId: string | null | undefi
 }
 
 export function isOffSpecAttributeWord(word: string, classId: string | null | undefined): boolean {
+  if (word === "minFormless" || word === "maxFormless") return false
   return isAttributeAttackWord(word) && !isOwnAttributeWord(word, classId)
 }

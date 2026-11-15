@@ -2235,6 +2235,7 @@
   "layout.outputPanel.qiEdgeAfterStart": "{skill} 在 {edge} 秒气竭开始后 {seconds} 秒命中——伤害稍有变化就会使其落到气竭外（影响本次约 {share}% 的伤害）。",
   "layout.outputPanel.qiEdgeBeforeEnd": "{skill} 在 {edge} 秒气竭结束前 {seconds} 秒命中——伤害稍有变化就会使其落到气竭外（影响本次约 {share}% 的伤害）。",
   "layout.outputPanel.qiEdgeBeforeStart": "{skill} 在 {edge} 秒气竭开始前 {seconds} 秒命中——伤害稍有变化就会使其落入气竭（影响本次约 {share}% 的伤害）。",
+  "layout.qiBreakToast.dontShowAgain": "不再显示",
   "layout.qiBreakToast.dontShowForSevenDays": "7 天内不再显示",
   "layout.simulationToast.checkoutResults": "查看结果",
   "layout.simulationToast.simulating": "模拟中…",

@@ -318,49 +318,11 @@ describe("heirloom — one retune away from any build", () => {
   })
 })
 
-describe("heirloom — foreign attribute attack matching", () => {
+describe("heirloom — stonesplit build and attribute attack matching", () => {
   const stonesplitBuild = classDefinition("stonesplitStrength")!.graduationBuilds[0]
   const targetArmor = stonesplitBuild.gear.find((piece) => piece.slot === "armor")!
 
-  it("recognizes armor with any other foreign attribute attack as an heirloom", () => {
-    const withBamboocut = pieceFrom(targetArmor, [
-      "crit",
-      "agility",
-      "maxStonesplit",
-      "minBamboocut",
-      "minPhys",
-    ])
-    expect(isHeirloom(withBamboocut, { classId: "stonesplitStrength" })).toBe(true)
-
-    const withMaxBellstrike = pieceFrom(targetArmor, [
-      "crit",
-      "agility",
-      "maxStonesplit",
-      "maxBellstrike",
-      "minPhys",
-    ])
-    expect(isHeirloom(withMaxBellstrike, { classId: "stonesplitStrength" })).toBe(true)
-
-    const withSilkbind = pieceFrom(targetArmor, [
-      "crit",
-      "agility",
-      "maxStonesplit",
-      "maxSilkbind",
-      "minPhys",
-    ])
-    expect(isHeirloom(withSilkbind, { classId: "stonesplitStrength" })).toBe(true)
-
-    const withFormless = pieceFrom(targetArmor, [
-      "crit",
-      "agility",
-      "maxStonesplit",
-      "minFormless",
-      "minPhys",
-    ])
-    expect(isHeirloom(withFormless, { classId: "stonesplitStrength" })).toBe(true)
-  })
-
-  it("does not accept the class's own attribute in place of a foreign attribute", () => {
+  it("recognizes armor with minStonesplit (own attribute) as an heirloom", () => {
     const withOwnStonesplit = pieceFrom(targetArmor, [
       "crit",
       "agility",
@@ -368,22 +330,22 @@ describe("heirloom — foreign attribute attack matching", () => {
       "minStonesplit",
       "minPhys",
     ])
-    expect(isHeirloom(withOwnStonesplit, { classId: "stonesplitStrength" })).toBe(false)
+    expect(isHeirloom(withOwnStonesplit, { classId: "stonesplitStrength" })).toBe(true)
   })
 
-  it("suggests Foreign Attribute Attack swap when an off-spec attribute line is missing", () => {
-    const missingOffSpec = pieceFrom(targetArmor, [
+  it("suggests minStonesplit swap when minStonesplit is missing on armor", () => {
+    const missingStonesplit = pieceFrom(targetArmor, [
       "crit",
       "agility",
       "maxStonesplit",
       "power",
       "minPhys",
     ])
-    const swap = heirloomSwapFor(missingOffSpec, { classId: "stonesplitStrength" })
+    const swap = heirloomSwapFor(missingStonesplit, { classId: "stonesplitStrength" })
     expect(swap).toMatchObject({
       slotIndex: 3,
       currentWord: "power",
-      word: "foreignAttributeAttack",
+      word: "minStonesplit",
     })
   })
 
@@ -408,5 +370,28 @@ describe("heirloom — foreign attribute attack matching", () => {
         graduationBuildId: minBuild.id,
       }),
     ).toBe(true)
+  })
+
+  it("suggests maxFormless (not foreign attribute) swap when a weapon is missing maxFormless", () => {
+    const minBuild = classDefinition("stonesplitStrength")!.graduationBuilds.find(
+      (b) => b.name === "Min Build",
+    )!
+    const weapon = minBuild.gear.find((p) => p.slot === "leftWeapon")!
+    const userWeapon = pieceFrom(weapon, [
+      "minPhys",
+      "agility",
+      "modaoBoost",
+      "crit",
+      "minPhys",
+    ])
+    const swap = heirloomSwapFor(userWeapon, {
+      classId: "stonesplitStrength",
+      graduationBuildId: minBuild.id,
+    })
+    expect(swap).toMatchObject({
+      slotIndex: 3,
+      currentWord: "crit",
+      word: "maxFormless",
+    })
   })
 })
