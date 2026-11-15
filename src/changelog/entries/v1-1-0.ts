@@ -19,7 +19,7 @@ export const details: ChangelogEntryDetails = {
       label: "Changed",
       items: [
         {
-          text: "Consolidated all auto-fallback occurrences in a rotation into a single alert item in the Alerts tab with multiplicity counter.",
+          text: "Consolidated rotation auto-fallback occurrences into a single alert item in Alerts tab with multiplicity counter.",
           authors: ["dimkah123"],
         },
       ],
