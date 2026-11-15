@@ -50,4 +50,50 @@ describe("GraduationBuildPicker", () => {
 
     expect(onFollow).toHaveBeenCalledWith(SECOND.id)
   })
+
+  it("supports Stonesplit archetypes (Mix Build & Pure Heng) tabs with Min/Max options", () => {
+    const stonesplitBuilds = classDefinition("stonesplitStrength")!.graduationBuilds
+    const onFollow = vi.fn()
+    const { rerender } = render(
+      <I18nProvider>
+        <GraduationBuildPicker
+          builds={stonesplitBuilds}
+          followedBuildId="graduation-stonesplitStrength-max-build"
+          onFollow={onFollow}
+        />
+      </I18nProvider>,
+    )
+
+    const mixTab = screen.getByRole("tab", { name: /Mix Build/i })
+    const pureHengTab = screen.getByRole("tab", { name: /Pure Heng/i })
+    expect(mixTab).toBeInTheDocument()
+    expect(pureHengTab).toBeInTheDocument()
+    expect(mixTab).toHaveAttribute("aria-selected", "true")
+
+    // Inside Mix tab, offers Max Build and Min Build
+    expect(screen.getByRole("radio", { name: /Max Build/i })).toBeChecked()
+    expect(screen.getByRole("radio", { name: /Min Build/i })).not.toBeChecked()
+
+    // Switch to Pure Heng tab
+    fireEvent.click(pureHengTab)
+    expect(pureHengTab).toHaveAttribute("aria-selected", "true")
+
+    // Click Pure Heng Min Build
+    const minRadio = screen.getByRole("radio", { name: /Min Build/i })
+    fireEvent.click(minRadio)
+    expect(onFollow).toHaveBeenCalledWith("graduation-stonesplitStrength-pureHeng-min-build")
+
+    // When rerendered with followed Pure Heng build, Pure Heng tab remains active
+    rerender(
+      <I18nProvider>
+        <GraduationBuildPicker
+          builds={stonesplitBuilds}
+          followedBuildId="graduation-stonesplitStrength-pureHeng-min-build"
+          onFollow={onFollow}
+        />
+      </I18nProvider>,
+    )
+    expect(pureHengTab).toHaveAttribute("aria-selected", "true")
+    expect(screen.getByRole("radio", { name: /Min Build/i })).toBeChecked()
+  })
 })
