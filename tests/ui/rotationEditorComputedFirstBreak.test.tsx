@@ -4,6 +4,7 @@ import { defaultInputs } from "../../src/engine/defaults"
 import { runEngine } from "../../src/engine/dps"
 import { I18nProvider } from "../../src/i18n/I18nProvider"
 import { ConfirmProvider } from "../../src/ui/components/confirm-dialog/ConfirmDialog"
+import { fightClockSec } from "../../src/ui/features/rotation/fightClock"
 import { RotationEditorPanel } from "../../src/ui/features/rotation/rotation-editor-panel/RotationEditorPanel"
 
 function renderPanel(inputs: typeof defaultInputs) {
@@ -27,9 +28,11 @@ describe("the rotation editor's Qi break row shows every computed break, read on
       return
     }
     for (const [index, qiBreak] of breaks.entries()) {
+      const startSec = fightClockSec(result, qiBreak.startSec)
+      const endSec = fightClockSec(result, qiBreak.endSec)
       expect(screen.getByText(`Computed break ${index + 1}`)).toBeInTheDocument()
       expect(
-        screen.getByText(`${qiBreak.startSec.toFixed(1)}s – ${qiBreak.endSec.toFixed(1)}s`),
+        screen.getByText(`${startSec.toFixed(1)}s – ${endSec.toFixed(1)}s`),
       ).toBeInTheDocument()
     }
   })

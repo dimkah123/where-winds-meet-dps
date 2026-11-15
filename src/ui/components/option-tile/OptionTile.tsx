@@ -36,12 +36,18 @@ export function OptionTile({
       title={title}
       onClick={onClick}
     >
-      <span className={styles.tileHead}>
+      <div className={styles.tileTitleRow}>
         <span className={styles.tileLabel}>{label}</span>
+      </div>
+      <div className={styles.tileMetaRow}>
+        <span className={styles.tileDetail + (toneClass ? ` ${toneClass}` : "")}>{detail}</span>
         {headMeta && <span className={styles.tileHeadMeta}>{headMeta}</span>}
-      </span>
-      {note && <span className={styles.tileNote}>{note}</span>}
-      <span className={styles.tileDetail + (toneClass ? ` ${toneClass}` : "")}>{detail}</span>
+      </div>
+      {note && (
+        <div className={styles.tileNoteRow}>
+          <span className={styles.tileNote}>{note}</span>
+        </div>
+      )}
     </button>
   )
 }

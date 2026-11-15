@@ -177,8 +177,19 @@ function DistanceChip({ distanceMeters }: { distanceMeters: number }) {
   )
 }
 
+function formatHits(hits: number, locale: string, t: (k: string, f?: string) => string): string {
+  if (locale === "ru") {
+    const mod10 = hits % 10
+    const mod100 = hits % 100
+    if (mod10 === 1 && mod100 !== 11) return `${hits} удар`
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return `${hits} удара`
+    return `${hits} ударов`
+  }
+  return `${hits} ${t("common.hits")}`
+}
+
 export function RotationEditorPanel({ inputs, onChange, result }: Props) {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const confirm = useConfirm()
 
   const [saved, setSaved] = useState<Rotation[]>(() => loadCustomRotations())
@@ -757,7 +768,7 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
                       </div>
                     )}
                     <span className={styles.castReadonly}>
-                      {maxHits} {t("common.hits")}
+                      {formatHits(maxHits, locale, t)}
                     </span>
                     <span
                       className={styles.prepull}
@@ -1040,10 +1051,11 @@ function QiBreakRow({
   return (
     <div className={rowClassName}>
       <div className={styles.idx}>—</div>
-      <span className={styles.openingBadge}>{t("common.qiBreak")}</span>
-      <span className={styles.skillStatic}>{t("common.qiBreakWindow")}</span>
-      <span />
-      <span />
+      <div className={styles.qiBreakLabelWrap}>
+        <span className={styles.openingBadge}>{t("common.qiBreak")}</span>
+        <span className={styles.qiBreakSep}>·</span>
+        <span className={styles.skillStatic}>{t("common.qiBreakWindow")}</span>
+      </div>
       <div className={styles.headControls}>
         {breaks.length === 0 ? (
           <span className={styles.headField}>
