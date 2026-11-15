@@ -19,7 +19,7 @@
 import type { Buff } from "../../engine/buff"
 import type { BuffModule } from "../../engine/buffs/buffModule"
 import type { AttunementOption } from "../../engine/attunements"
-import type { AttributeKey, GearSlot, WeaponName } from "../../engine/types"
+import type { AttributeKey, GearSlot, GearWordId, WeaponName } from "../../engine/types"
 import { attunementsForClass } from "../../engine/attunements"
 import { builtinBuffsForClass, registerBuiltinBuffs } from "../../engine/builtinBuffs"
 import type { ClassDef, RetunementPool } from "./classDef"
@@ -91,12 +91,14 @@ for (const classDef of CLASSES) {
     registerPoisonExtension(classDef.id, statusId, maxRemainingSec)
 }
 
+const AVAILABLE_CLASSES = CLASSES.filter((classDef) => classDef.id === "stonesplitStrength")
+
 export function CLASS_DEFS(): readonly ClassDef[] {
-  return CLASSES
+  return AVAILABLE_CLASSES
 }
 
 export function CLASS_IDS(): readonly string[] {
-  return CLASSES.map((classDef) => classDef.id)
+  return AVAILABLE_CLASSES.map((classDef) => classDef.id)
 }
 
 export interface ClassDefinition extends ClassDef {
@@ -159,4 +161,34 @@ export function grantsMinPhysCritBoostFor(
 ): (weaponType: string | undefined) => boolean {
   const types = new Set(classDefinition(classId)?.critBoostWeaponTypes ?? [])
   return (weaponType) => !!weaponType && types.has(weaponType)
+}
+
+export const ATTRIBUTE_ATTACK_WORDS = [
+  "minBellstrike",
+  "maxBellstrike",
+  "minStonesplit",
+  "maxStonesplit",
+  "minSilkbind",
+  "maxSilkbind",
+  "minBamboocut",
+  "maxBamboocut",
+  "minFormless",
+  "maxFormless",
+] as const
+
+const ATTRIBUTE_ATTACK_WORD_SET: ReadonlySet<string> = new Set<string>(ATTRIBUTE_ATTACK_WORDS)
+
+export function isAttributeAttackWord(word: string): word is GearWordId {
+  return ATTRIBUTE_ATTACK_WORD_SET.has(word)
+}
+
+export function isOwnAttributeWord(word: string, classId: string | null | undefined): boolean {
+  if (!classId) return false
+  const attr = attributeForClass(classId)
+  if (!attr) return false
+  return word.toLowerCase().includes(attr.toLowerCase())
+}
+
+export function isOffSpecAttributeWord(word: string, classId: string | null | undefined): boolean {
+  return isAttributeAttackWord(word) && !isOwnAttributeWord(word, classId)
 }

@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react"
-import { describe, expect, it } from "vitest"
+import { fireEvent, render, screen } from "@testing-library/react"
+import { describe, expect, it, vi } from "vitest"
 import { defaultInputs } from "../../src/engine/defaults"
 import { equippedPiecesFor, withDerivedStats } from "../../src/engine/derivedInputs"
 import {
@@ -39,6 +39,7 @@ function withFormlessAndBellstrikeWeapon(formlessMaxRoll: number): Inputs {
   }
   return {
     ...defaultInputs,
+    classId: "bellstrikeUmbra",
     inventory: [weapon],
     equipped: { ...EMPTY_EQUIPPED, leftWeapon: weapon.id },
   }
@@ -268,7 +269,7 @@ describe("StatsOverviewPanel", () => {
 
     expect(screen.getByText("Constitution").parentElement).toHaveTextContent(fmt(attrs.body, false))
     expect(screen.getByText("Defense").parentElement).toHaveTextContent(fmt(attrs.defense, false))
-    expect(screen.getByText("Max HP").parentElement).toHaveTextContent(fmt(maxHp, false))
+    expect(screen.getByText("Max HP").parentElement).toHaveTextContent(String(Math.round(maxHp)))
   })
 
   it("points Max HP at the Arsenal tab's own mastery score, without a floor marker", () => {
@@ -308,5 +309,56 @@ describe("StatsOverviewPanel", () => {
 
     expect(minAttackRowText("caiNengjiaAttackBun")).toBe(minAttackRowText(null))
     expect(minAttackRowText("twinImmortalsStew")).not.toBe(minAttackRowText(null))
+  })
+
+  it("renders inputs when onChange is passed and updates statOverrides on edit", () => {
+    const onChange = vi.fn()
+    render(
+      <I18nProvider>
+        <StatsOverviewPanel inputs={defaultInputs} onChange={onChange} />
+      </I18nProvider>,
+    )
+
+    const critRateLabel = screen.getByText("Critical Rate")
+    const critRateInput = critRateLabel.parentElement!.querySelector("input")!
+    expect(critRateInput).toBeInTheDocument()
+
+    // Edit Critical Rate from current to 150
+    fireEvent.change(critRateInput, { target: { value: "150" } })
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statOverrides: expect.objectContaining({ critRate: 1.5 }),
+      }),
+    )
+  })
+
+  it("renders the overridden class on inputs present in statOverrides and clears them on empty blur", () => {
+    const onChange = vi.fn()
+    const inputs: Inputs = {
+      ...defaultInputs,
+      statOverrides: {
+        critRate: 1.5,
+        "phys.min": 3000,
+      },
+    }
+    render(
+      <I18nProvider>
+        <StatsOverviewPanel inputs={inputs} onChange={onChange} />
+      </I18nProvider>,
+    )
+
+    const critRateLabel = screen.getByText("Critical Rate")
+    const critRateInput = critRateLabel.parentElement!.querySelector("input")!
+    expect(critRateInput.className).toMatch(/statInputOverridden/)
+
+    // Clear input to reset
+    fireEvent.change(critRateInput, { target: { value: "" } })
+    fireEvent.blur(critRateInput)
+
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statOverrides: { "phys.min": 3000 },
+      }),
+    )
   })
 })

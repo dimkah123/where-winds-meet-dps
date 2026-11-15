@@ -22,14 +22,14 @@ export const forgetfulness: InnerWayGateBuff = defineInnerWayGateBuff({
 })
 
 // In-game values as of 2026-09-24: the free Grave Frost the Forgetfulness
-// window lets the player cast starts its own 6 s cooldown, reset by an
-// Exhausted-boss hit — not the 6 s counted from Forgetfulness's own grant.
+// window lets the player cast starts its own 5.5 s cooldown, reset by an
+// Exhausted-boss hit — not the 5.5 s counted from Forgetfulness's own grant.
 export const forgetfulnessCooldown: InnerWayGateBuff = defineInnerWayGateBuff({
   id: BUFF.forgetfulnessCooldown,
   name: "Forgetfulness Cooldown",
   scope: "player",
   activation: "triggered",
-  durationFrames: 360,
+  durationFrames: 330,
   effects: [],
   maxStacks: 1,
   stackScaling: "flat",

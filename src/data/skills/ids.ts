@@ -100,6 +100,7 @@ export const CAST = {
   phalanxChargedS3InnerPassion: "cast:phalanxChargedS3InnerPassion",
   phalanxQ: "cast:phalanxQ",
   phalanxQSupreme: "cast:phalanxQSupreme",
+  phalanxQSoul: "cast:phalanxQSoul",
   anxiSoldierMoSweepSupreme: "cast:anxiSoldierMoSweepSupreme",
   phalanxSpecial: "cast:phalanxSpecial",
   phalanxSpecialPrepull: "cast:phalanxSpecialPrepull",

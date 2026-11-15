@@ -2,7 +2,13 @@ import { equippedPiecesFor } from "../../../../engine/derivedInputs"
 import { followedGraduationBuild } from "../../../../engine/graduation"
 import { GEAR_SLOTS } from "../../../../engine/types"
 import type { GearPiece, Inputs } from "../../../../engine/types"
-import { STAT_LINES, isGearWordId, isUnknownGearWord } from "../../../../data/stats/statLines"
+import {
+  STAT_LINES,
+  FOREIGN_ATTRIBUTE_ATTACK_ID,
+  isGearWordId,
+  isUnknownGearWord,
+} from "../../../../data/stats/statLines"
+import { isOffSpecAttributeWord } from "../../../../definitions/classes/registry"
 
 export interface EquippedStatLineRow {
   statLineId: string
@@ -16,12 +22,19 @@ export interface EquippedStatLineCounts {
   wantedTotal: number | null
 }
 
-function countWords(pieces: readonly GearPiece[]): Map<string, number> {
+function countWords(
+  pieces: readonly GearPiece[],
+  classId?: string | null,
+): Map<string, number> {
   const counts = new Map<string, number>()
   for (const piece of pieces) {
     for (const entry of piece.words) {
       if (entry.word === "" || isUnknownGearWord(entry.word) || !isGearWordId(entry.word)) continue
-      counts.set(entry.word, (counts.get(entry.word) ?? 0) + 1)
+      const wordKey =
+        classId && isOffSpecAttributeWord(entry.word, classId)
+          ? FOREIGN_ATTRIBUTE_ATTACK_ID
+          : entry.word
+      counts.set(wordKey, (counts.get(wordKey) ?? 0) + 1)
     }
   }
   return counts
@@ -34,10 +47,13 @@ function sumCounts(counts: ReadonlyMap<string, number>): number {
 }
 
 export function equippedStatLineCounts(inputs: Inputs): EquippedStatLineCounts {
-  const current = countWords(equippedPiecesFor(inputs))
+  const current = countWords(equippedPiecesFor(inputs), inputs.classId)
   const build = followedGraduationBuild(inputs)
   const wanted = build
-    ? countWords(build.gear.filter((piece) => GEAR_SLOTS.includes(piece.slot)))
+    ? countWords(
+        build.gear.filter((piece) => GEAR_SLOTS.includes(piece.slot)),
+        inputs.classId,
+      )
     : new Map<string, number>()
   const rows: EquippedStatLineRow[] = []
   for (const line of STAT_LINES) {

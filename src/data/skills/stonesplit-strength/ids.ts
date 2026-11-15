@@ -12,6 +12,7 @@ export const SKILL = {
   phalanxchargedS3Innerpassion: "stonesplitStrength-phalanxcharged-s3-innerpassion",
   phalanxq: "stonesplitStrength-phalanxq",
   phalanxqSupreme: "stonesplitStrength-phalanxq-supreme",
+  phalanxqSoul: "stonesplitStrength-phalanxq-soul",
   anxisoldiermosweepSupreme: "stonesplitStrength-anxisoldiermosweep-supreme",
   phalanxspecial: "stonesplitStrength-phalanxspecial",
   phalanxspecialPrepull: "stonesplitStrength-phalanxspecial-prepull",

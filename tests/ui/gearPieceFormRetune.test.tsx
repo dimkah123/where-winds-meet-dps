@@ -203,7 +203,8 @@ describe("GearPieceForm — the draw chance in a tunement's word list", () => {
     )
   })
 
-  it("shows how likely the piece's whole set of tunements is", () => {
+  // Skipped: tunement set chances are hidden per user request as they are not currently relevant
+  it.skip("shows how likely the piece's whole set of tunements is", () => {
     const piece = makePiece()
     piece.words[0] = { word: "maxPhys", value: 70, retuned: false }
     renderForm(piece)
@@ -218,7 +219,8 @@ describe("GearPieceForm — the draw chance in a tunement's word list", () => {
     ).toBeInTheDocument()
   })
 
-  it("shows the chance of lines two to five with one retune and names the retuned line", () => {
+  // Skipped: tunement set chances are hidden per user request as they are not currently relevant
+  it.skip("shows the chance of lines two to five with one retune and names the retuned line", () => {
     const piece = makePiece()
     piece.words[0] = { word: "maxPhys", value: 70, retuned: false }
     piece.words[1] = { word: "crit", value: 0.05, retuned: true }

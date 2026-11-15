@@ -3,6 +3,7 @@ import { GEAR_LEVELS } from "./types"
 import { FOUR_PIECE_SIZE, TWO_PIECE_SIZE, equippedSetBearingPieces } from "./setPieces"
 import { GEAR_SET_DEFS, SET_BY_ID } from "../definitions/sets/registry"
 import { BOW_SET_DEFS } from "../data/sets/bowSets"
+import { applyStatOverrides } from "./derivedInputs"
 
 export { setPieceCount, setPieceCountWith } from "./setPieces"
 
@@ -127,6 +128,9 @@ export function applySetBonuses(inputs: Inputs): Inputs {
     const definition = BOW_SET_DEFS[active.bow.set]
     const value = definition.value[active.bow.level]
     if (value !== undefined) next = withStat(next, definition.stat, value)
+  }
+  if (inputs.statOverrides && Object.keys(inputs.statOverrides).length > 0) {
+    next = applyStatOverrides(next)
   }
   return next
 }

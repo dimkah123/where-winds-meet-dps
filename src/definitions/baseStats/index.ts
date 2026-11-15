@@ -502,9 +502,9 @@ export function buildScalingSources(
     bound: "min" | "max",
   ) => inputs[block][bound] - (block === primaryKey ? formless[bound] : 0)
   return {
-    power: totals.power,
-    agility: totals.agility,
-    momentum: totals.momentum,
+    power: inputs.statOverrides?.power ?? totals.power,
+    agility: inputs.statOverrides?.agility ?? totals.agility,
+    momentum: inputs.statOverrides?.momentum ?? totals.momentum,
     "phys.min": inputs.phys.min,
     "phys.max": inputs.phys.max,
     "phys.penetration": inputs.phys.penetration,

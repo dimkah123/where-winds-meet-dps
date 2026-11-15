@@ -2,7 +2,8 @@ import { useMemo } from "react"
 import type { GearPiece } from "../../../../engine/types"
 import type { RetunementRow } from "../../../../engine/dpsWorker"
 import type { RetunementReason } from "../../../hooks/useRetunementAnalysis"
-import { statLineLabel } from "../../../../data/stats/statLines"
+import { FOREIGN_ATTRIBUTE_ATTACK_ID, statLineLabel } from "../../../../data/stats/statLines"
+import { isOffSpecAttributeWord } from "../../../../definitions/classes/registry"
 import { heirloomMatch, type HeirloomProfile } from "../../../../engine/heirloom"
 import { retuneAttemptBudget } from "../../../../engine/retunement"
 import { HelpHint } from "../../../components/help-hint/HelpHint"
@@ -306,7 +307,11 @@ export function RetunementAnalyzerPanel({ piece, profile, rows, reason, isPendin
               <div className={retunement.cell}>
                 {t(statLineKey(candidate.word), statLineLabel(candidate.word))}
                 {heirloomSwaps.some(
-                  (swap) => swap.slotIndex === candidate.slotIndex && swap.word === candidate.word,
+                  (swap) =>
+                    swap.slotIndex === candidate.slotIndex &&
+                    (swap.word === candidate.word ||
+                      (swap.word === FOREIGN_ATTRIBUTE_ATTACK_ID &&
+                        isOffSpecAttributeWord(candidate.word, profile.classId))),
                 ) && <span className={retunement.heirloomTag}>{t("common.heirloom")}</span>}
               </div>
               <div className={`${retunement.cell} ${deltaSignClass(candidate.deltaDps)}`}>

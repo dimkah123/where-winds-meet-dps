@@ -1,10 +1,10 @@
 {
   "name": "where-winds-meet-dps",
   "private": true,
-  "version": "0.9.3",
+  "version": "1.0.0",
   "type": "module",
   "engines": {
-    "node": ">=26"
+    "node": ">=24"
   },
   "packageManager": "pnpm@10.33.0",
   "scripts": {

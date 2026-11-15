@@ -153,6 +153,54 @@ describe("equippedStatLineCounts", () => {
     expect(counts.wantedTotal).toBeNull()
     expect(counts.rows).toEqual([{ statLineId: "crit", current: 1, wanted: 0 }])
   })
+
+  it("groups foreign attribute attack lines under foreignAttributeAttack when classId is set", () => {
+    const build = customBuild([
+      { slot: "armor", words: ["crit", "agility", "maxStonesplit", "minBellstrike", "minPhys"] },
+    ])
+    const inputs: Inputs = {
+      ...inputsWith(
+        [pieceWithWords("armor", ["crit", "agility", "maxStonesplit", "minBamboocut", "minPhys"])],
+        build,
+      ),
+      classId: "stonesplitStrength",
+    }
+    const counts = equippedStatLineCounts(inputs)
+    const foreignRow = counts.rows.find((row) => row.statLineId === "foreignAttributeAttack")
+    expect(foreignRow).toEqual({
+      statLineId: "foreignAttributeAttack",
+      current: 1,
+      wanted: 1,
+    })
+    expect(counts.rows.some((row) => row.statLineId === "minBellstrike")).toBe(false)
+    expect(counts.rows.some((row) => row.statLineId === "minBamboocut")).toBe(false)
+  })
+
+  it("does not count own attribute lines as foreignAttributeAttack", () => {
+    const build = customBuild([
+      { slot: "armor", words: ["crit", "agility", "maxStonesplit", "minBellstrike", "minPhys"] },
+    ])
+    const inputs: Inputs = {
+      ...inputsWith(
+        [pieceWithWords("armor", ["crit", "agility", "maxStonesplit", "minStonesplit", "minPhys"])],
+        build,
+      ),
+      classId: "stonesplitStrength",
+    }
+    const counts = equippedStatLineCounts(inputs)
+    const foreignRow = counts.rows.find((row) => row.statLineId === "foreignAttributeAttack")
+    expect(foreignRow).toEqual({
+      statLineId: "foreignAttributeAttack",
+      current: 0,
+      wanted: 1,
+    })
+    const ownMinRow = counts.rows.find((row) => row.statLineId === "minStonesplit")
+    expect(ownMinRow).toEqual({
+      statLineId: "minStonesplit",
+      current: 1,
+      wanted: 0,
+    })
+  })
 })
 
 describe("EquippedStatLinesPanel", () => {
@@ -184,5 +232,21 @@ describe("EquippedStatLinesPanel", () => {
   it("shows the empty hint when nothing is equipped and nothing is followed", () => {
     renderPanel(inputsWith([]))
     expect(screen.getByText("No stat lines on the equipped gear.")).toBeTruthy()
+  })
+
+  it("renders Foreign Attribute Attack label and 1 / 1 count", () => {
+    const build = customBuild([
+      { slot: "armor", words: ["crit", "agility", "maxStonesplit", "minBellstrike", "minPhys"] },
+    ])
+    const inputs: Inputs = {
+      ...inputsWith(
+        [pieceWithWords("armor", ["crit", "agility", "maxStonesplit", "minBamboocut", "minPhys"])],
+        build,
+      ),
+      classId: "stonesplitStrength",
+    }
+    renderPanel(inputs)
+    const row = screen.getByText("Foreign Attribute Attack").closest("tr") as HTMLElement
+    expect(row.textContent).toContain("1 / 1")
   })
 })

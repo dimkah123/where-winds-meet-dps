@@ -9,7 +9,13 @@ import { ANXI_SOLDIER_BLADE_MOMENTUM_GAIN } from "./buffs/anxiSoldierBladeMoment
 // 2026-09-24).
 const SOLDIER_HIT_FRAMES = [10, 24, 28, 42]
 
-function hengSoldier(id: string, name: string, attunement: string, extraTags: string[] = []) {
+function hengSoldier(
+  id: string,
+  name: string,
+  attunement: string,
+  extraTags: string[] = [],
+  extraReceives: string[] = [],
+) {
   return defineSkill({
     id,
     classId: "stonesplitStrength",
@@ -23,7 +29,9 @@ function hengSoldier(id: string, name: string, attunement: string, extraTags: st
       BUFF.mountainSplitter,
       BUFF.cleftpeakDeflect,
       BUFF.etherwrathPenetrationBoost,
+      BUFF.snowpartingBladeAdditionalAttackCoefficient,
       ...SNOWPARTING_BLADE_RECEIVES,
+      ...extraReceives,
     ],
     triggersBuffs: [BUFF.throatPierced],
     castFrames: 42,
@@ -52,6 +60,7 @@ export const anxisoldierheng = hengSoldier(
   "AnxiSoldierHeng",
   ATTUNE.snowpartingVariedCombo,
   [ROLE.snowpartingVC],
+  [BUFF.frostCladSnowbreakIPConsume],
 )
 
 export const anxisoldierhengStab = hengSoldier(

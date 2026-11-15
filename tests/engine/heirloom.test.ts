@@ -317,3 +317,73 @@ describe("heirloom — one retune away from any build", () => {
     )
   })
 })
+
+describe("heirloom — foreign attribute attack matching", () => {
+  const stonesplitBuild = classDefinition("stonesplitStrength")!.graduationBuilds[0]
+  const targetArmor = stonesplitBuild.gear.find((piece) => piece.slot === "armor")!
+
+  it("recognizes armor with any other foreign attribute attack as an heirloom", () => {
+    const withBamboocut = pieceFrom(targetArmor, [
+      "crit",
+      "agility",
+      "maxStonesplit",
+      "minBamboocut",
+      "minPhys",
+    ])
+    expect(isHeirloom(withBamboocut, { classId: "stonesplitStrength" })).toBe(true)
+
+    const withMaxBellstrike = pieceFrom(targetArmor, [
+      "crit",
+      "agility",
+      "maxStonesplit",
+      "maxBellstrike",
+      "minPhys",
+    ])
+    expect(isHeirloom(withMaxBellstrike, { classId: "stonesplitStrength" })).toBe(true)
+
+    const withSilkbind = pieceFrom(targetArmor, [
+      "crit",
+      "agility",
+      "maxStonesplit",
+      "maxSilkbind",
+      "minPhys",
+    ])
+    expect(isHeirloom(withSilkbind, { classId: "stonesplitStrength" })).toBe(true)
+
+    const withFormless = pieceFrom(targetArmor, [
+      "crit",
+      "agility",
+      "maxStonesplit",
+      "minFormless",
+      "minPhys",
+    ])
+    expect(isHeirloom(withFormless, { classId: "stonesplitStrength" })).toBe(true)
+  })
+
+  it("does not accept the class's own attribute in place of a foreign attribute", () => {
+    const withOwnStonesplit = pieceFrom(targetArmor, [
+      "crit",
+      "agility",
+      "maxStonesplit",
+      "minStonesplit",
+      "minPhys",
+    ])
+    expect(isHeirloom(withOwnStonesplit, { classId: "stonesplitStrength" })).toBe(false)
+  })
+
+  it("suggests Foreign Attribute Attack swap when an off-spec attribute line is missing", () => {
+    const missingOffSpec = pieceFrom(targetArmor, [
+      "crit",
+      "agility",
+      "maxStonesplit",
+      "power",
+      "minPhys",
+    ])
+    const swap = heirloomSwapFor(missingOffSpec, { classId: "stonesplitStrength" })
+    expect(swap).toMatchObject({
+      slotIndex: 3,
+      currentWord: "power",
+      word: "foreignAttributeAttack",
+    })
+  })
+})

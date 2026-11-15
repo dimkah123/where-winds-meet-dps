@@ -16,6 +16,24 @@
   grid-area: stats;
 }
 
+.panelHeadTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.resetGearBtn {
+  padding: 2px 8px;
+  font-size: 0.78em;
+  line-height: 1.3;
+}
+
+.resetGearBtnActive {
+  padding: 2px 8px;
+  font-size: 0.78em;
+  line-height: 1.3;
+}
+
 .lift {
   grid-area: lift;
 }

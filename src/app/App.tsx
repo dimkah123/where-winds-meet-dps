@@ -19,7 +19,6 @@ import { CornerToasts } from "../ui/layout/corner-toasts/CornerToasts"
 import { EncounterSettingsTrigger } from "../ui/features/overview/encounter-settings-trigger/EncounterSettingsTrigger"
 import { EncounterSettingsDialog } from "../ui/features/overview/encounter-settings-dialog/EncounterSettingsDialog"
 import type { EncounterCategory } from "../engine/encounterOptions"
-import { GithubLink } from "../ui/layout/github-link/GithubLink"
 import { ChangelogButton } from "../ui/layout/changelog-button/ChangelogButton"
 import { LanguageSelect } from "../ui/layout/language-select/LanguageSelect"
 import { RotationTab } from "../ui/features/rotation/rotation-tab/RotationTab"
@@ -383,7 +382,6 @@ function AppInner() {
           </div>
           <div className={styles.appTitlebarActions}>
             <LanguageSelect />
-            <GithubLink />
             <button
               type="button"
               className={"save-btn" + (isDirty ? " dirty" : "")}

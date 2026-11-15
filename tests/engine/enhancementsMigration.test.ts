@@ -82,4 +82,13 @@ describe("enhancement levels — the every-load hydrator", () => {
     const { profiles } = loadProfiles()
     expect(profiles[0].inputs.enhancements).toEqual(defaultInputs.enhancements)
   })
+
+  it("upgrades a slot at legacy level 65 to 70 when breakthrough is 18 and cap is 70", () => {
+    writeProfilesBlob({
+      breakthrough: 18,
+      enhancements: { ...defaultInputs.enhancements, bracer: 65 },
+    })
+    const { profiles } = loadProfiles()
+    expect(profiles[0].inputs.enhancements.bracer).toBe(70)
+  })
 })

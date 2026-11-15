@@ -13,6 +13,7 @@ import { BUFF, PARAM } from "../../src/data/skills/buffs/ids"
 import { CAST } from "../../src/data/skills/ids"
 import { SKILL } from "../../src/data/skills/stonesplit-strength/ids"
 import { INNER_WAY_ID } from "../../src/data/innerWays/ids"
+import { forgetfulnessCooldown } from "../../src/data/innerWays/frostCladNightBuffs/forgetfulness"
 import { builtinSkill, testRotation } from "../builtins"
 
 const CLASS_ID = "stonesplitStrength"
@@ -110,6 +111,41 @@ describe("Snowbreak Spring", () => {
     expect(strike.damageFactor).toBeCloseTo(1.76, 9)
   })
 
+  it("propagates the 1.40 damage factor to the Anxi Army Assist when Snowbreak Spring consumes Inner Passion at Tier >= 4", () => {
+    const engine = buffEngineWith(
+      { classId: CLASS_ID, [PARAM.frostCladNight]: true, frostCladNightTier: 4 },
+      buffDefsForClass(CLASS_ID),
+      groupBuffDefs(),
+    )
+    engine.processSkillCast(CAST.snowpartingSpecial, 0, { castTime: 1 }, false, [BUFF.innerPassion])
+    const press = engine.processSkillCast(CAST.snowpartingVC, 2, {
+      consumesInnerPassion: true,
+      castTime: 52 / 60,
+      hitCount: 3,
+    })
+    expect(press.propagatedBuffIds).toContain(BUFF.frostCladSnowbreakIPConsume)
+    const assist = stonesplitSkill(SKILL.anxisoldierheng)
+    const result = engine.calculateDamageEffects(assist, 2 + 34 / 60, press.propagatedBuffIds)
+    expect(result.damageFactor).toBeCloseTo(1.4, 9)
+  })
+
+  it("does not boost the Anxi Army Assist when Snowbreak Spring is cast without Inner Passion", () => {
+    const engine = buffEngineWith(
+      { classId: CLASS_ID, [PARAM.frostCladNight]: true, frostCladNightTier: 4 },
+      buffDefsForClass(CLASS_ID),
+      groupBuffDefs(),
+    )
+    const press = engine.processSkillCast(CAST.snowpartingVC, 2, {
+      consumesInnerPassion: true,
+      castTime: 52 / 60,
+      hitCount: 3,
+    })
+    expect(press.propagatedBuffIds).not.toContain(BUFF.frostCladSnowbreakIPConsume)
+    const assist = stonesplitSkill(SKILL.anxisoldierheng)
+    const result = engine.calculateDamageEffects(assist, 2 + 34 / 60, press.propagatedBuffIds)
+    expect(result.damageFactor).toBe(1)
+  })
+
   it("is legal after a Dual-Weapon Skill and spends the marker", () => {
     const once = runRotation([SKILL.snowpartingdual, SKILL.snowpartingvc])
     expect(invalidCount(once)).toBe(0)
@@ -181,6 +217,10 @@ describe("Forgetfulness' Grave Frost", () => {
     expect(markerFrame(SKILL.snowpartingcharged)).toEqual([83, false])
     expect(markerFrame(SKILL.snowpartingchargedForgetfulness)).toEqual([44, false])
   })
+
+  it("runs a 5.5 s cooldown (330 frames at 60 fps)", () => {
+    expect(forgetfulnessCooldown.durationFrames).toBe(330)
+  })
 })
 
 describe("Total Annihilation", () => {
@@ -200,6 +240,35 @@ describe("Total Annihilation", () => {
       [BUFF.jadeware]: 179.76,
     })
   })
+
+  it("unleashes Soul with Supreme damage and refreshes Iron Guards while active", () => {
+    const soul = stonesplitSkill(SKILL.phalanxqSoul)
+    expect(soul.castConditions).toEqual([
+      { buffId: BUFF.ironGuards, op: "gte", stacks: 1, source: "buffEngine" },
+    ])
+    expect(soul.hits.map((hit) => hit.frame)).toEqual([25.65])
+    expect(soul.castFrames).toBe(49)
+    expect(soul.triggersBuffs).toContain(BUFF.ironGuards)
+    expect(soul.triggersBuffsAtFrame).toEqual({
+      [BUFF.totalAnnihilationSupremeShield]: 49,
+      [BUFF.jadeware]: 7,
+    })
+    const supreme = stonesplitSkill(SKILL.phalanxqSupreme)
+    expect(soul.hits[0]!.physMultiplier).toBe(supreme.hits[0]!.physMultiplier)
+    expect(soul.hits[0]!.attributeMultiplier).toBe(supreme.hits[0]!.attributeMultiplier)
+    expect(soul.hits[0]!.physFixed).toBe(supreme.hits[0]!.physFixed)
+    expect(soul.hits[0]!.attributeFixed).toBe(supreme.hits[0]!.attributeFixed)
+    expect(soul.hits[0]!.triggers).toEqual(supreme.hits[0]!.triggers)
+  })
+
+  it("rejects Soul when Iron Guards is absent and accepts it when Iron Guards is active", () => {
+    const withoutIronGuards = runRotation([SKILL.phalanxqSoul])
+    expect(invalidCount(withoutIronGuards)).toBe(1)
+    expect(failedBuffIds(withoutIronGuards, 0)).toContain(BUFF.ironGuards)
+
+    const withIronGuards = runRotation([SKILL.phalanxspecialPrepull, SKILL.phalanxqSoul])
+    expect(invalidCount(withIronGuards)).toBe(0)
+  })
 })
 
 describe("Jadeware", () => {
@@ -216,6 +285,7 @@ describe("Jadeware", () => {
       SKILL.snowpartingqSlash,
       SKILL.phalanxq,
       SKILL.phalanxqSupreme,
+      SKILL.phalanxqSoul,
     ])
       expect(firing(skillId), skillId).toBe(true)
     for (const skillId of [

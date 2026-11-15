@@ -48,6 +48,10 @@ const CHECKED_FIELDS = [
   "hits",
 ] as const
 
+const MOVED_AGAIN_FIELDS: Partial<Record<string, readonly (typeof CHECKED_FIELDS)[number][]>> = {
+  "stonesplitStrength-snowpartingq-stab": ["hits"],
+}
+
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T
 
 const healedThroughLaterSteps = (skill: unknown): Skill =>
@@ -66,7 +70,11 @@ const builtinOf = (id: string): Skill =>
   builtinSkillsForClass("stonesplitStrength").find((skill) => skill.id === id)!
 
 const fieldsOf = (skill: Skill) =>
-  Object.fromEntries(CHECKED_FIELDS.map((field) => [field, skill[field]]))
+  Object.fromEntries(
+    CHECKED_FIELDS.filter(
+      (field) => !(MOVED_AGAIN_FIELDS[skill.id] ?? []).includes(field),
+    ).map((field) => [field, skill[field]]),
+  )
 
 describe("custom-skills v85 fixture", () => {
   it("is v85 and still stores the old shape for every healed skill", () => {

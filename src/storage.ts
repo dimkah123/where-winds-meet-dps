@@ -29,7 +29,11 @@ import {
   isValidPingMs,
   isValidServerProcessingMs,
 } from "./engine/pingFps"
-import { repairGraduationBuildId } from "./engine/graduation"
+import {
+  repairGraduationBuildId,
+  standardizedInnerWaysForClass,
+  standardizedMindMethods,
+} from "./engine/graduation"
 import { defaultArsenalForClass } from "./engine/panel"
 import { CLASS_IDS, classDefinition } from "./definitions/classes/registry"
 import { resolveResourceSettings } from "./definitions/resources/resourceDef"
@@ -395,7 +399,15 @@ function hydrateInputs(inputs: Inputs): Inputs {
   // A class id naming a class that no longer exists degrades to the default
   // build's class rather than reaching `getSchool()`, which throws on an
   // unknown id — see CLAUDE.md → "localStorage migrations".
-  if (!CLASS_IDS().includes(next.classId)) next.classId = defaultInputs.classId
+  const classWasReset = !CLASS_IDS().includes(next.classId)
+  if (classWasReset) {
+    next.classId = defaultInputs.classId
+    next.arsenal = defaultArsenalForClass(next.classId)
+    const standardInnerWays = standardizedInnerWaysForClass(next.classId)
+    if (standardInnerWays) {
+      next.mindMethods = standardizedMindMethods(standardInnerWays)
+    }
+  }
   Object.assign(next, moveWeaponsToMartialArtSlots(next as unknown as Record<string, unknown>))
   const withSetsOnPieces = moveSetsOntoGearPieces(next as unknown as Record<string, unknown>)
   delete (next as unknown as Record<string, unknown>).set
@@ -576,10 +588,14 @@ function hydrateInputs(inputs: Inputs): Inputs {
     const healed = {} as EnhancementLevels
     for (const slot of GEAR_SLOTS) {
       const value = bySlot[slot]
-      healed[slot] =
+      const level =
         typeof value === "number" && Number.isFinite(value) && value >= 0
           ? Math.round(value)
           : defaults[slot]
+      healed[slot] =
+        level === 65 && (next.breakthrough as number) >= 18 && defaults[slot] >= 70
+          ? defaults[slot]
+          : level
     }
     next.enhancements = healed
   }

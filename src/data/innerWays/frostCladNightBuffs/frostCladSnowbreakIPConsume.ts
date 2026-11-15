@@ -1,6 +1,6 @@
 import { defineBuff } from "../../../definitions/skills/buffDef"
 import { BUFF, PARAM } from "../../skills/buffs/ids"
-import { PROP } from "../../skills/ids"
+import { PROP, ROLE } from "../../skills/ids"
 import { damageMultiplier } from "../../../engine/effects/effect"
 
 // The bonus lands on a cast that actually spent an Inner Passion stack, so it
@@ -18,7 +18,20 @@ export const frostCladSnowbreakIPConsume = defineBuff({
       phase: "exhausted",
       requires: { param: PARAM.frostCladNight, minTier: 6 },
     },
+    grants: [
+      {
+        whenConsumedFrom: BUFF.innerPassion,
+        buffIds: [BUFF.frostCladSnowbreakIPConsume],
+        propagate: true,
+      },
+    ],
   },
-  summary: "Snowbreak Spring ×1.76 instead of ×1.36 on a cast that consumes Inner Passion",
-  effects: (ctx) => (ctx.self.reachesEvent ? [damageMultiplier(1.76 / 1.36)] : []),
+  summary: "Snowbreak Spring ×1.76 instead of ×1.36 and Anxi Army Assist ×1.40 on a cast that consumes Inner Passion",
+  effects: (ctx) => {
+    if (!ctx.self.reachesEvent) return []
+    if (ctx.event.kind === "damage" && ctx.event.tags.has(ROLE.anxiSoldier)) {
+      return [damageMultiplier(1.4)]
+    }
+    return [damageMultiplier(1.76 / 1.36)]
+  },
 })

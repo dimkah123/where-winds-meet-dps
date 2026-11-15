@@ -209,6 +209,8 @@ export interface Inputs {
   disabledTalentNodes: DisabledTalentNodes
 
   enhancements: EnhancementLevels
+
+  statOverrides?: Record<string, number>
 }
 
 export type TalentStat =

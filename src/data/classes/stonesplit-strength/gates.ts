@@ -17,11 +17,14 @@ export const STONESPLIT_STRENGTH_GATES: Buff[] = [
     scope: "player",
     activation: "triggered",
     durationFrames: DREAD_DURATION_FRAMES,
-    effects: [{ statKey: "allDamageBoost", amount: 0.12 }],
+    effects: [
+      { statKey: "physBoost", amount: 0.12 },
+      { statKey: "attributeDamageBoost", amount: 0.12 },
+    ],
     maxStacks: 1,
     stackScaling: "flat",
     createdAt: "2026-08-09T00:00:00.000Z",
-    updatedAt: "2026-08-09T00:00:00.000Z",
+    updatedAt: "2026-11-14T00:00:00.000Z",
   }),
   defineGateBuff({
     id: FEARFUL_BLADE_BUFF_ID,

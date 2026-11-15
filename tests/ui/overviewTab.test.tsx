@@ -94,6 +94,49 @@ describe("the Overview tab", () => {
     expect(panel.querySelector(".panel-head-meta")?.textContent).toBe("0 / 5")
     expect(within(panel).getByRole("row", { name: /Critical/ })).toHaveTextContent("0 / 5")
   })
+
+  it("disables the Reset to gear button when there are no stat overrides", () => {
+    const inputs = { ...defaultInputs, classId: "bellstrikeUmbra" }
+    render(
+      <I18nProvider>
+        <OverviewTab
+          inputs={inputs}
+          configuredInputs={inputs}
+          engineInputs={inputs}
+          onChange={() => {}}
+          result={runEngine(inputs)}
+        />
+      </I18nProvider>,
+    )
+
+    const resetBtn = screen.getByRole("button", { name: "Reset to gear" })
+    expect(resetBtn).toBeDisabled()
+  })
+
+  it("enables the Reset to gear button when stat overrides exist and clears them on click", () => {
+    const onChange = vi.fn()
+    const inputs = {
+      ...defaultInputs,
+      classId: "bellstrikeUmbra",
+      statOverrides: { critRate: 1.5 },
+    }
+    render(
+      <I18nProvider>
+        <OverviewTab
+          inputs={inputs}
+          configuredInputs={inputs}
+          engineInputs={inputs}
+          onChange={onChange}
+          result={runEngine(inputs)}
+        />
+      </I18nProvider>,
+    )
+
+    const resetBtn = screen.getByRole("button", { name: "Reset to gear" })
+    expect(resetBtn).not.toBeDisabled()
+    fireEvent.click(resetBtn)
+    expect(onChange).toHaveBeenCalledWith(expect.not.objectContaining({ statOverrides: expect.anything() }))
+  })
 })
 
 describe("the Sword Trial boss choice on the Overview tab", () => {

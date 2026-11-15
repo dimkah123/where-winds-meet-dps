@@ -292,6 +292,23 @@ describe("Iron Guards", () => {
     ])
     expect(withSteadfastDevotion.isBuffActiveAtTime(BUFF.ironGuards, 41)).toBe(true)
   })
+
+  it("Total Annihilation: Soul refreshes Iron Guards", () => {
+    const withSteadfastDevotion = engine({
+      maxPhysAttack: 750,
+      [PARAM.steadfastDevotion]: true,
+      steadfastDevotionTier: 1,
+    })
+    withSteadfastDevotion.processSkillCast(CAST.phalanxSpecial, 0, { castTime: 1 }, false, [
+      BUFF.ironGuards,
+    ])
+    expect(withSteadfastDevotion.isBuffActiveAtTime(BUFF.ironGuards, 39)).toBe(true)
+    withSteadfastDevotion.processSkillCast(CAST.phalanxQSoul, 25, { castTime: 1 }, false, [
+      BUFF.ironGuards,
+    ])
+    expect(withSteadfastDevotion.isBuffActiveAtTime(BUFF.ironGuards, 64)).toBe(true)
+    expect(withSteadfastDevotion.isBuffActiveAtTime(BUFF.ironGuards, 66)).toBe(false)
+  })
 })
 
 describe("the class's skill critical damage — steps by white Critical Rate", () => {
@@ -353,7 +370,10 @@ describe("Dread and Fearful Blade — the two gate buffs", () => {
   const fearfulBlade = gates.find((buff) => buff.id === STATUS.fearfulBlade)!
 
   it("carry their measured stat effects", () => {
-    expect(dread.effects).toEqual([{ statKey: "allDamageBoost", amount: 0.12 }])
+    expect(dread.effects).toEqual([
+      { statKey: "physBoost", amount: 0.12 },
+      { statKey: "attributeDamageBoost", amount: 0.12 },
+    ])
     expect(fearfulBlade.effects).toEqual([
       { statKey: "allDamageBoost", amount: 0.08 },
       { statKey: "bellstrike.penetration", amount: 0.16 },
@@ -384,13 +404,11 @@ describe("what lays the two gate buffs", () => {
     expect(opening.extendFrames).toBeUndefined()
   })
 
-  // The stab EXTENDS Dread rather than reopening it — without `extendOnly` the
-  // window collapses from thirteen seconds to seven.
-  it("the stab extends Dread by two seconds and lays Fearful Blade", () => {
+  it("the stab extends Dread and lays Fearful Blade", () => {
     const stab = triggersOf(SKILL.snowpartingqStab)
     const extension = stab.find((trigger) => trigger.targetId === STATUS.dread)!
     expect(extension.stacks).toBe(0)
-    expect(extension.extendFrames).toBe(120)
+    expect(extension.extendFrames).toBe(200)
     expect(extension.extendOnly).toBe(true)
 
     const fearful = stab.find((trigger) => trigger.targetId === STATUS.fearfulBlade)!

@@ -4,12 +4,13 @@ import { followedGraduationBuildAmong, graduationBuildsForProfile } from "./grad
 import { ALL_REROLLABLE_SLOTS, retunedOutWordsOf } from "./retunement"
 import { gearPieceAtGearLevel } from "../data/classes/graduationGear"
 import { gearWordPoolForLine } from "../data/stats/gearWordPools"
-import { weaponTypeForSlot } from "../definitions/classes/registry"
+import { FOREIGN_ATTRIBUTE_ATTACK_ID } from "../data/stats/statLines"
+import { isOffSpecAttributeWord, weaponTypeForSlot } from "../definitions/classes/registry"
 
 export interface HeirloomSwap {
   slotIndex: number
   currentWord: GearWordId | ""
-  word: GearWordId
+  word: GearWordId | typeof FOREIGN_ATTRIBUTE_ATTACK_ID
   builds: readonly GraduationBuild[]
 }
 
@@ -31,55 +32,130 @@ function wordIds(piece: Pick<GearPiece, "words">): string[] {
   return piece.words.map((word) => word.word)
 }
 
-function sortedWordIds(piece: Pick<GearPiece, "words">): string[] {
-  return [...wordIds(piece)].sort()
-}
+function sameWordSet(
+  piece: Pick<GearPiece, "words">,
+  target: GearPiece,
+  classId?: string,
+): boolean {
+  const pieceWords = wordIds(piece)
+  const targetWords = wordIds(target)
+  if (pieceWords.length !== targetWords.length) return false
+  const remainingTarget = [...targetWords]
+  const unmatchedPiece: string[] = []
 
-function sameWordSet(piece: Pick<GearPiece, "words">, target: GearPiece): boolean {
-  const pieceWords = sortedWordIds(piece)
-  const targetWords = sortedWordIds(target)
-  return pieceWords.every((word, index) => word === targetWords[index])
+  for (const pw of pieceWords) {
+    const idx = remainingTarget.indexOf(pw)
+    if (idx >= 0) {
+      remainingTarget.splice(idx, 1)
+    } else {
+      unmatchedPiece.push(pw)
+    }
+  }
+
+  if (unmatchedPiece.length === 0 && remainingTarget.length === 0) return true
+  if (!classId) return false
+
+  const stillUnmatchedPiece: string[] = []
+  for (const pw of unmatchedPiece) {
+    if (isOffSpecAttributeWord(pw, classId)) {
+      const targetOffSpecIdx = remainingTarget.findIndex((tw) =>
+        isOffSpecAttributeWord(tw, classId),
+      )
+      if (targetOffSpecIdx >= 0) {
+        remainingTarget.splice(targetOffSpecIdx, 1)
+        continue
+      }
+    }
+    stillUnmatchedPiece.push(pw)
+  }
+
+  return stillUnmatchedPiece.length === 0 && remainingTarget.length === 0
 }
 
 function singleSwapTo(
   piece: GearPiece,
   target: GearPiece,
   build: GraduationBuild,
+  classId?: string,
 ): HeirloomSwap | null {
-  const missing = [...wordIds(target)]
-  const extra: number[] = []
+  const remainingTarget = [...wordIds(target)]
+  const unmatchedPiece: { slotIndex: number; word: string }[] = []
+
   for (const [slotIndex, word] of wordIds(piece).entries()) {
-    const found = missing.indexOf(word)
-    if (found >= 0) missing.splice(found, 1)
-    else extra.push(slotIndex)
+    const found = remainingTarget.indexOf(word)
+    if (found >= 0) remainingTarget.splice(found, 1)
+    else unmatchedPiece.push({ slotIndex, word })
   }
-  if (extra.length !== 1 || missing.length !== 1) return null
-  const slotIndex = extra[0]
+
+  const stillUnmatchedPiece: { slotIndex: number; word: string }[] = []
+  if (classId) {
+    for (const item of unmatchedPiece) {
+      if (isOffSpecAttributeWord(item.word, classId)) {
+        const targetOffSpecIdx = remainingTarget.findIndex((tw) =>
+          isOffSpecAttributeWord(tw, classId),
+        )
+        if (targetOffSpecIdx >= 0) {
+          remainingTarget.splice(targetOffSpecIdx, 1)
+          continue
+        }
+      }
+      stillUnmatchedPiece.push(item)
+    }
+  } else {
+    stillUnmatchedPiece.push(...unmatchedPiece)
+  }
+
+  if (stillUnmatchedPiece.length !== 1 || remainingTarget.length !== 1) return null
+  const slotIndex = stillUnmatchedPiece[0].slotIndex
   if (!ALL_REROLLABLE_SLOTS.includes(slotIndex)) return null
+  const missingWord = remainingTarget[0]
+  const word =
+    classId && isOffSpecAttributeWord(missingWord, classId)
+      ? (FOREIGN_ATTRIBUTE_ATTACK_ID as GearWordId)
+      : (missingWord as GearWordId)
   return {
     slotIndex,
     currentWord: piece.words[slotIndex].word,
-    word: missing[0] as GearWordId,
+    word,
     builds: [build],
   }
 }
 
-function canStillRetune(piece: GearPiece, slotIndex: number, word: GearWordId): boolean {
+function canStillRetune(
+  piece: GearPiece,
+  slotIndex: number,
+  word: GearWordId | typeof FOREIGN_ATTRIBUTE_ATTACK_ID,
+  classId?: string,
+): boolean {
   if (piece.relayed) return false
   const markedElsewhere = piece.words.some(
     (line, index) => line.retuned && index !== slotIndex && ALL_REROLLABLE_SLOTS.includes(index),
   )
   if (markedElsewhere) return false
-  return !retunedOutWordsOf(piece).has(word)
+  if (word === FOREIGN_ATTRIBUTE_ATTACK_ID) {
+    const pool = gearWordPoolForLine(
+      piece.level,
+      piece.slot,
+      slotIndex,
+      classId ? weaponTypeForSlot(classId, piece.slot) : null,
+    )
+    const retunedOut = retunedOutWordsOf(piece)
+    return pool.some((w) => isOffSpecAttributeWord(w, classId) && !retunedOut.has(w))
+  }
+  return !retunedOutWordsOf(piece).has(word as GearWordId)
 }
 
 function isWordInLinePool(piece: GearPiece, swap: HeirloomSwap, classId: string): boolean {
-  return gearWordPoolForLine(
+  const pool = gearWordPoolForLine(
     piece.level,
     piece.slot,
     swap.slotIndex,
     weaponTypeForSlot(classId, piece.slot),
-  ).includes(swap.word)
+  )
+  if (swap.word === FOREIGN_ATTRIBUTE_ATTACK_ID) {
+    return pool.some((w) => isOffSpecAttributeWord(w, classId))
+  }
+  return pool.includes(swap.word as GearWordId)
 }
 
 export function heirloomMatch(piece: GearPiece, profile: HeirloomProfile): HeirloomMatch {
@@ -93,14 +169,14 @@ export function heirloomMatch(piece: GearPiece, profile: HeirloomProfile): Heirl
     const rawTarget = build.gear.find((gearPiece) => gearPiece.slot === piece.slot)
     if (!rawTarget) continue
     const target = gearPieceAtGearLevel(rawTarget, piece.level)
-    if (sameWordSet(piece, target)) {
+    if (sameWordSet(piece, target, profile.classId)) {
       perfect.push(build)
       continue
     }
-    const candidate = singleSwapTo(piece, target, build)
+    const candidate = singleSwapTo(piece, target, build, profile.classId)
     if (
       !candidate ||
-      !canStillRetune(piece, candidate.slotIndex, candidate.word) ||
+      !canStillRetune(piece, candidate.slotIndex, candidate.word, profile.classId) ||
       !isWordInLinePool(piece, candidate, profile.classId)
     )
       continue

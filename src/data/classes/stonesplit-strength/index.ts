@@ -3,13 +3,15 @@ import { CLASS_ID, SKILLS } from "../../skills/stonesplit-strength"
 import { DEBUFFS } from "../../skills/stonesplit-strength/debuffs"
 import { withUniversalSkills } from "../../../definitions/skills/universalSkills"
 import { rotationsFor } from "../../../definitions/rotations/registry"
-import defaultRotation from "./rotations/tillaDummyRotation"
+import defaultRotation from "./rotations/mixedDummy1Min"
 import { INNER_WAY_ID } from "../../innerWays/ids"
 import { ironGuards } from "../../skills/stonesplit-strength/buffs/ironGuards"
 import { stonesplitStrengthSkillCritDamage } from "../../skills/stonesplit-strength/buffs/skillCritDamage"
 import {
   phalanxbaneBladeAdditionalAttack,
+  phalanxbaneBladeAdditionalAttackCoefficient,
   snowpartingBladeAdditionalAttack,
+  snowpartingBladeAdditionalAttackCoefficient,
 } from "../../skills/stonesplit-strength/buffs/additionalAttack"
 import { STONESPLIT_STRENGTH_GATES } from "./gates"
 import { MARTIAL_ART_ID } from "../../martialArts/ids"
@@ -59,7 +61,9 @@ export const stonesplitStrength = defineClass({
     ironGuards,
     stonesplitStrengthSkillCritDamage,
     phalanxbaneBladeAdditionalAttack,
+    phalanxbaneBladeAdditionalAttackCoefficient,
     snowpartingBladeAdditionalAttack,
+    snowpartingBladeAdditionalAttackCoefficient,
   ],
   gateBuffs: STONESPLIT_STRENGTH_GATES,
   mechanics: [],

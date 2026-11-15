@@ -743872,7 +743872,7 @@
   "stonesplitStrength": {
     "static": {
       "skills": {
-        "count": 80,
+        "count": 81,
         "ids": [
           "mystic-dragon-fire-smolder-1-hit",
           "mystic-dragon-fire-smolder-2-hits",
@@ -743938,6 +743938,7 @@
           "stonesplitStrength-phalanxcharged-s3",
           "stonesplitStrength-phalanxcharged-s3-innerpassion",
           "stonesplitStrength-phalanxq",
+          "stonesplitStrength-phalanxq-soul",
           "stonesplitStrength-phalanxq-supreme",
           "stonesplitStrength-phalanxspecial",
           "stonesplitStrength-phalanxspecial-prepull",
@@ -743955,7 +743956,7 @@
           "stonesplitStrength-snowpartingvc",
           "stonesplitStrength-snowpartingvc-prepull"
         ],
-        "digest": "255325a9385dc1d96276e9ab6c4e2f891e728d9d08e1365908225b9628c662f3"
+        "digest": "56f75f998ae323566402ccc2bb76dff1c4fd2fa7ffc8cbcdef808a393807a4ed"
       },
       "debuffs": {
         "count": 7,
@@ -744073,7 +744074,7 @@
           "duration": 0,
           "maxStacks": null,
           "effects": "[fn]",
-          "summary": "Snowbreak Spring ×1.76 instead of ×1.36 on a cast that consumes Inner Passion"
+          "summary": "Snowbreak Spring ×1.76 instead of ×1.36 and Anxi Army Assist ×1.40 on a cast that consumes Inner Passion"
         },
         {
           "id": "mountainSplitter",
@@ -746024,6 +746025,32 @@
           "summary": "physFixed/attributeFixed +7.25% to +50% by breakthrough"
         },
         {
+          "id": "phalanxbaneBladeAdditionalAttackCoefficient",
+          "name": "Phalanxbane Blade — Anxi Soldier Coefficient",
+          "classBuff": true,
+          "requires": {
+            "minBreakthrough": 18
+          },
+          "grantRequires": null,
+          "affectsAll": false,
+          "alwaysActive": true,
+          "buffAppliesOnCastEnd": false,
+          "cooldown": null,
+          "rateLimit": null,
+          "stackRateLimit": null,
+          "stacksPerHit": false,
+          "stackOnGrantingHit": false,
+          "seedAtStart": false,
+          "refreshOnAnyCast": false,
+          "requiresBuffActive": null,
+          "activeAfterBuffEnds": null,
+          "hasStacksFn": false,
+          "duration": 9999,
+          "maxStacks": null,
+          "effects": "[fn]",
+          "summary": "Anxi Soldier Mo skills ×1.00725 to ×1.05 by breakthrough"
+        },
+        {
           "id": "snowpartingBladeAdditionalAttack",
           "name": "Snowparting Blade — Additional Attack Up",
           "classBuff": true,
@@ -746048,6 +746075,32 @@
           "maxStacks": null,
           "effects": "[fn]",
           "summary": "physFixed/attributeFixed +7.25% to +50% by breakthrough"
+        },
+        {
+          "id": "snowpartingBladeAdditionalAttackCoefficient",
+          "name": "Snowparting Blade — Anxi Soldier Coefficient",
+          "classBuff": true,
+          "requires": {
+            "minBreakthrough": 18
+          },
+          "grantRequires": null,
+          "affectsAll": false,
+          "alwaysActive": true,
+          "buffAppliesOnCastEnd": false,
+          "cooldown": null,
+          "rateLimit": null,
+          "stackRateLimit": null,
+          "stacksPerHit": false,
+          "stackOnGrantingHit": false,
+          "seedAtStart": false,
+          "refreshOnAnyCast": false,
+          "requiresBuffActive": null,
+          "activeAfterBuffEnds": null,
+          "hasStacksFn": false,
+          "duration": 9999,
+          "maxStacks": null,
+          "effects": "[fn]",
+          "summary": "Anxi Soldier Heng skills ×1.00725 to ×1.05 by breakthrough"
         }
       ],
       "group": [
@@ -746078,7 +746131,7 @@
       ]
     },
     "dynamic": {
-      "digest": "8e0cf47d4de3e9b63a7bff765c10254f7cf2aedd03e1c11a4f092e18861ee64e"
+      "digest": "3ab1a7b7ad70434e1140d16d69a1b59d9f42238b437d3e842eaec2468ad52f21"
     }
   },
   "bellstrikeSplendor": {

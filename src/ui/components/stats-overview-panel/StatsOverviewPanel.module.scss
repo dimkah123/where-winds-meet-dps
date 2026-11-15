@@ -32,10 +32,10 @@
 
 .statsOverviewRow {
   display: grid;
-  grid-template-columns: minmax(70px, 1fr) minmax(60px, max-content);
-  align-items: baseline;
-  column-gap: 8px;
-  padding: 1px 0;
+  grid-template-columns: minmax(70px, 1fr) minmax(50px, max-content);
+  align-items: center;
+  column-gap: 6px;
+  padding: 0.5px 0;
 }
 
 .statsOverviewLabel {
@@ -50,6 +50,67 @@
   font-variant-numeric: tabular-nums;
   text-align: right;
   white-space: nowrap;
+}
+
+.statValueGroup {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1px;
+  max-width: 100%;
+}
+
+.statInput {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.9em;
+  font-variant-numeric: tabular-nums;
+  padding: 0 3px;
+  height: 18px;
+  line-height: 18px;
+  text-align: right;
+  box-sizing: border-box;
+  field-sizing: content;
+  min-width: 34px;
+  max-width: 68px;
+  transition:
+    border-color 0.12s,
+    background-color 0.12s,
+    color 0.12s;
+
+  &:hover {
+    border-color: var(--color-border-hover);
+    background: rgba(0, 0, 0, 0.35);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    background: var(--color-surface);
+  }
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  -moz-appearance: textfield;
+}
+
+.statInputOverridden {
+  color: var(--color-accent-bright);
+  border-color: var(--color-accent);
+  background: rgba(229, 169, 59, 0.12);
+  font-weight: 600;
+}
+
+.statPercentSign {
+  color: var(--color-text-dim);
+  font-size: 0.85em;
+  margin-right: 2px;
 }
 
 .statsOverviewEff {

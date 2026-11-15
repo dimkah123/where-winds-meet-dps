@@ -12,7 +12,7 @@ export const emptyMindMethod = { name: "", stacks: "" } as const
 const FIXTURE_BREAKTHROUGH = 13
 
 export const defaultInputs: Inputs = {
-  classId: "bellstrikeUmbra",
+  classId: "stonesplitStrength",
   breakthrough: FIXTURE_BREAKTHROUGH,
   followedBreakthroughRelease: newestBreakthroughRelease(),
 
@@ -81,7 +81,7 @@ export const defaultInputs: Inputs = {
   shareDebuff5HenZhi: false,
   shareEasyHurt: false,
   bowGear: { ...EMPTY_BOW_GEAR },
-  arsenal: "bamboocut",
+  arsenal: "stonesplit",
   arsenalScores: { ...DEFAULT_ARSENAL_SCORES },
   dummyMode: false,
   useGraduationQiBreak: true,
@@ -106,7 +106,7 @@ export const defaultInputs: Inputs = {
 
 export const blankInputs: Inputs = {
   ...defaultInputs,
-  classId: "bellstrikeUmbra",
+  classId: "stonesplitStrength",
   breakthrough: defaultBreakthrough(),
   food: bestRecipeAttackFoodAt(defaultBreakthrough()),
   enhancements: defaultEnhancementLevels(defaultBreakthrough()),

@@ -156,6 +156,7 @@ describe("Skill Editor — Effects: Triggers / Receives columns", () => {
     expect(savedAnxiSoldierMoDown().receives).toEqual([
       "cleftpeakDeflect",
       "etherwrathPenetrationBoost",
+      "phalanxbaneBladeAdditionalAttackCoefficient",
       "phalanxbaneBladeAdditionalAttack",
     ])
   })

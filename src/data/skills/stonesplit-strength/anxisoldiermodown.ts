@@ -24,6 +24,7 @@ export const anxisoldiermodown = defineSkill({
     BUFF.mountainSplitter,
     BUFF.cleftpeakDeflect,
     BUFF.etherwrathPenetrationBoost,
+    BUFF.phalanxbaneBladeAdditionalAttackCoefficient,
     ...PHALANXBANE_BLADE_RECEIVES,
   ],
   triggersBuffs: [BUFF.throatPierced, BUFF.mountainSplitter],

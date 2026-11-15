@@ -43,7 +43,7 @@ export const snowpartingqStab = defineSkill({
         applyBuff({
           target: STATUS.dread,
           stacks: 0,
-          extendFrames: 120,
+          extendFrames: 200,
           extendOnly: true,
         }),
         applyBuff({ target: STATUS.fearfulBlade }),
@@ -51,5 +51,5 @@ export const snowpartingqStab = defineSkill({
     }),
   ],
   createdAt: "2026-07-19T00:00:00.000Z",
-  updatedAt: "2026-07-19T00:00:00.000Z",
+  updatedAt: "2026-11-14T00:00:00.000Z",
 })

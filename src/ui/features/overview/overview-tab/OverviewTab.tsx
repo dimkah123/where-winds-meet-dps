@@ -30,6 +30,17 @@ export function OverviewTab({
   const { t } = useI18n()
   const { rows: rankingRows, isPending: rankingPending } = useItemRanking(engineInputs, result.dps)
   const slottedInnerWays = inputs.mindMethods.filter((slot) => slotInnerWayId(slot)).length
+  const hasStatOverrides = Boolean(
+    inputs.statOverrides && Object.keys(inputs.statOverrides).length > 0,
+  )
+
+  const handleResetToGear = () => {
+    if (!hasStatOverrides) return
+    const next = { ...inputs }
+    delete next.statOverrides
+    onChange(next)
+  }
+
   return (
     <div className={styles.overviewGrid}>
       <div className={styles.slots}>
@@ -66,13 +77,24 @@ export function OverviewTab({
       <div className={styles.stats}>
         <div className="panel">
           <div className="panel-head">
-            <h2>{t("common.panelStats")}</h2>
+            <div className={styles.panelHeadTitleGroup}>
+              <h2>{t("common.panelStats")}</h2>
+              <button
+                type="button"
+                className={`btn ${hasStatOverrides ? `secondary ${styles.resetGearBtnActive}` : styles.resetGearBtn}`}
+                onClick={handleResetToGear}
+                disabled={!hasStatOverrides}
+                title={t("overview.resetToGearHint")}
+              >
+                {t("overview.resetToGear")}
+              </button>
+            </div>
             <span className="panel-head-meta">
               {t("common.resistance")}:{" "}
               <span className="panel-head-meta-value">{resistanceForInputs(inputs)}%</span>
             </span>
           </div>
-          <StatsOverviewPanel inputs={inputs} />
+          <StatsOverviewPanel inputs={inputs} onChange={onChange} />
         </div>
       </div>
 

@@ -63,9 +63,31 @@ function clone(inputs: Inputs): Inputs {
     stonesplit: { ...inputs.stonesplit },
     silkbind: { ...inputs.silkbind },
     bamboocut: { ...inputs.bamboocut },
-    classSpecificAttunement: {},
+    classSpecificAttunement: { ...inputs.classSpecificAttunement },
     mindMethods: inputs.mindMethods.map((m) => ({ ...m })) as Inputs["mindMethods"],
+    statOverrides: inputs.statOverrides ? { ...inputs.statOverrides } : undefined,
   }
+}
+
+export function applyStatOverrides(inputs: Inputs): Inputs {
+  if (!inputs.statOverrides || Object.keys(inputs.statOverrides).length === 0) {
+    return inputs
+  }
+  const next = clone(inputs)
+  for (const [path, value] of Object.entries(inputs.statOverrides)) {
+    if (value === undefined || !Number.isFinite(value)) continue
+    if (path === "formlessAttack.min" || path === "formlessAttack.max") {
+      const bound = path.split(".")[1] as "min" | "max"
+      next.formlessAttack = {
+        min: next.formlessAttack?.min ?? 0,
+        max: next.formlessAttack?.max ?? 0,
+        [bound]: value,
+      }
+    } else {
+      writePath(next, path, value)
+    }
+  }
+  return next
 }
 
 function writePath(inputs: Inputs, path: string, value: number): void {

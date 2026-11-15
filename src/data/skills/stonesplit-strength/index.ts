@@ -10,6 +10,7 @@ import { phalanxchargedS3Innerpassion } from "./phalanxcharged-s3-innerpassion"
 import { phalanxchargedS3 } from "./phalanxcharged-s3"
 import { phalanxq } from "./phalanxq"
 import { phalanxqSupreme } from "./phalanxq-supreme"
+import { phalanxqSoul } from "./phalanxq-soul"
 import { phalanxspecialPrepull } from "./phalanxspecial-prepull"
 import { phalanxspecial } from "./phalanxspecial"
 import { snowpartingchargedForgetfulness } from "./snowpartingcharged-forgetfulness"
@@ -60,6 +61,7 @@ export const SKILLS: Skill[] = [
   phalanxchargedS3,
   phalanxq,
   phalanxqSupreme,
+  phalanxqSoul,
   phalanxspecialPrepull,
   phalanxspecial,
   snowpartingchargedForgetfulness,

@@ -464,6 +464,11 @@ export const STAT_LINES = [
     maxRoll: getAttunement("formlessPen")?.max ?? {},
   },
   {
+    id: "foreignAttributeAttack",
+    label: "Foreign Attribute Attack",
+    unit: "raw",
+  },
+  {
     id: "targetDefense",
     label: "Target Defense",
     unit: "raw",
@@ -557,6 +562,8 @@ export function statLine(id: string): StatLineDef | undefined {
 export function statLineLabel(id: string): string {
   return STAT_LINE_BY_ID.get(id)?.label ?? id
 }
+
+export const FOREIGN_ATTRIBUTE_ATTACK_ID = "foreignAttributeAttack"
 
 export const GEAR_WORD_LINES: readonly StatLineDef[] = STAT_LINE_DEFS.filter(
   (line) => line.maxRoll !== undefined,
