@@ -7,7 +7,11 @@ import { writeFixture } from "../writeFixture"
 
 const LOCALES_DIR = join(import.meta.dirname, "..", "..", "src", "i18n", "locales")
 const ENGLISH_PATH = join(LOCALES_DIR, "en.json")
-const TRANSLATED_PATHS = [join(LOCALES_DIR, "ko.json"), join(LOCALES_DIR, "zh.json")]
+const TRANSLATED_PATHS = [
+  join(LOCALES_DIR, "ko.json"),
+  join(LOCALES_DIR, "zh.json"),
+  join(LOCALES_DIR, "ru.json"),
+]
 const REGENERATE = process.env.UPDATE_I18N_CATALOGUE === "1"
 
 function read(path: string): Record<string, string> {
