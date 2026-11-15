@@ -1,7 +1,7 @@
 import type { Inputs } from "../../engine/types"
 import { allowedInnerWaysForClass, defaultArsenalForClass, swapArsenal } from "../../engine/panel"
 import {
-  soleGraduationBuildId,
+  defaultGraduationBuildId,
   standardizedInnerWaysForClass,
   standardizedMindMethods,
 } from "../../engine/graduation"
@@ -51,6 +51,6 @@ export function syncClassPermanent(inputs: Inputs, classId: string): Inputs {
     graduationBuildId:
       sameClass && inputs.graduationBuildId
         ? inputs.graduationBuildId
-        : soleGraduationBuildId(classId),
+        : defaultGraduationBuildId(classId),
   }
 }

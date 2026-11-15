@@ -1,27 +1,25 @@
-import { CLASS_DEFS, classDefinition } from "../../../../definitions/classes/registry"
+import { SELECTABLE_CLASS_DEFS, classDefinition } from "../../../../definitions/classes/registry"
+import { graduationBuildsFor } from "../../../../definitions/graduationBuilds/registry"
 import { useI18n } from "../../../../i18n/i18nContext"
-import { classKey, martialArtKey } from "../../../../i18n/contentKeys"
-import { GITHUB_REPO_URL } from "../../../layout/github-link/GithubLink"
-import { GithubIcon } from "../../../components/github-icon/GithubIcon"
-import optionTiles from "../../../components/option-tile/OptionTile.module.scss"
+import { classKey, graduationBuildKey, martialArtKey } from "../../../../i18n/contentKeys"
 import styles from "./ClassPicker.module.scss"
-
-const WIKI_URL = `${GITHUB_REPO_URL}/wiki`
-
-const UNVALIDATED_HINT_KEY = "setup.classPicker.unvalidatedHint"
 
 interface Props {
   value: string
   onChange(classId: string): void
+  selectedBuildId?: string | null
+  onSelectBuild?: (buildId: string) => void
 }
 
-export function ClassPicker({ value, onChange }: Props) {
+export function ClassPicker({ value, onChange, selectedBuildId, onSelectBuild }: Props) {
   const { t } = useI18n()
+  const classDefs = SELECTABLE_CLASS_DEFS()
+  const builds = graduationBuildsFor(value)
 
   return (
     <div className={styles.pickerRoot}>
-      <div className={`${optionTiles.tileGrid} ${optionTiles.cols2}`}>
-        {CLASS_DEFS().map((classDef) => {
+      <div className={styles.classTileContainer}>
+        {classDefs.map((classDef) => {
           const martialArts = classDefinition(classDef.id)!.martialArts
           const icon = martialArts.find((martialArt) => martialArt.icon)?.icon
           const selected = classDef.id === value
@@ -43,11 +41,6 @@ export function ClassPicker({ value, onChange }: Props) {
                   <span className={styles.name}>
                     {t(classKey(classDef.id), classDef.displayName)}
                   </span>
-                  {classDef.validated ? null : (
-                    <span className={styles.wip} title={t(UNVALIDATED_HINT_KEY)}>
-                      {t("setup.classPicker.wip")}
-                    </span>
-                  )}
                 </div>
                 {martialArts.map((martialArt, index) => (
                   <div key={martialArt.id} className={styles.weaponRow}>
@@ -64,12 +57,41 @@ export function ClassPicker({ value, onChange }: Props) {
           )
         })}
       </div>
-      <a className={styles.helpLink} href={WIKI_URL} target="_blank" rel="noreferrer">
-        <span className={styles.helpIcon}>
-          <GithubIcon />
-        </span>
-        {t("setup.classPicker.missingYourClassHelpImplement")}
-      </a>
+
+      {builds.length > 0 && (
+        <div className={styles.buildPickerSection}>
+          <div className={styles.buildGrid}>
+            {builds.map((build) => {
+              const isSelected = selectedBuildId
+                ? build.id === selectedBuildId
+                : build.id === builds[0]?.id
+              return (
+                <button
+                  type="button"
+                  key={build.id}
+                  className={`${styles.buildTile} ${isSelected ? styles.buildSelected : ""}`}
+                  onClick={() => onSelectBuild?.(build.id)}
+                  aria-current={isSelected}
+                >
+                  <span className={styles.buildRadio}>
+                    <span
+                      className={`${styles.radioDot} ${isSelected ? styles.radioDotSelected : ""}`}
+                    />
+                    <span className={styles.buildName}>
+                      {t(graduationBuildKey(build.id), build.name)}
+                    </span>
+                  </span>
+                  {isSelected && (
+                    <span className={styles.buildFollowing}>
+                      {t("gear.graduationBuildPicker.following")}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

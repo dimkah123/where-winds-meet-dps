@@ -2,21 +2,18 @@ import { describe, it, expect, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
 import { ClassPicker } from "../../src/ui/features/setup/class-picker/ClassPicker"
 import { I18nProvider } from "../../src/i18n/I18nProvider"
-import { CLASS_DEFS, classDefinition } from "../../src/definitions/classes/registry"
-import { GITHUB_REPO_URL } from "../../src/ui/layout/github-link/GithubLink"
+import { SELECTABLE_CLASS_DEFS, classDefinition } from "../../src/definitions/classes/registry"
 
 describe("ClassPicker", () => {
   it("offers one tile per registered class, and each names its martial arts", () => {
+    const classDefs = SELECTABLE_CLASS_DEFS()
     render(
       <I18nProvider>
-        <ClassPicker value={CLASS_DEFS()[0].id} onChange={() => {}} />
+        <ClassPicker value={classDefs[0].id} onChange={() => {}} />
       </I18nProvider>,
     )
 
-    const tiles = screen.getAllByRole("button")
-    expect(tiles).toHaveLength(CLASS_DEFS().length)
-
-    for (const classDef of CLASS_DEFS()) {
+    for (const classDef of classDefs) {
       const martialArts = classDefinition(classDef.id)!.martialArts
       const tile = screen.getByRole("button", {
         name: new RegExp(classDef.displayName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
@@ -29,7 +26,7 @@ describe("ClassPicker", () => {
 
   it("clicking a tile reports that class's id", () => {
     const onChange = vi.fn()
-    const classDefs = CLASS_DEFS()
+    const classDefs = SELECTABLE_CLASS_DEFS()
     render(
       <I18nProvider>
         <ClassPicker value={classDefs[0].id} onChange={onChange} />
@@ -42,7 +39,7 @@ describe("ClassPicker", () => {
   })
 
   it("marks the selected class's tile as current", () => {
-    const classDefs = CLASS_DEFS()
+    const classDefs = SELECTABLE_CLASS_DEFS()
     render(
       <I18nProvider>
         <ClassPicker value={classDefs[0].id} onChange={() => {}} />
@@ -58,30 +55,36 @@ describe("ClassPicker", () => {
     }
   })
 
-  it("offers a link to the wiki for a missing class, not a selectable tile", () => {
+  it("offers Min Build and Max Build options instead of the external link", () => {
+    const onSelectBuild = vi.fn()
     render(
       <I18nProvider>
-        <ClassPicker value={CLASS_DEFS()[0].id} onChange={() => {}} />
+        <ClassPicker
+          value={SELECTABLE_CLASS_DEFS()[0].id}
+          onChange={() => {}}
+          onSelectBuild={onSelectBuild}
+        />
       </I18nProvider>,
     )
 
-    const helpLink = screen.getByRole("link")
-    expect(helpLink).toHaveAttribute("href", `${GITHUB_REPO_URL}/wiki`)
-    expect(helpLink).toHaveAttribute("target", "_blank")
-    expect(helpLink).not.toHaveAttribute("aria-current")
-    expect(screen.getAllByRole("button")).toHaveLength(CLASS_DEFS().length)
+    expect(screen.queryByRole("link")).not.toBeInTheDocument()
+    const minBuildBtn = screen.getByRole("button", { name: /Min Build/i })
+    const maxBuildBtn = screen.getByRole("button", { name: /Max Build/i })
+    expect(minBuildBtn).toBeInTheDocument()
+    expect(maxBuildBtn).toBeInTheDocument()
+
+    maxBuildBtn.click()
+    expect(onSelectBuild).toHaveBeenCalledWith("graduation-stonesplitStrength-max-build")
   })
 
-  // Keyed to `ClassDef.validated` rather than to a class name, so validating a
-  // class moves the badge without this test being touched.
   it("badges every unvalidated class as WIP, and no validated one", () => {
     render(
       <I18nProvider>
-        <ClassPicker value={CLASS_DEFS()[0].id} onChange={() => {}} />
+        <ClassPicker value={SELECTABLE_CLASS_DEFS()[0].id} onChange={() => {}} />
       </I18nProvider>,
     )
 
-    for (const classDef of CLASS_DEFS()) {
+    for (const classDef of SELECTABLE_CLASS_DEFS()) {
       const tile = screen.getByRole("button", {
         name: new RegExp(classDef.displayName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
       })

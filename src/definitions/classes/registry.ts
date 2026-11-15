@@ -94,7 +94,15 @@ for (const classDef of CLASSES) {
 const AVAILABLE_CLASSES = CLASSES.filter((classDef) => classDef.id === "stonesplitStrength")
 
 export function CLASS_DEFS(): readonly ClassDef[] {
+  return CLASSES
+}
+
+export function SELECTABLE_CLASS_DEFS(): readonly ClassDef[] {
   return AVAILABLE_CLASSES
+}
+
+export function SELECTABLE_CLASS_IDS(): readonly string[] {
+  return AVAILABLE_CLASSES.map((classDef) => classDef.id)
 }
 
 export function CLASS_IDS(): readonly string[] {

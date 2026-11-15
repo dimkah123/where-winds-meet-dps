@@ -44,9 +44,14 @@ export function SetupWizard({ initialName, initialInputs, mode, onFinish, onCanc
   const [step, setStep] = useState<WizardStep>("class")
   const [manual, setManual] = useState(false)
   const [name, setName] = useState(initialName)
-  const [draft, setDraft] = useState<Inputs>(() =>
-    syncClassPermanent(initialInputs, initialInputs.classId),
-  )
+  const [draft, setDraft] = useState<Inputs>(() => {
+    const initial = syncClassPermanent(initialInputs, initialInputs.classId)
+    const builds = graduationBuildsFor(initial.classId)
+    return {
+      ...initial,
+      graduationBuildId: initial.graduationBuildId ?? builds[0]?.id,
+    }
+  })
   const importDraft = useGearImportDraft(draft)
 
   const graduationBuilds = graduationBuildsFor(draft.classId)
@@ -133,6 +138,8 @@ export function SetupWizard({ initialName, initialInputs, mode, onFinish, onCanc
           <ClassPicker
             value={draft.classId}
             onChange={(classId) => setDraft(syncClassPermanent(draft, classId))}
+            selectedBuildId={draft.graduationBuildId ?? graduationBuilds[0]?.id}
+            onSelectBuild={(graduationBuildId) => setDraft({ ...draft, graduationBuildId })}
           />
         )}
 

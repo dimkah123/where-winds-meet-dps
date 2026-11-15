@@ -145,10 +145,16 @@ export function soleGraduationBuildId(classId: string): string | null {
   return builds.length === 1 ? builds[0].id : null
 }
 
+export function defaultGraduationBuildId(classId: string): string | null {
+  const builds = graduationBuildsFor(classId)
+  return builds[0]?.id ?? null
+}
+
 export function repairGraduationBuildId(classId: string, stored: unknown): string | null {
-  if (typeof stored !== "string" || stored === "") return soleGraduationBuildId(classId)
+  const fallback = defaultGraduationBuildId(classId)
+  if (typeof stored !== "string" || stored === "") return fallback
   const known = allGraduationBuilds().find((build) => build.id === stored)
-  return known && known.classId !== classId ? soleGraduationBuildId(classId) : stored
+  return known && known.classId !== classId ? fallback : stored
 }
 
 export function graduationRatedInputs(inputs: Inputs): Inputs | null {
