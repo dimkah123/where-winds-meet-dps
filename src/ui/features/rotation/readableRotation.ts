@@ -343,6 +343,44 @@ export function readableRotationFromSteps(
   return groups.map(({ text, count }) => (count > 1 ? `${text} x${count}` : text)).join(" > ")
 }
 
+export function collapseConsecutiveSkills(text: string): string {
+  if (!text || !text.trim()) return text
+
+  const hasTrailingSep = /\s*>\s*$/.test(text)
+  const segments = text
+    .split(/\s*>\s*/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+
+  if (segments.length === 0) return text
+
+  interface Group {
+    base: string
+    count: number
+  }
+
+  const groups: Group[] = []
+
+  for (const seg of segments) {
+    const match = seg.match(/^(.*?)(?:\s*(?:[xX*×]\s*(\d+)))\s*$/)
+    const base = match ? match[1].trim() : seg
+    const count = match ? Math.max(1, parseInt(match[2], 10)) : 1
+
+    const prev = groups[groups.length - 1]
+    if (prev && prev.base.toLowerCase() === base.toLowerCase()) {
+      prev.count += count
+    } else {
+      groups.push({ base, count })
+    }
+  }
+
+  const formatted = groups
+    .map(({ base, count }) => (count > 1 ? `${base} x${count}` : base))
+    .join(" > ")
+
+  return hasTrailingSep ? `${formatted} > ` : formatted
+}
+
 export const CANONICAL_SKILLS_BY_CLASS: Record<string, Record<string, string>> = {
   stonesplitStrength: {
     "mo special": "stonesplitStrength-phalanxspecial",

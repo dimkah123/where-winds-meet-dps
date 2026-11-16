@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import {
   readableRotationText,
   readableRotationFromSteps,
+  collapseConsecutiveSkills,
 } from "../../src/ui/features/rotation/readableRotation"
 import { runEngine } from "../../src/engine/dps"
 import { defaultInputs } from "../../src/engine/defaults"
@@ -47,5 +48,15 @@ describe("readableRotation", () => {
 
     const text = readableRotationFromSteps(steps, skillsById)
     expect(text).toBe("Mo Special > Mo Charged x2 > Mo QQ")
+  })
+
+  it("collapses consecutive identical skills into multiplier format (x2, x3, etc.)", () => {
+    const input =
+      "Mo Special > Heng Q > Mo QQ > Mo Charged > Mo Charged > Mo Charged > Mo Charged > "
+    const collapsed = collapseConsecutiveSkills(input)
+    expect(collapsed).toBe("Mo Special > Heng Q > Mo QQ > Mo Charged x4 > ")
+
+    const inputWithMultipliers = "Mo Charged x2 > Mo Charged x3 > Heng Tab > Heng Tab"
+    expect(collapseConsecutiveSkills(inputWithMultipliers)).toBe("Mo Charged x5 > Heng Tab x2")
   })
 })

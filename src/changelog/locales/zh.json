@@ -5,6 +5,7 @@
     "Fixed": "修复"
   },
   "headlines": {
+    "1.1.5": "连续相同技能自动合并（x2、x3）与智能添加",
     "1.1.4": "斩雪滑步自动化与快捷添加精简",
     "1.1.3": "交互式循环编辑器、T9 输入与告警优化",
     "1.1.2": "气绝术语与布局优化，清晰的循环行",
@@ -17,6 +18,9 @@
     "1.0.0": "劈石破玉（力）DPS 计算器发布"
   },
   "items": {
+    "Auto-collapsing consecutive identical skills into multiplier format (x2, x3, etc.) when typing or using Quick Add.": "在输入或快捷添加时，自动将连续相同的技能合并为倍数格式（x2、x3 等）。",
+    "Smart Quick Add repetition: clicking the same skill button automatically increments its multiplier.": "智能快捷添加重复：点击相同技能按钮会自动增加其倍数。",
+    "Updated rotation editor input handling to automatically collapse consecutive duplicates on typing, blur, and paste.": "更新循环编辑器输入逻辑：在键入、失去焦点及粘贴时自动合并连续重复项。",
     "Automated Heng Q slide in prepull: writing a single Heng Q automatically sets up the full double-slide sequence.": "战斗前斩雪滑步自动化：输入单个 Heng Q 即可自动配置完整的双滑步序列。",
     "Added Heng LC quick-action button to rotation quick add palette for one-click insertion.": "在快捷添加调色板中添加 Heng LC 快捷按钮，支持一键插入。",
     "Unified Heng Q notation: removed duplicate 'Heng Q2 > Heng Q' in favor of clean single 'Heng Q'.": "统一 Heng Q 表示法：移除重复的“Heng Q2 > Heng Q”，改为整洁的单一“Heng Q”。",

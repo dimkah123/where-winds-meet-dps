@@ -90,6 +90,20 @@ describe("ReadableRotationDialog", () => {
     expect(quickHengLC).toBeInTheDocument()
     fireEvent.click(quickHengLC)
     expect(textarea.value).toBe("Mo Special > Heng Q > Heng LC > ")
+
+    const quickMoCharged = screen.getByRole("button", { name: "+Mo Charged" })
+    fireEvent.click(quickMoCharged)
+    expect(textarea.value).toBe("Mo Special > Heng Q > Heng LC > Mo Charged > ")
+
+    // Consecutive clicks on +Mo Charged should increment multiplier x2, x3, x4
+    fireEvent.click(quickMoCharged)
+    expect(textarea.value).toBe("Mo Special > Heng Q > Heng LC > Mo Charged x2 > ")
+
+    fireEvent.click(quickMoCharged)
+    expect(textarea.value).toBe("Mo Special > Heng Q > Heng LC > Mo Charged x3 > ")
+
+    fireEvent.click(quickMoCharged)
+    expect(textarea.value).toBe("Mo Special > Heng Q > Heng LC > Mo Charged x4 > ")
   })
 
   it("shows unknown skill highlight warning when typo is present", () => {

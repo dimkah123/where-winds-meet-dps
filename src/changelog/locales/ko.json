@@ -5,6 +5,7 @@
     "Fixed": "수정됨"
   },
   "headlines": {
+    "1.1.5": "연속 동일 스킬 자동 통합 (x2, x3) 및 스마트 추가",
     "1.1.4": "횡도 Q 활주 자동화 및 빠른 추가 간소화",
     "1.1.3": "대화형 로테이션 편집기, T9 입력 및 알림 개선",
     "1.1.2": "기파 파괴 용어 및 레이아웃 개선, 깔끔한 로테이션 행",
@@ -17,6 +18,9 @@
     "1.0.0": "벽석파옥 (힘) DPS 계산기 출시"
   },
   "items": {
+    "Auto-collapsing consecutive identical skills into multiplier format (x2, x3, etc.) when typing or using Quick Add.": "입력 또는 빠른 추가 시 연속된 동일 스킬을 배수 형식(x2, x3 등)으로 자동 통합.",
+    "Smart Quick Add repetition: clicking the same skill button automatically increments its multiplier.": "스마트 빠른 추가 반복: 동일한 스킬 버튼을 클릭하면 배수가 자동으로 증가합니다.",
+    "Updated rotation editor input handling to automatically collapse consecutive duplicates on typing, blur, and paste.": "로테이션 편집기 입력 처리 업데이트: 입력, 포커스 해제 및 붙여넣기 시 연속 중복 항목 자동 통합.",
     "Automated Heng Q slide in prepull: writing a single Heng Q automatically sets up the full double-slide sequence.": "전투 전 횡도 Q 활주 자동화: 단일 Heng Q 입력 시 전체 이중 활주 시퀀스가 자동으로 구성됩니다.",
     "Added Heng LC quick-action button to rotation quick add palette for one-click insertion.": "로테이션 빠른 추가 팔레트에 원클릭 삽입을 위한 Heng LC 버튼 추가.",
     "Unified Heng Q notation: removed duplicate 'Heng Q2 > Heng Q' in favor of clean single 'Heng Q'.": "횡도 Q 표기 통합: 중복된 'Heng Q2 > Heng Q'를 깔끔한 단일 'Heng Q'로 통일.",

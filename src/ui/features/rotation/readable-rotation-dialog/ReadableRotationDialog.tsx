@@ -4,6 +4,7 @@ import { useI18n } from "../../../../i18n/i18nContext"
 import type { Skill } from "../../../../engine/skill"
 import type { RotationStep } from "../../../../engine/rotation"
 import {
+  collapseConsecutiveSkills,
   getAvailableSkillSuggestions,
   parseReadableRotation,
   type SkillSuggestion,
@@ -81,10 +82,44 @@ export function ReadableRotationDialog({
   )
 
   function handleTextChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-    setText(e.target.value)
-    setCursorPos(e.target.selectionStart ?? 0)
+    const val = e.target.value
+    const pos = e.target.selectionStart ?? 0
+
+    // Auto-collapse if user just completed entering a `>` separator at the end
+    if (pos === val.length && /\s*>\s*$/.test(val)) {
+      const collapsed = collapseConsecutiveSkills(val)
+      setText(collapsed)
+      setCursorPos(collapsed.length)
+    } else {
+      setText(val)
+      setCursorPos(pos)
+    }
+
     setShowSuggestions(true)
     setActiveSuggestionIdx(0)
+  }
+
+  function handleBlur() {
+    setText((prev) => collapseConsecutiveSkills(prev))
+  }
+
+  function handlePaste(e: React.ClipboardEvent<HTMLTextAreaElement>) {
+    const pasted = e.clipboardData.getData("text")
+    if (pasted && pasted.includes(">")) {
+      e.preventDefault()
+      const before = text.slice(0, cursorPos)
+      const after = text.slice(cursorPos)
+      const combined = `${before}${pasted}${after}`
+      const collapsed = collapseConsecutiveSkills(combined)
+      setText(collapsed)
+      const newPos = collapsed.length
+      setCursorPos(newPos)
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.setSelectionRange(newPos, newPos)
+        }
+      }, 0)
+    }
   }
 
   function handleSelectOrClick(e: React.SyntheticEvent<HTMLTextAreaElement>) {
@@ -99,7 +134,30 @@ export function ReadableRotationDialog({
       beforeToken.length > 0 && !beforeToken.endsWith(" ") ? `${beforeToken} ` : beforeToken
     const cleanAfter = afterCursor.replace(/^\s*>*\s*/, "")
 
-    const inserted = `${cleanBefore}${suggestion.shortName} > `
+    // Check if the immediately preceding skill matches the suggestion
+    const segments = cleanBefore
+      .replace(/\s*>+\s*$/, "")
+      .split(/\s*>\s*/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+
+    let inserted = ""
+    if (segments.length > 0) {
+      const lastSeg = segments[segments.length - 1]
+      const match = lastSeg.match(/^(.*?)(?:\s*(?:[xX*×]\s*(\d+)))\s*$/)
+      const lastBase = match ? match[1].trim() : lastSeg
+      const lastCount = match ? Math.max(1, parseInt(match[2], 10)) : 1
+
+      if (lastBase.toLowerCase() === suggestion.shortName.toLowerCase()) {
+        segments[segments.length - 1] = `${lastBase} x${lastCount + 1}`
+        inserted = `${segments.join(" > ")} > `
+      } else {
+        inserted = `${cleanBefore}${suggestion.shortName} > `
+      }
+    } else {
+      inserted = `${cleanBefore}${suggestion.shortName} > `
+    }
+
     const newText = `${inserted}${cleanAfter}`
     setText(newText)
     setShowSuggestions(false)
@@ -145,8 +203,30 @@ export function ReadableRotationDialog({
     setText((prev) => {
       const trimmed = prev.trim()
       if (!trimmed) return `${skillName} > `
-      if (trimmed.endsWith(">")) return `${trimmed} ${skillName} > `
-      return `${trimmed} > ${skillName} > `
+
+      // Split into existing segments to check for consecutive repetition
+      const segments = trimmed
+        .replace(/\s*>+\s*$/, "")
+        .split(/\s*>\s*/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+
+      if (segments.length > 0) {
+        const lastSeg = segments[segments.length - 1]
+        const match = lastSeg.match(/^(.*?)(?:\s*(?:[xX*×]\s*(\d+)))\s*$/)
+        const lastBase = match ? match[1].trim() : lastSeg
+        const lastCount = match ? Math.max(1, parseInt(match[2], 10)) : 1
+
+        if (lastBase.toLowerCase() === skillName.toLowerCase()) {
+          // Increment count on existing skill
+          segments[segments.length - 1] = `${lastBase} x${lastCount + 1}`
+          return `${segments.join(" > ")} > `
+        }
+      }
+
+      // Different skill: append
+      const separator = trimmed.endsWith(">") ? " " : " > "
+      return `${trimmed}${separator}${skillName} > `
     })
     setTimeout(() => {
       if (textareaRef.current) {
@@ -215,6 +295,8 @@ export function ReadableRotationDialog({
             ref={textareaRef}
             value={text}
             onChange={handleTextChange}
+            onBlur={handleBlur}
+            onPaste={handlePaste}
             onSelect={handleSelectOrClick}
             onClick={handleSelectOrClick}
             onKeyDown={handleKeyDown}

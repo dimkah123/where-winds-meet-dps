@@ -5,6 +5,7 @@
     "Fixed": "Исправлено"
   },
   "headlines": {
+    "1.1.5": "Авто-объединение одинаковых навыков (x2, x3) и умный ввод",
     "1.1.4": "Автоматика слайда Heng Q и оптимизация быстрого ввода",
     "1.1.3": "Интерактивный редактор ротаций, T9-ввод и алерты",
     "1.1.2": "Терминология истощения Ци, улучшение интерфейса и строки ротаций",
@@ -17,6 +18,9 @@
     "1.0.0": "Релиз калькулятора УВС для Расколотого пика (Сила)"
   },
   "items": {
+    "Auto-collapsing consecutive identical skills into multiplier format (x2, x3, etc.) when typing or using Quick Add.": "Автоматическое объединение одинаковых идущих подряд навыков в формат множителя (x2, x3 и т.д.) при вводе и быстром добавлении.",
+    "Smart Quick Add repetition: clicking the same skill button automatically increments its multiplier.": "Умные повторные нажатия в быстром вводе: клик по тому же навыку автоматически увеличивает его множитель.",
+    "Updated rotation editor input handling to automatically collapse consecutive duplicates on typing, blur, and paste.": "Обновлена обработка ввода в редакторе: авто-объединение дубликатов при наборе, потере фокуса и вставке из буфера.",
     "Automated Heng Q slide in prepull: writing a single Heng Q automatically sets up the full double-slide sequence.": "Автоматизация слайда Heng Q в пре-пулле: при вводе одного Heng Q автоматически настраивается полная связка двойного скольжения.",
     "Added Heng LC quick-action button to rotation quick add palette for one-click insertion.": "Кнопка быстрого действия Heng LC добавлена в палитру быстрого ввода для вставки в один клик.",
     "Unified Heng Q notation: removed duplicate 'Heng Q2 > Heng Q' in favor of clean single 'Heng Q'.": "Единое обозначение Heng Q: исключено дублирование «Heng Q2 > Heng Q» в пользу чистого одинарного «Heng Q».",

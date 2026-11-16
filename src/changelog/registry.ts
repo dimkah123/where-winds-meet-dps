@@ -2,6 +2,12 @@ import type { ChangelogEntry } from "./types"
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: "1.1.5",
+    date: "2026-11-16",
+    headline: "Consecutive Skill Auto-Collapse (x2, x3) & Smart Add",
+    loadDetails: () => import("./entries/v1-1-5").then((module) => module.details),
+  },
+  {
     version: "1.1.4",
     date: "2026-11-16",
     headline: "Heng Q Slide Automation & Quick Add Streamlining",
