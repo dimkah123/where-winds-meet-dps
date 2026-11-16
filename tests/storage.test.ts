@@ -19,6 +19,7 @@ import {
   saveProfiles,
   exportProfile,
   importProfile,
+  healPrepullSlideSteps,
 } from "../src/storage"
 import { defaultInputs } from "../src/engine/defaults"
 import { builtinSkillsForClass, builtinDebuffsForClass } from "../src/engine/builtinLibrary"
@@ -2332,5 +2333,20 @@ describe("Sword Trial boss and Qi bar target hydration (additive, no version bum
     expect(runEngine(unknown).dps).toBe(
       runEngine({ ...unknown, swordTrialBoss: DEFAULT_SWORD_TRIAL_BOSS_ID }).dps,
     )
+  })
+
+  it("heals legacy Stonesplit prepull slide steps by swapping reslide-prepull before prepull into prepull before reslide-prepull", () => {
+    const legacyRotation = makeRotation("stonesplitStrength", {
+      steps: [
+        makeStep({ skillId: "stonesplitStrength-phalanxspecial-prepull" }),
+        makeStep({ skillId: "stonesplitStrength-snowpartingslide-reslide-prepull" }),
+        makeStep({ skillId: "stonesplitStrength-snowpartingslide-prepull" }),
+        makeStep({ skillId: "stonesplitStrength-snowpartingspecial" }),
+      ],
+    })
+
+    const healed = healPrepullSlideSteps(legacyRotation)
+    expect(healed.steps[1].skillId).toBe("stonesplitStrength-snowpartingslide-prepull")
+    expect(healed.steps[2].skillId).toBe("stonesplitStrength-snowpartingslide-reslide-prepull")
   })
 })

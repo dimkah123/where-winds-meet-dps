@@ -237,6 +237,27 @@ function isStoredProfile(x: unknown): x is StoredProfile {
   return true
 }
 
+export function healPrepullSlideSteps<T>(rotation: T): T {
+  if (!rotation || typeof rotation !== "object") return rotation
+  const r = rotation as unknown as Rotation
+  if (r.classId !== "stonesplitStrength" || !Array.isArray(r.steps)) return rotation
+  const steps: RotationStep[] = [...r.steps]
+  let changed = false
+  for (let i = 0; i < steps.length - 1; i++) {
+    if (
+      steps[i]?.skillId === "stonesplitStrength-snowpartingslide-reslide-prepull" &&
+      steps[i + 1]?.skillId === "stonesplitStrength-snowpartingslide-prepull"
+    ) {
+      const temp = steps[i]
+      steps[i] = steps[i + 1]
+      steps[i + 1] = temp
+      changed = true
+      i++
+    }
+  }
+  return (changed ? { ...r, steps } : rotation) as T
+}
+
 // For the standalone `wwm.customRotations` store; rotations inside a profile
 // go through the version chain instead.
 function migrateRotationIds<T>(rotation: T): T {
@@ -275,7 +296,9 @@ function migrateRotationIds<T>(rotation: T): T {
   )
     next.preferredDistanceMeters = DEFAULT_PREFERRED_DISTANCE_METERS
   delete (next as unknown as Record<string, unknown>).prePullHitsCount
-  return migrateRotationNightwickTipsylayIds(migrateRotationMysticIds(next)) as unknown as T
+  return healPrepullSlideSteps(
+    migrateRotationNightwickTipsylayIds(migrateRotationMysticIds(next)),
+  ) as unknown as T
 }
 
 // additive — see CLAUDE.md → "localStorage migrations"

@@ -6,8 +6,8 @@ export default defineRotation({
   classId: "stonesplitStrength",
   steps: [
     { skillId: "stonesplitStrength-phalanxspecial-prepull" },
-    { skillId: "stonesplitStrength-snowpartingslide-reslide-prepull" },
     { skillId: "stonesplitStrength-snowpartingslide-prepull" },
+    { skillId: "stonesplitStrength-snowpartingslide-reslide-prepull" },
     { skillId: "mystic-flute-of-the-tides-prepull" },
     { skillId: "stonesplitStrength-deflect" },
     { skillId: "stonesplitStrength-snowpartingspecial" },
