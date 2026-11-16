@@ -194,7 +194,7 @@ export function readableRotationText(
 ): string {
   const steps = rotation?.steps ?? []
   const casts = (result?.casts ?? []).filter(
-    (c) => !c.stepId.startsWith("swap-") && !c.stepId.startsWith("direct-swap-"),
+    (c) => !c.stepId || (!c.stepId.startsWith("swap-") && !c.stepId.startsWith("direct-swap-")),
   )
 
   if (casts.length === 0) {
