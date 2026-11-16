@@ -258,7 +258,7 @@ export function ReadableRotationDialog({
           <div className={styles.quickAddSection}>
             <span className={styles.quickAddLabel}>{t("rotation.editor.quickAdd")}:</span>
             <div className={styles.quickAddList}>
-              {availableSuggestions.slice(0, 16).map((s) => (
+              {availableSuggestions.slice(0, 17).map((s) => (
                 <button
                   key={`quick-${s.skillId}-${s.shortName}`}
                   type="button"
