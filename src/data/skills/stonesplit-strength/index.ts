@@ -24,6 +24,7 @@ import { snowpartingslidePrepull } from "./snowpartingslide-prepull"
 import { snowpartingslideReslidePrepull } from "./snowpartingslide-reslide-prepull"
 import { snowpartingslide } from "./snowpartingslide"
 import { snowpartingspecial } from "./snowpartingspecial"
+import { snowpartingspecial6Hit } from "./snowpartingspecial-6hit"
 import { snowpartingvcPrepull } from "./snowpartingvc-prepull"
 import { snowpartingvc } from "./snowpartingvc"
 import { snowpartingqSlash } from "./snowpartingq-slash"
@@ -74,6 +75,7 @@ export const SKILLS: Skill[] = [
   snowpartingslideReslidePrepull,
   snowpartingslide,
   snowpartingspecial,
+  snowpartingspecial6Hit,
   snowpartingvcPrepull,
   snowpartingvc,
   moBladeDual,

@@ -26,6 +26,7 @@ export const SKILL = {
   snowpartingslideReslidePrepull: "stonesplitStrength-snowpartingslide-reslide-prepull",
   snowpartingslidePrepullHit: "stonesplitStrength-snowpartingslide-prepull-hit",
   snowpartingspecial: "stonesplitStrength-snowpartingspecial",
+  snowpartingspecial6Hit: "stonesplitStrength-snowpartingspecial-6hit",
   snowpartingvc: "stonesplitStrength-snowpartingvc",
   snowpartingvcPrepull: "stonesplitStrength-snowpartingvc-prepull",
   moBladeDual: "stonesplitStrength-mo-blade-dual",

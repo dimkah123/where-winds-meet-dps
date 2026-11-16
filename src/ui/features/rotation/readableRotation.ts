@@ -26,6 +26,7 @@ export const SKILL_SHORT_NAMES: Record<string, string> = {
 
   // Stonesplit Strength — Snowparting
   "stonesplitStrength-snowpartingspecial": "Heng Special",
+  "stonesplitStrength-snowpartingspecial-6hit": "Heng Special 6 Hit",
   "stonesplitStrength-snowpartingq-stab": "Heng Q Stab",
   "stonesplitStrength-snowpartingq-slash": "Heng Q",
   "stonesplitStrength-snowpartingq": "Heng Q",
@@ -364,6 +365,15 @@ export const CANONICAL_SKILLS_BY_CLASS: Record<string, Record<string, string>> =
     "mo jump": "stonesplitStrength-anxisoldiermojump",
     "mo sweep": "stonesplitStrength-anxisoldiermosweep",
     "heng special": "stonesplitStrength-snowpartingspecial",
+    "heng special 6 hit": "stonesplitStrength-snowpartingspecial-6hit",
+    "heng special [6 hit]": "stonesplitStrength-snowpartingspecial-6hit",
+    "heng special [6 hits]": "stonesplitStrength-snowpartingspecial-6hit",
+    "heng 6 hit": "stonesplitStrength-snowpartingspecial-6hit",
+    "6 hit": "stonesplitStrength-snowpartingspecial-6hit",
+    "6-hit": "stonesplitStrength-snowpartingspecial-6hit",
+    "fleeting trace 6 hit": "stonesplitStrength-snowpartingspecial-6hit",
+    "fleeting trace [6 hit]": "stonesplitStrength-snowpartingspecial-6hit",
+    "fleeting trace [6 hits]": "stonesplitStrength-snowpartingspecial-6hit",
     "heng q": "stonesplitStrength-snowpartingq-slash",
     "heng q2": "stonesplitStrength-snowpartingslide-reslide-prepull",
     "heng q stab": "stonesplitStrength-snowpartingq-stab",
@@ -477,6 +487,7 @@ export const QUICK_ADD_GROUPS_BY_CLASS: Record<string, QuickAddGroup[]> = {
       label: "Heng",
       skills: [
         { shortName: "Heng Special", skillId: "stonesplitStrength-snowpartingspecial" },
+        { shortName: "Heng Special 6 Hit", skillId: "stonesplitStrength-snowpartingspecial-6hit" },
         { shortName: "Heng Q", skillId: "stonesplitStrength-snowpartingq-slash" },
         { shortName: "Heng Q2", skillId: "stonesplitStrength-snowpartingslide-reslide-prepull" },
         { shortName: "Heng Q Stab", skillId: "stonesplitStrength-snowpartingq-stab" },

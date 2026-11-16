@@ -90,7 +90,28 @@ describe("parseReadableRotation", () => {
     expect(shortNames).toContain("Mo Charged")
     expect(shortNames).toContain("Mo QQ")
     expect(shortNames).toContain("Heng Special")
+    expect(shortNames).toContain("Heng Special 6 Hit")
     expect(shortNames).toContain("Flute Cancel")
     expect(shortNames).toContain("Toad")
+  })
+
+  it("resolves Heng Special 6 Hit and 6 Hit aliases", () => {
+    const skills = builtinSkillsForClass("stonesplitStrength")
+    const skillsById = new Map(skills.map((s) => [s.id, s]))
+
+    const input1 = "Heng Special 6 Hit (start) > Heng Q Stab"
+    const parsed1 = parseReadableRotation(input1, "stonesplitStrength", skillsById)
+    expect(parsed1.hasErrors).toBe(false)
+    expect(parsed1.steps[0].skillId).toBe("stonesplitStrength-snowpartingspecial-6hit")
+
+    const input2 = "6 Hit (start) > Heng Q Stab"
+    const parsed2 = parseReadableRotation(input2, "stonesplitStrength", skillsById)
+    expect(parsed2.hasErrors).toBe(false)
+    expect(parsed2.steps[0].skillId).toBe("stonesplitStrength-snowpartingspecial-6hit")
+
+    const input3 = "Heng 6 Hit (start) > Heng Q Stab"
+    const parsed3 = parseReadableRotation(input3, "stonesplitStrength", skillsById)
+    expect(parsed3.hasErrors).toBe(false)
+    expect(parsed3.steps[0].skillId).toBe("stonesplitStrength-snowpartingspecial-6hit")
   })
 })
