@@ -84,6 +84,7 @@ describe("ReadableRotationDialog", () => {
     const quickHengQ = screen.getByRole("button", { name: "+Heng Q" })
     fireEvent.click(quickHengQ)
     expect(textarea.value).toBe("Mo Special > Heng Q > ")
+    expect(screen.queryByRole("button", { name: "+Heng Q2" })).not.toBeInTheDocument()
 
     const quickHengLC = screen.getByRole("button", { name: "+Heng LC" })
     expect(quickHengLC).toBeInTheDocument()

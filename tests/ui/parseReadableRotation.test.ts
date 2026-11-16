@@ -38,6 +38,23 @@ describe("parseReadableRotation", () => {
     expect(parsed.tokens[7].multiplier).toBe(3)
   })
 
+  it("automatically expands single Heng Q in prepull into both required prepull slide steps", () => {
+    const skills = builtinSkillsForClass("stonesplitStrength")
+    const skillsById = new Map(skills.map((s) => [s.id, s]))
+
+    const input =
+      "Mo Special > Heng Q > Flute Cancel > Deflect > Heng Special (start) > Heng Q Stab > Mo Charged x3 > Heng Tab > Heng VC > Heng LC"
+
+    const parsed = parseReadableRotation(input, "stonesplitStrength", skillsById)
+
+    expect(parsed.hasErrors).toBe(false)
+    expect(parsed.validCount).toBe(10)
+    // 10 tokens where Heng Q produces 2 slide steps + 1 skill with x3 = 13 steps
+    expect(parsed.totalSteps).toBe(13)
+    expect(parsed.steps[1].skillId).toBe("stonesplitStrength-snowpartingslide-reslide-prepull")
+    expect(parsed.steps[2].skillId).toBe("stonesplitStrength-snowpartingslide-prepull")
+  })
+
   it("handles unknown skills gracefully with error tokens", () => {
     const skills = builtinSkillsForClass("stonesplitStrength")
     const skillsById = new Map(skills.map((s) => [s.id, s]))

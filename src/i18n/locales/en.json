@@ -2477,7 +2477,7 @@
   "rotation.editor.saveAs": "Save as",
   "rotation.editor.selectSkill": "Select skill…",
   "rotation.editor.stacks": "Stacks",
-  "rotation.editor.typeRotationPlaceholder": "Type rotation (e.g. Mo Special > Heng Q2 > Mo Charged x3)...",
+  "rotation.editor.typeRotationPlaceholder": "Type rotation (e.g. Mo Special > Heng Q > Mo Charged x3)...",
   "rotation.editor.unknownSkillsCount": "{count} unknown",
   "rotation.options.default": " (default)",
   "rotation.rotationEditor": "Rotation Editor",

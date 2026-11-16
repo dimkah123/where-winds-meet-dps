@@ -2477,7 +2477,7 @@
   "rotation.editor.saveAs": "另存为",
   "rotation.editor.selectSkill": "选择技能…",
   "rotation.editor.stacks": "层数",
-  "rotation.editor.typeRotationPlaceholder": "输入循环（例如：Mo Special > Heng Q2 > Mo Charged x3）...",
+  "rotation.editor.typeRotationPlaceholder": "输入循环（例如：Mo Special > Heng Q > Mo Charged x3）...",
   "rotation.editor.unknownSkillsCount": "{count} 个未识别",
   "rotation.options.default": "（默认）",
   "rotation.rotationEditor": "循环编辑器",

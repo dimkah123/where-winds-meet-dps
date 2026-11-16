@@ -31,7 +31,7 @@ export const SKILL_SHORT_NAMES: Record<string, string> = {
   "stonesplitStrength-snowpartingq": "Heng Q",
   "stonesplitStrength-snowpartingslide": "Heng Q",
   "stonesplitStrength-snowpartingslide-prepull": "Heng Q",
-  "stonesplitStrength-snowpartingslide-reslide-prepull": "Heng Q2",
+  "stonesplitStrength-snowpartingslide-reslide-prepull": "Heng Q",
   "stonesplitStrength-snowpartingslide-prepull-hit": "Heng Q",
   "stonesplitStrength-snowpartingdual": "Heng Tab",
   "stonesplitStrength-snowpartingdual-prepull": "Heng Tab",
@@ -234,6 +234,10 @@ export function readableRotationText(
 
   const entries: string[] = []
 
+  const isPrepullSlide = (id?: string) =>
+    id === "stonesplitStrength-snowpartingslide-prepull" ||
+    id === "stonesplitStrength-snowpartingslide-reslide-prepull"
+
   for (let i = 0; i < casts.length; i++) {
     const cast = casts[i]
     const skillId =
@@ -241,6 +245,23 @@ export function readableRotationText(
       (cast.stepIndex !== undefined && steps[cast.stepIndex]?.skillId) ||
       cast.fallbackFromSkillId ||
       ""
+
+    // Collapse consecutive prepull slides into a single "Heng Q"
+    if (isPrepullSlide(skillId) && i < startCastIndex) {
+      const nextCast = casts[i + 1]
+      const nextSkillId =
+        (nextCast &&
+          (stepSkillIdMap.get(nextCast.stepId) ||
+            (nextCast.stepIndex !== undefined && steps[nextCast.stepIndex]?.skillId) ||
+            nextCast.fallbackFromSkillId)) ||
+        ""
+      if (isPrepullSlide(nextSkillId)) {
+        entries.push("Heng Q")
+        i++ // Skip second slide cast
+        continue
+      }
+    }
+
     const skill =
       skillsById.get(skillId) ||
       skillsByName.get(cast.skillName) ||
@@ -291,12 +312,28 @@ export function readableRotationFromSteps(
   steps: RotationStep[],
   skillsById: Map<string, Skill>,
 ): string {
-  const entries = steps
-    .filter((step) => Boolean(step.skillId))
-    .map((step) => {
-      const skill = skillsById.get(step.skillId)
-      return getSkillShortName(skill, step.skillId)
-    })
+  const filteredSteps = steps.filter((step) => Boolean(step.skillId))
+  const entries: string[] = []
+
+  const isPrepullSlide = (id?: string) =>
+    id === "stonesplitStrength-snowpartingslide-prepull" ||
+    id === "stonesplitStrength-snowpartingslide-reslide-prepull"
+
+  for (let i = 0; i < filteredSteps.length; i++) {
+    const step = filteredSteps[i]
+    const skillId = step.skillId
+    const nextSkillId = filteredSteps[i + 1]?.skillId
+
+    if (isPrepullSlide(skillId) && isPrepullSlide(nextSkillId)) {
+      entries.push("Heng Q")
+      i++ // Skip second slide step
+      continue
+    }
+
+    const skill = skillsById.get(skillId)
+    entries.push(getSkillShortName(skill, skillId))
+  }
+
   const groups = entries.reduce<Array<{ text: string; count: number }>>((acc, text) => {
     const prev = acc[acc.length - 1]
     if (prev?.text === text) prev.count += 1
@@ -321,11 +358,13 @@ export const CANONICAL_SKILLS_BY_CLASS: Record<string, Record<string, string>> =
     "mo sweep": "stonesplitStrength-anxisoldiermosweep",
     "heng special": "stonesplitStrength-snowpartingspecial",
     "heng q": "stonesplitStrength-snowpartingq-slash",
-    "heng q2": "stonesplitStrength-snowpartingslide-reslide-prepull",
     "heng q stab": "stonesplitStrength-snowpartingq-stab",
     "heng tab": "stonesplitStrength-snowpartingdual",
     "heng vc": "stonesplitStrength-snowpartingvc",
     "heng lc": "stonesplitStrength-snowpartingcharged-forgetfulness",
+    deflect: "stonesplitStrength-deflect",
+    "break defense": "stonesplitStrength-break-defense",
+    "heng anxi": "stonesplitStrength-anxisoldierheng",
     "heng a1": "stonesplitStrength-heng-light-attack-1",
     "heng a2": "stonesplitStrength-heng-light-attack-2",
     "heng a3": "stonesplitStrength-heng-light-attack-3",
@@ -334,9 +373,6 @@ export const CANONICAL_SKILLS_BY_CLASS: Record<string, Record<string, string>> =
     "heng h2": "stonesplitStrength-heng-heavy-attack-2",
     "heng h3": "stonesplitStrength-heng-heavy-attack-3",
     "heng h4": "stonesplitStrength-heng-heavy-attack-4",
-    "heng anxi": "stonesplitStrength-anxisoldierheng",
-    "break defense": "stonesplitStrength-break-defense",
-    deflect: "stonesplitStrength-deflect",
   },
   bellstrikeUmbra: {
     "sword charged": "bellstrikeUmbra-sword-charge-stage-1-4-hit",
@@ -512,6 +548,11 @@ export function parseReadableRotation(
   const steps: RotationStep[] = []
   const classCanonical = CANONICAL_SKILLS_BY_CLASS[classId] ?? {}
 
+  const startIndex = rawSegments.findIndex((seg) =>
+    /\(start(?:\s+at\s+hit\s+\d+)?\)/i.test(seg),
+  )
+  let prepullSlideExpanded = false
+
   for (let i = 0; i < rawSegments.length; i++) {
     const raw = rawSegments[i]
 
@@ -530,28 +571,71 @@ export function parseReadableRotation(
       .trim()
 
     const normKey = cleanName.toLowerCase().replace(/\s+/g, " ")
+    const isPrepull = startIndex >= 0 ? i < startIndex : i <= 4
+
+    // Special automation for Stonesplit Heng Q slide in prepull:
+    if (
+      classId === "stonesplitStrength" &&
+      isPrepull &&
+      (normKey === "heng q" || normKey === "heng q2")
+    ) {
+      if (prepullSlideExpanded) {
+        // Already expanded prepull slide from preceding token (e.g. user typed Heng Q2 > Heng Q or Heng Q > Heng Q2)
+        // Mark this token valid as part of the slide, without adding duplicate steps
+        tokens.push({
+          raw,
+          cleanName,
+          multiplier,
+          skillId: "stonesplitStrength-snowpartingslide-prepull",
+          skillName: "SnowpartingSlide Prepull",
+          valid: true,
+        })
+        continue
+      }
+
+      prepullSlideExpanded = true
+      tokens.push({
+        raw,
+        cleanName,
+        multiplier,
+        skillId: "stonesplitStrength-snowpartingslide-prepull",
+        skillName: "SnowpartingSlide Prepull",
+        valid: true,
+      })
+
+      // Automatically generate both slide steps in correct order
+      steps.push({
+        id: newStepId(),
+        skillId: "stonesplitStrength-snowpartingslide-reslide-prepull",
+      })
+      steps.push({
+        id: newStepId(),
+        skillId: "stonesplitStrength-snowpartingslide-prepull",
+      })
+      continue
+    }
 
     // Match resolution:
     let resolvedSkillId: string | undefined
 
-    // Check prepull specific variants for opening skills (first 4 skills)
-    if (i <= 3) {
+    // Check prepull specific variants for opening skills
+    if (isPrepull) {
       if (classId === "stonesplitStrength") {
         if (
           normKey === "mo special" &&
           skillsById.has("stonesplitStrength-phalanxspecial-prepull")
         ) {
           resolvedSkillId = "stonesplitStrength-phalanxspecial-prepull"
-        } else if (
-          normKey === "heng q" &&
-          skillsById.has("stonesplitStrength-snowpartingslide-prepull")
-        ) {
-          resolvedSkillId = "stonesplitStrength-snowpartingslide-prepull"
         }
       }
       if (normKey === "flute cancel" && skillsById.has("mystic-flute-of-the-tides-prepull")) {
         resolvedSkillId = "mystic-flute-of-the-tides-prepull"
       }
+    }
+
+    // Support alias for "heng q2" outside prepull
+    if (!resolvedSkillId && normKey === "heng q2") {
+      resolvedSkillId = "stonesplitStrength-snowpartingslide-reslide-prepull"
     }
 
     // 1. Canonical class mapping

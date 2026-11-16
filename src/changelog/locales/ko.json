@@ -5,6 +5,7 @@
     "Fixed": "수정됨"
   },
   "headlines": {
+    "1.1.4": "횡도 Q 활주 자동화 및 빠른 추가 간소화",
     "1.1.3": "대화형 로테이션 편집기, T9 입력 및 알림 개선",
     "1.1.2": "기파 파괴 용어 및 레이아웃 개선, 깔끔한 로테이션 행",
     "1.1.1": "특성 현지화 및 초기 설정 마법사 경험 개선",
@@ -16,6 +17,11 @@
     "1.0.0": "벽석파옥 (힘) DPS 계산기 출시"
   },
   "items": {
+    "Automated Heng Q slide in prepull: writing a single Heng Q automatically sets up the full double-slide sequence.": "전투 전 횡도 Q 활주 자동화: 단일 Heng Q 입력 시 전체 이중 활주 시퀀스가 자동으로 구성됩니다.",
+    "Added Heng LC quick-action button to rotation quick add palette for one-click insertion.": "로테이션 빠른 추가 팔레트에 원클릭 삽입을 위한 Heng LC 버튼 추가.",
+    "Unified Heng Q notation: removed duplicate 'Heng Q2 > Heng Q' in favor of clean single 'Heng Q'.": "횡도 Q 표기 통합: 중복된 'Heng Q2 > Heng Q'를 깔끔한 단일 'Heng Q'로 통일.",
+    "Streamlined Quick Add palette by removing redundant +Heng Q2 and adding +Deflect.": "빠른 추가 팔레트 간소화: 불필요한 +Heng Q2를 제거하고 +Deflect 추가.",
+    "Prevented duplicate slide execution when importing rotations containing legacy Heng Q2 slide steps.": "레거시 Heng Q2 활주 단계가 포함된 로테이션 가져오기 시 중복 활주 실행 방지.",
     "Interactive readable rotation format editor with live syntax highlights, chip badges, and one-click copy.": "실시간 구문 강조, 칩 배지 및 원클릭 복사 기능이 포함된 대화형 가독성 로테이션 편집기.",
     "Smart T9 autocomplete for fast rotation typing with skill prefixes, brackets, and quick-add palette.": "스킬 접두사, 괄호 및 빠른 추가 팔레트로 빠른 로테이션 입력을 지원하는 스마트 T9 자동 완성.",
     "Replaced temporary rotation Qi break reminders with a permanent 'Don't show again' action.": "임시 로테이션 기파 파괴 알림을 영구적인 '다시 표시 안 함' 버튼으로 교체.",
