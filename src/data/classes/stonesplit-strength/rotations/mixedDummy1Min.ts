@@ -4,6 +4,7 @@ export default defineRotation({
   id: "builtin-stonesplitStrength-mixed-dummy-1-min",
   name: "Mixed Dummy 1 Min",
   classId: "stonesplitStrength",
+  category: "Mo - Rotation",
   steps: [
     { skillId: "stonesplitStrength-phalanxspecial-prepull" },
     { skillId: "stonesplitStrength-snowpartingslide-prepull" },

@@ -2428,6 +2428,8 @@
   "rotation.editor.charges": "충전 횟수",
   "rotation.editor.computedBreak": "",
   "rotation.editor.computedFirstBreakNone": "",
+  "rotation.category.Heng - Rotation": "Heng - Rotation",
+  "rotation.category.Mo - Rotation": "Mo - Rotation",
   "rotation.editor.connection": "",
   "rotation.editor.copied": "클립보드에 복사됨",
   "rotation.editor.default": " (기본값)",

@@ -18,6 +18,7 @@ export interface Rotation {
   id: string
   name: string
   classId: string
+  category?: string
   steps: RotationStep[]
   permanentBuffIds: string[]
   openingStacks?: Record<string, number>

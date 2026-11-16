@@ -14,20 +14,48 @@ export interface RotationOption {
   name: string
   description?: string
   group: RotationOptionGroup
+  category?: string
   isClassDefault: boolean
   rotation: Rotation
 }
 
+export function rotationOptionSectionLabel(
+  option: RotationOption | undefined,
+  t: (key: string, fallback?: string) => string,
+): string {
+  if (!option) return ""
+  if (option.group === "builtin") {
+    if (option.category) {
+      return t(`rotation.category.${option.category}`, option.category)
+    }
+    return t("common.builtInRotations")
+  }
+  return t("common.customRotation")
+}
+
 export function rotationOptions(classId: string, savedRotations: Rotation[]): RotationOption[] {
   const classDefault = defaultRotationForClass(classId)
-  const builtins = builtinRotationsForClass(classId).map<RotationOption>((rotation) => ({
-    id: rotation.id,
-    name: rotation.name,
-    description: rotation.description,
-    group: "builtin",
-    isClassDefault: rotation.id === classDefault?.id,
-    rotation,
-  }))
+  const defaultCategory = classDefault?.category
+  const builtins = builtinRotationsForClass(classId)
+    .map<RotationOption>((rotation) => ({
+      id: rotation.id,
+      name: rotation.name,
+      description: rotation.description,
+      group: "builtin",
+      category: rotation.category,
+      isClassDefault: rotation.id === classDefault?.id,
+      rotation,
+    }))
+    .sort((a, b) => {
+      if (a.category && b.category && a.category !== b.category) {
+        if (a.category === defaultCategory) return -1
+        if (b.category === defaultCategory) return 1
+        return a.category.localeCompare(b.category)
+      }
+      if (a.isClassDefault && !b.isClassDefault) return -1
+      if (!a.isClassDefault && b.isClassDefault) return 1
+      return 0
+    })
   const customs = savedRotations
     .filter((rotation) => rotation.classId === classId)
     .map<RotationOption>((rotation) => ({
@@ -35,6 +63,7 @@ export function rotationOptions(classId: string, savedRotations: Rotation[]): Ro
       name: rotation.name,
       description: rotation.description,
       group: "custom",
+      category: rotation.category,
       isClassDefault: false,
       rotation,
     }))

@@ -4,6 +4,7 @@ export default defineRotation({
   id: "builtin-stonesplitStrength-3-heng-charge",
   name: "3 Heng Charge",
   classId: "stonesplitStrength",
+  category: "Mo - Rotation",
   steps: [
     { skillId: "stonesplitStrength-phalanxspecial-prepull" },
     { skillId: "stonesplitStrength-snowpartingslide-prepull" },

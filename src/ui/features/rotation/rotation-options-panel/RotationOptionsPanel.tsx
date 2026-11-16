@@ -11,15 +11,10 @@ import { Select } from "../../../components/select/Select"
 import {
   inputsWithRotationOption,
   rotationOptions,
+  rotationOptionSectionLabel,
   selectedRotationOptionId,
-  type RotationOption,
 } from "../rotationOptions"
 import styles from "./RotationOptionsPanel.module.scss"
-
-const GROUP_KEYS: Record<RotationOption["group"], string> = {
-  builtin: "common.builtInRotations",
-  custom: "common.customRotation",
-}
 
 function signedDps(deltaDps: number): string {
   const rounded = Math.round(deltaDps)
@@ -65,7 +60,7 @@ export function RotationOptionsPanel({
             label:
               (option.name ? t(rotationKey(option.id), option.name) : t("common.unnamed")) +
               (option.isClassDefault ? t("rotation.options.default") : ""),
-            group: t(GROUP_KEYS[option.group]),
+            group: rotationOptionSectionLabel(option, t),
           }))}
         />
       </div>
@@ -75,10 +70,12 @@ export function RotationOptionsPanel({
           const optionDps = dpsByOptionId[option.id]
           const isSelected = option.id === selectedId
           const delta = optionDps - currentDps
+          const currentSection = rotationOptionSectionLabel(option, t)
+          const prevSection = rotationOptionSectionLabel(options[index - 1], t)
           return (
             <li key={option.id}>
-              {options[index - 1]?.group !== option.group && (
-                <div className="section-label">{t(GROUP_KEYS[option.group])}</div>
+              {currentSection !== prevSection && (
+                <div className="section-label">{currentSection}</div>
               )}
               <OptionTile
                 label={option.name ? t(rotationKey(option.id), option.name) : t("common.unnamed")}

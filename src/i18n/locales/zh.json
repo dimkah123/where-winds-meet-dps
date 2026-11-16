@@ -2428,6 +2428,8 @@
   "rotation.editor.charges": "层数",
   "rotation.editor.computedBreak": "计算的气竭",
   "rotation.editor.computedFirstBreakNone": "无气竭",
+  "rotation.category.Heng - Rotation": "Heng - Rotation",
+  "rotation.category.Mo - Rotation": "Mo - Rotation",
   "rotation.editor.connection": "连接",
   "rotation.editor.copied": "已复制到剪贴板",
   "rotation.editor.default": "（默认）",

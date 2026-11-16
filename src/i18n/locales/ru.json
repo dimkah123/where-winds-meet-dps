@@ -2428,6 +2428,8 @@
   "rotation.editor.charges": "Заряды",
   "rotation.editor.computedBreak": "Расчётное истощение",
   "rotation.editor.computedFirstBreakNone": "Нет истощения",
+  "rotation.category.Heng - Rotation": "Heng - Rotation",
+  "rotation.category.Mo - Rotation": "Mo - Rotation",
   "rotation.editor.connection": "Соединение",
   "rotation.editor.copied": "Скопировано в буфер обмена",
   "rotation.editor.default": " (по умолчанию)",

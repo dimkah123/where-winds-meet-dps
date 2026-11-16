@@ -2428,6 +2428,8 @@
   "rotation.editor.charges": "Charges",
   "rotation.editor.computedBreak": "Computed break",
   "rotation.editor.computedFirstBreakNone": "No break",
+  "rotation.category.Heng - Rotation": "Heng - Rotation",
+  "rotation.category.Mo - Rotation": "Mo - Rotation",
   "rotation.editor.connection": "Connection",
   "rotation.editor.copied": "Copied to clipboard",
   "rotation.editor.default": " (default)",

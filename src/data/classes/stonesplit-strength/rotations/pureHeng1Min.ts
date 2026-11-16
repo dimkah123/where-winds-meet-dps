@@ -4,6 +4,7 @@ export default defineRotation({
   id: "builtin-stonesplitStrength-pure-heng-1-min",
   name: "Pure Heng 1 Min",
   classId: "stonesplitStrength",
+  category: "Heng - Rotation",
   steps: [
     { skillId: "stonesplitStrength-phalanxspecial-prepull" },
     { skillId: "mystic-flute-of-the-tides-prepull" },

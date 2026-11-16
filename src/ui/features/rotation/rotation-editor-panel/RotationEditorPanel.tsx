@@ -48,6 +48,7 @@ import { conditionFailureReasonsText } from "../../skills/statusText"
 import {
   inputsWithRotationOption,
   rotationOptions,
+  rotationOptionSectionLabel,
   selectedRotationOptionId,
   usesCustomRotation,
 } from "../rotationOptions"
@@ -546,24 +547,13 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
           ariaLabel={t("common.rotation")}
           value={selectedRotationValue}
           onChange={selectRotation}
-          options={[
-            ...options
-              .filter((option) => option.group === "builtin")
-              .map((option) => ({
-                value: option.id,
-                label:
-                  (option.name ? t(rotationKey(option.id), option.name) : t("common.unnamed")) +
-                  (option.isClassDefault ? t("rotation.editor.default") : ""),
-                group: t("common.builtInRotations"),
-              })),
-            ...options
-              .filter((option) => option.group === "custom")
-              .map((option) => ({
-                value: option.id,
-                label: option.name ? t(rotationKey(option.id), option.name) : t("common.unnamed"),
-                group: t("common.customRotation"),
-              })),
-          ]}
+          options={options.map((option) => ({
+            value: option.id,
+            label:
+              (option.name ? t(rotationKey(option.id), option.name) : t("common.unnamed")) +
+              (option.isClassDefault ? t("rotation.editor.default") : ""),
+            group: rotationOptionSectionLabel(option, t),
+          }))}
         />
         {selectedBuiltin?.description && (
           <span className={styles.builtinHint}>{selectedBuiltin.description}</span>

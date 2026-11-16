@@ -1,16 +1,11 @@
 import { useI18n } from "../../../../i18n/i18nContext"
 import { NumInput } from "../../../components/number-inputs/NumberInputs"
 import { Select } from "../../../components/select/Select"
-import type { RotationOption } from "../../rotation/rotationOptions"
+import { rotationOptionSectionLabel, type RotationOption } from "../../rotation/rotationOptions"
 import type { SimulationStatus } from "../../../hooks/useParseSimulation"
 import { SimulationProgressBar } from "../simulation-progress-bar/SimulationProgressBar"
 import { MAX_RUN_COUNT, MIN_RUN_COUNT, RUN_COUNT_STEP } from "../simulationRunSettings"
 import styles from "./SimulationControlsPanel.module.scss"
-
-const GROUP_KEYS: Record<RotationOption["group"], string> = {
-  builtin: "common.builtInRotations",
-  custom: "common.customRotation",
-}
 
 export function SimulationControlsPanel({
   options,
@@ -51,7 +46,7 @@ export function SimulationControlsPanel({
             options={options.map((option) => ({
               value: option.id,
               label: option.name,
-              group: t(GROUP_KEYS[option.group]),
+              group: rotationOptionSectionLabel(option, t),
               meta: option.isClassDefault ? t("common.default") : undefined,
             }))}
           />
