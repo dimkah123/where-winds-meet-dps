@@ -14,11 +14,11 @@ const BASE_HIT_COEFFICIENTS = {
   attributeFixed: 0,
 }
 
-// First repeated hit (30%)
+// First repeated hit (30%): exactly 0.76389246 and 120.69500868 from game/editor
 const REPEAT_30_COEFFICIENTS = {
-  physMultiplier: 2.5463082 * 0.3,
-  attributeMultiplier: 2.5463082 * 0.3,
-  physFixed: 402.3166956 * 0.3,
+  physMultiplier: 0.76389246,
+  attributeMultiplier: 0.76389246,
+  physFixed: 120.69500868,
   attributeFixed: 0,
 }
 
