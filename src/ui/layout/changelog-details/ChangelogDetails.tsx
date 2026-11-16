@@ -45,15 +45,11 @@ export function ChangelogDetails({
       )}
       {details?.sections.map((section) => (
         <section key={section.label} className={`${styles.section} ${SECTION_TONE[section.label]}`}>
-          <div className={styles.sectionLabel}>
-            {translateSectionLabel(section.label, locale)}
-          </div>
+          <div className={styles.sectionLabel}>{translateSectionLabel(section.label, locale)}</div>
           <ul className={styles.changes}>
             {section.items.map((item) => (
               <li key={item.text} className={styles.change}>
-                <span className={styles.changeText}>
-                  {translateItemText(item.text, locale)}
-                </span>
+                <span className={styles.changeText}>{translateItemText(item.text, locale)}</span>
                 {item.authors.length > 0 && (
                   <span className={styles.credit}>
                     <span className={styles.creditLabel}>

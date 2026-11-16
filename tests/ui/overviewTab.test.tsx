@@ -135,7 +135,9 @@ describe("the Overview tab", () => {
     const resetBtn = screen.getByRole("button", { name: "Reset to gear" })
     expect(resetBtn).not.toBeDisabled()
     fireEvent.click(resetBtn)
-    expect(onChange).toHaveBeenCalledWith(expect.not.objectContaining({ statOverrides: expect.anything() }))
+    expect(onChange).toHaveBeenCalledWith(
+      expect.not.objectContaining({ statOverrides: expect.anything() }),
+    )
   })
 })
 

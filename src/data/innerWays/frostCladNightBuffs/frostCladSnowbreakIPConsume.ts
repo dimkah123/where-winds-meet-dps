@@ -26,7 +26,8 @@ export const frostCladSnowbreakIPConsume = defineBuff({
       },
     ],
   },
-  summary: "Snowbreak Spring ×1.76 instead of ×1.36 and Anxi Army Assist ×1.40 on a cast that consumes Inner Passion",
+  summary:
+    "Snowbreak Spring ×1.76 instead of ×1.36 and Anxi Army Assist ×1.40 on a cast that consumes Inner Passion",
   effects: (ctx) => {
     if (!ctx.self.reachesEvent) return []
     if (ctx.event.kind === "damage" && ctx.event.tags.has(ROLE.anxiSoldier)) {

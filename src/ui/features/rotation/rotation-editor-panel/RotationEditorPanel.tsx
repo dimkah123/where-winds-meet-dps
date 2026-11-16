@@ -418,6 +418,28 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
     onChange({ ...inputs, activeCustomRotation: copy, selectedBuiltinRotationId: null })
   }
 
+  function handleApplyReadableRotation(newSteps: RotationStep[]) {
+    if (isCustom && activeRotation) {
+      commitRotation((rotation) => ({
+        ...rotation,
+        steps: newSteps,
+      }))
+    } else if (activeRotation) {
+      const copy = makeRotation(inputs.classId, {
+        name: activeRotation.name ? `${activeRotation.name} (Custom)` : t("common.unnamed"),
+        steps: newSteps,
+        permanentBuffIds: [...activeRotation.permanentBuffIds],
+        openingStacks: { ...activeRotation.openingStacks },
+        fixedWindowSec: activeRotation.fixedWindowSec,
+        pingMs: activeRotation.pingMs,
+        averageFps: activeRotation.averageFps,
+        serverProcessingMs: activeRotation.serverProcessingMs,
+        preferredDistanceMeters: activeRotation.preferredDistanceMeters,
+      })
+      onChange({ ...inputs, activeCustomRotation: copy, selectedBuiltinRotationId: null })
+    }
+  }
+
   function handleSave() {
     if (!activeRotation || !isCustom) return
     if (!effectiveName.trim()) {
@@ -788,9 +810,7 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
                         )}
                       </div>
                     )}
-                    <span className={styles.castReadonly}>
-                      {formatHits(maxHits, locale, t)}
-                    </span>
+                    <span className={styles.castReadonly}>{formatHits(maxHits, locale, t)}</span>
                     <span
                       className={styles.prepull}
                       title={t("rotation.editor.prePullExcludedFromDuration")}
@@ -942,6 +962,9 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
         <ReadableRotationDialog
           title={readableRotationTitle}
           readableText={readableRotation}
+          classId={inputs.classId}
+          skillsById={skillsById}
+          onApply={handleApplyReadableRotation}
           onClose={() => setReadableDialogOpen(false)}
         />
       )}

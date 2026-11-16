@@ -55,11 +55,7 @@ export function QiBreakToast({
           </span>
         </span>
         <div className={styles.actions}>
-          <button
-            type="button"
-            className={styles.dontShowAgainButton}
-            onClick={dismissForever}
-          >
+          <button type="button" className={styles.dontShowAgainButton} onClick={dismissForever}>
             {t("layout.qiBreakToast.dontShowAgain")}
           </button>
         </div>

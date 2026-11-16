@@ -9,10 +9,7 @@ import type {
 import { GEAR_SLOTS, isWeaponSlot } from "../../../../engine/types"
 import { isGearWordId } from "../../../../data/stats/statLines"
 import { gearWordPoolForLine } from "../../../../data/stats/gearWordPools"
-import {
-  tunementDrawChances,
-  wordsOnOtherTunableLines,
-} from "../../../../engine/tunementChance"
+import { tunementDrawChances, wordsOnOtherTunableLines } from "../../../../engine/tunementChance"
 import { getWordSpecs } from "../../../../engine/itemRanking"
 import { relayedCapValue } from "../../../../engine/gearStats"
 import { gearBaseStatsFor } from "../../../../data/stats/gearBaseStats"
@@ -59,7 +56,6 @@ function fmtDpsDelta(deltaDps: number): string {
   if (rounded < 0) return rounded.toLocaleString()
   return "+0"
 }
-
 
 function deltaSignClass(deltaDps: number): string {
   if (deltaDps > 0.5) return "is-positive"
@@ -459,7 +455,6 @@ export function GearPieceForm({
           </div>
         )
       })()}
-
     </fieldset>
   )
 }

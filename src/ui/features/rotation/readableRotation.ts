@@ -1,5 +1,5 @@
 import type { Result } from "../../../engine/types"
-import type { Rotation, RotationStep } from "../../../engine/rotation"
+import { newStepId, type Rotation, type RotationStep } from "../../../engine/rotation"
 import type { Skill } from "../../../engine/skill"
 
 export const SKILL_SHORT_NAMES: Record<string, string> = {
@@ -171,8 +171,18 @@ export function getSkillShortName(skill: Skill | undefined, skillId?: string): s
   return key
 }
 
-function hitDealsDamage(h: { physMultiplier?: number; attributeMultiplier?: number; physFixed?: number; attributeFixed?: number }): boolean {
-  return (h.physMultiplier ?? 0) > 0 || (h.attributeMultiplier ?? 0) > 0 || (h.physFixed ?? 0) > 0 || (h.attributeFixed ?? 0) > 0
+function hitDealsDamage(h: {
+  physMultiplier?: number
+  attributeMultiplier?: number
+  physFixed?: number
+  attributeFixed?: number
+}): boolean {
+  return (
+    (h.physMultiplier ?? 0) > 0 ||
+    (h.attributeMultiplier ?? 0) > 0 ||
+    (h.physFixed ?? 0) > 0 ||
+    (h.attributeFixed ?? 0) > 0
+  )
 }
 
 export function readableRotationText(
@@ -181,7 +191,9 @@ export function readableRotationText(
   skillsById: Map<string, Skill>,
 ): string {
   const steps = rotation?.steps ?? []
-  const casts = (result?.casts ?? []).filter((c) => !c.stepId.startsWith("swap-") && !c.stepId.startsWith("direct-swap-"))
+  const casts = (result?.casts ?? []).filter(
+    (c) => !c.stepId.startsWith("swap-") && !c.stepId.startsWith("direct-swap-"),
+  )
 
   if (casts.length === 0) {
     return readableRotationFromSteps(steps, skillsById)
@@ -240,9 +252,13 @@ export function readableRotationText(
       if (skill?.hits && skill.hits.length > 0) {
         const startFrame = Math.round(cast.timeSec * 60)
         const fightStartFrame = Math.round(anchorTime * 60)
-        const hitIndex = skill.hits.findIndex((h) => Math.abs(startFrame + h.frame - fightStartFrame) <= 3)
+        const hitIndex = skill.hits.findIndex(
+          (h) => Math.abs(startFrame + h.frame - fightStartFrame) <= 3,
+        )
         if (hitIndex >= 0) {
-          const hitNumber = skill.hits.slice(0, hitIndex + 1).filter((h) => hitDealsDamage(h)).length
+          const hitNumber = skill.hits
+            .slice(0, hitIndex + 1)
+            .filter((h) => hitDealsDamage(h)).length
           if (hitNumber > 1) {
             entries.push(`${name} (start at hit ${hitNumber})`)
             continue
@@ -288,4 +304,338 @@ export function readableRotationFromSteps(
     return acc
   }, [])
   return groups.map(({ text, count }) => (count > 1 ? `${text} x${count}` : text)).join(" > ")
+}
+
+export const CANONICAL_SKILLS_BY_CLASS: Record<string, Record<string, string>> = {
+  stonesplitStrength: {
+    "mo special": "stonesplitStrength-phalanxspecial",
+    "mo special prepull": "stonesplitStrength-phalanxspecial-prepull",
+    "mo charged": "stonesplitStrength-phalanxcharged-s3-innerpassion",
+    "mo qq": "stonesplitStrength-phalanxq-soul",
+    "mo tab": "stonesplitStrength-mo-blade-dual",
+    "mo a1": "stonesplitStrength-mo-light-attack-1",
+    "mo a2": "stonesplitStrength-mo-light-attack-2",
+    "mo a3": "stonesplitStrength-mo-light-attack-3",
+    "mo down": "stonesplitStrength-anxisoldiermodown",
+    "mo jump": "stonesplitStrength-anxisoldiermojump",
+    "mo sweep": "stonesplitStrength-anxisoldiermosweep",
+    "heng special": "stonesplitStrength-snowpartingspecial",
+    "heng q": "stonesplitStrength-snowpartingq-slash",
+    "heng q2": "stonesplitStrength-snowpartingslide-reslide-prepull",
+    "heng q stab": "stonesplitStrength-snowpartingq-stab",
+    "heng tab": "stonesplitStrength-snowpartingdual",
+    "heng vc": "stonesplitStrength-snowpartingvc",
+    "heng lc": "stonesplitStrength-snowpartingcharged-forgetfulness",
+    "heng a1": "stonesplitStrength-heng-light-attack-1",
+    "heng a2": "stonesplitStrength-heng-light-attack-2",
+    "heng a3": "stonesplitStrength-heng-light-attack-3",
+    "heng a4": "stonesplitStrength-heng-light-attack-4",
+    "heng h1": "stonesplitStrength-heng-heavy-attack-1",
+    "heng h2": "stonesplitStrength-heng-heavy-attack-2",
+    "heng h3": "stonesplitStrength-heng-heavy-attack-3",
+    "heng h4": "stonesplitStrength-heng-heavy-attack-4",
+    "heng anxi": "stonesplitStrength-anxisoldierheng",
+    "break defense": "stonesplitStrength-break-defense",
+    deflect: "stonesplitStrength-deflect",
+  },
+  bellstrikeUmbra: {
+    "sword charged": "bellstrikeUmbra-sword-charge-stage-1-4-hit",
+    "sword special": "bellstrikeUmbra-swordspecial-3-hit",
+    "sword qq": "bellstrikeUmbra-swordqfollowup",
+    "sword q": "bellstrikeUmbra-swordq",
+    "sword qqq": "bellstrikeUmbra-sword-martial-qqq",
+    "sword followup": "bellstrikeUmbra-sword-r-charge-follow-up-1-hit-cancel",
+    "spear q": "bellstrikeUmbra-spearq-5-hit-cancel",
+    "spear special": "bellstrikeUmbra-spearspecial-1-hit-cancel",
+    crosswind: "bellstrikeUmbra-crosswind-blade-cancel",
+    deflect: "bellstrikeUmbra-deflect-cancel",
+    delay: "bellstrikeUmbra-delay",
+    "ghostly steps": "bellstrikeUmbra-ghostly-steps",
+  },
+  bellstrikeSplendor: {
+    "sword charged": "bellstrikeSplendor-swordheavycharged",
+    "sword q": "bellstrikeSplendor-swordq",
+    "spear q": "bellstrikeSplendor-spearq",
+    "energy surge": "bellstrikeSplendor-energysurge",
+    deflect: "bellstrikeSplendor-deflect-cancel-prepull",
+    "ghostly steps": "bellstrikeSplendor-ghostly-steps",
+  },
+  silkbindJade: {
+    "umbrella q": "silkbindJade-umbq",
+    "umbrella light charged": "silkbindJade-umblightcharge",
+    "umbrella heavy": "silkbindJade-umb-heavylight",
+    "colorful phoenix": "silkbindJade-umbdronelaunch-20hit",
+    "fan q": "silkbindJade-fanq",
+    "fan special": "silkbindJade-fanspecial",
+    "fan light charged": "silkbindJade-fanlightcharged",
+    "fan heavy": "silkbindJade-fanheavypursuit-3-hit",
+    deflect: "silkbindJade-deflect-cancel",
+    "golden body": "silkbindJade-golden-body-cancel",
+    "ghostly steps": "silkbindJade-ghostly-steps",
+    delay: "silkbindJade-delay",
+  },
+  bamboocutDraught: {
+    flamelash: "bamboocutDraught-dragonquench-inebriate-cancel",
+    "hero's blood": "bamboocutDraught-heros-blood",
+    nightwick: "bamboocutDraught-nightwick-primepick",
+    "gauntlet q": "bamboocutDraught-peakfall",
+    drink: "bamboocutDraught-quick-drink-cancel",
+    reveldrift: "bamboocutDraught-reveldrift-cancel",
+    castlink: "bamboocutDraught-castlink",
+    deflect: "bamboocutDraught-deflect-cancel",
+  },
+}
+
+export const COMMON_MYSTIC_AND_UNIVERSAL: Record<string, string> = {
+  "flute cancel": "mystic-flute-of-the-tides-cancel",
+  "flute full": "mystic-flute-of-the-tides-full",
+  drink: "mystic-drunkenpoet-prepull",
+  "drunken poet": "mystic-poet-final-hit-cancel",
+  "smolder 1 hit": "mystic-dragon-fire-smolder-1-hit",
+  "smolder full": "mystic-dragon-fire-smolder-2-hits",
+  "breath 1 hit": "mystic-fire-breath-1-hit",
+  "breath full": "mystic-fire-breath-2-hit",
+  toad: "mystic-toad-cancel",
+  "dragon head": "mystic-dragon-head-plus",
+  soaring: "mystic-soaring",
+  deflect: "universal-deflect-cancel",
+  delay: "universal-delay",
+  "ghostly steps": "universal-ghostly-steps",
+  "golden body": "universal-golden-body-cancel",
+}
+
+export interface SkillSuggestion {
+  shortName: string
+  fullName: string
+  skillId: string
+  category: "class" | "mystic" | "universal"
+}
+
+export function getAvailableSkillSuggestions(
+  classId: string,
+  skillsById: Map<string, Skill>,
+): SkillSuggestion[] {
+  const suggestions: SkillSuggestion[] = []
+  const seenShortNames = new Set<string>()
+
+  // 1. Add canonical class skills
+  const classCanonical = CANONICAL_SKILLS_BY_CLASS[classId] ?? {}
+  for (const skillId of Object.values(classCanonical)) {
+    const skill = skillsById.get(skillId)
+    const shortName = getSkillShortName(skill, skillId)
+    if (!seenShortNames.has(shortName.toLowerCase())) {
+      seenShortNames.add(shortName.toLowerCase())
+      suggestions.push({
+        shortName,
+        fullName: skill?.name || shortName,
+        skillId,
+        category: "class",
+      })
+    }
+  }
+
+  // 2. Add other class skills from skillsById
+  for (const [id, skill] of skillsById) {
+    if (id.startsWith(classId)) {
+      const shortName = getSkillShortName(skill, id)
+      if (!seenShortNames.has(shortName.toLowerCase())) {
+        seenShortNames.add(shortName.toLowerCase())
+        suggestions.push({
+          shortName,
+          fullName: skill.name || shortName,
+          skillId: id,
+          category: "class",
+        })
+      }
+    }
+  }
+
+  // 3. Add common mystics and universals
+  for (const skillId of Object.values(COMMON_MYSTIC_AND_UNIVERSAL)) {
+    const skill = skillsById.get(skillId)
+    const shortName = getSkillShortName(skill, skillId)
+    if (!seenShortNames.has(shortName.toLowerCase())) {
+      seenShortNames.add(shortName.toLowerCase())
+      suggestions.push({
+        shortName,
+        fullName: skill?.name || shortName,
+        skillId,
+        category: skillId.startsWith("mystic-") ? "mystic" : "universal",
+      })
+    }
+  }
+
+  return suggestions
+}
+
+export interface ParsedRotationToken {
+  raw: string
+  cleanName: string
+  multiplier: number
+  skillId?: string
+  skillName?: string
+  valid: boolean
+  error?: string
+}
+
+export interface ParseReadableRotationResult {
+  tokens: ParsedRotationToken[]
+  steps: RotationStep[]
+  totalSteps: number
+  validCount: number
+  hasErrors: boolean
+}
+
+export function parseReadableRotation(
+  text: string,
+  classId: string,
+  skillsById: Map<string, Skill>,
+): ParseReadableRotationResult {
+  const trimmed = text.trim()
+  if (!trimmed) {
+    return {
+      tokens: [],
+      steps: [],
+      totalSteps: 0,
+      validCount: 0,
+      hasErrors: false,
+    }
+  }
+
+  // Split by `>`, `->`, commas, or newlines
+  const rawSegments = trimmed
+    .split(/(?:\s*(?:>|->|\n|,)\s*)+/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+
+  const tokens: ParsedRotationToken[] = []
+  const steps: RotationStep[] = []
+  const classCanonical = CANONICAL_SKILLS_BY_CLASS[classId] ?? {}
+
+  for (let i = 0; i < rawSegments.length; i++) {
+    const raw = rawSegments[i]
+
+    // Extract multiplier e.g. "Mo Charged x3", "Mo Charged * 3", "Mo Charged ×3"
+    let multiplier = 1
+    let base = raw
+    const multiplierMatch = raw.match(/\s*(?:[xX*×]\s*(\d+))\s*$/)
+    if (multiplierMatch) {
+      multiplier = Math.max(1, Math.min(100, parseInt(multiplierMatch[1], 10)))
+      base = raw.slice(0, multiplierMatch.index).trim()
+    }
+
+    // Strip tags: (start), (break), (start at hit 6), etc.
+    const cleanName = base
+      .replace(/\s*\((?:start|break|start at hit \d+|start\/break)[^)]*\)/gi, "")
+      .trim()
+
+    const normKey = cleanName.toLowerCase().replace(/\s+/g, " ")
+
+    // Match resolution:
+    let resolvedSkillId: string | undefined
+
+    // Check prepull specific variants for opening skills (first 4 skills)
+    if (i <= 3) {
+      if (classId === "stonesplitStrength") {
+        if (
+          normKey === "mo special" &&
+          skillsById.has("stonesplitStrength-phalanxspecial-prepull")
+        ) {
+          resolvedSkillId = "stonesplitStrength-phalanxspecial-prepull"
+        } else if (
+          normKey === "heng q" &&
+          skillsById.has("stonesplitStrength-snowpartingslide-prepull")
+        ) {
+          resolvedSkillId = "stonesplitStrength-snowpartingslide-prepull"
+        }
+      }
+      if (normKey === "flute cancel" && skillsById.has("mystic-flute-of-the-tides-prepull")) {
+        resolvedSkillId = "mystic-flute-of-the-tides-prepull"
+      }
+    }
+
+    // 1. Canonical class mapping
+    if (!resolvedSkillId && classCanonical[normKey]) {
+      resolvedSkillId = classCanonical[normKey]
+    }
+
+    // 2. Common mystic and universal mapping
+    if (!resolvedSkillId && COMMON_MYSTIC_AND_UNIVERSAL[normKey]) {
+      resolvedSkillId = COMMON_MYSTIC_AND_UNIVERSAL[normKey]
+    }
+
+    // 3. Search skillsById by short name
+    if (!resolvedSkillId) {
+      for (const [id, skill] of skillsById) {
+        if (getSkillShortName(skill, id).toLowerCase() === normKey) {
+          resolvedSkillId = id
+          break
+        }
+      }
+    }
+
+    // 4. Search skillsById by full name
+    if (!resolvedSkillId) {
+      for (const [id, skill] of skillsById) {
+        if (skill.name?.toLowerCase() === normKey) {
+          resolvedSkillId = id
+          break
+        }
+      }
+    }
+
+    // 5. Search skillsById by exact ID
+    if (!resolvedSkillId) {
+      if (skillsById.has(cleanName)) {
+        resolvedSkillId = cleanName
+      } else {
+        const idLower = cleanName.toLowerCase()
+        for (const id of skillsById.keys()) {
+          if (id.toLowerCase() === idLower) {
+            resolvedSkillId = id
+            break
+          }
+        }
+      }
+    }
+
+    if (resolvedSkillId) {
+      const skill = skillsById.get(resolvedSkillId)
+      const token: ParsedRotationToken = {
+        raw,
+        cleanName,
+        multiplier,
+        skillId: resolvedSkillId,
+        skillName: skill?.name || cleanName,
+        valid: true,
+      }
+      tokens.push(token)
+
+      for (let m = 0; m < multiplier; m++) {
+        steps.push({
+          id: newStepId(),
+          skillId: resolvedSkillId,
+        })
+      }
+    } else {
+      tokens.push({
+        raw,
+        cleanName,
+        multiplier,
+        valid: false,
+        error: `Unknown skill: "${cleanName}"`,
+      })
+    }
+  }
+
+  const validCount = tokens.filter((t) => t.valid).length
+  const hasErrors = tokens.some((t) => !t.valid)
+
+  return {
+    tokens,
+    steps,
+    totalSteps: steps.length,
+    validCount,
+    hasErrors,
+  }
 }

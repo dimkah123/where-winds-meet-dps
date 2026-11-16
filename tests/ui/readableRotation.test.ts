@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest"
-import { readableRotationText, readableRotationFromSteps } from "../../src/ui/features/rotation/readableRotation"
+import {
+  readableRotationText,
+  readableRotationFromSteps,
+} from "../../src/ui/features/rotation/readableRotation"
 import { runEngine } from "../../src/engine/dps"
 import { defaultInputs } from "../../src/engine/defaults"
 import { builtinSkillsForClass, builtinRotationsForClass } from "../../src/engine/builtinLibrary"

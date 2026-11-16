@@ -60,7 +60,8 @@ export function ClassPicker({ value, onChange, selectedBuildId, onSelectBuild }:
   }
 
   function handleSelectVariant(variant: "max" | "min") {
-    const nextBuildId = variant === "min" ? currentArchetype.minBuildId : currentArchetype.maxBuildId
+    const nextBuildId =
+      variant === "min" ? currentArchetype.minBuildId : currentArchetype.maxBuildId
     onSelectBuild?.(nextBuildId)
   }
 

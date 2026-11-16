@@ -17,7 +17,12 @@ export const phalanxqSoul = defineSkill({
   attributeAttack: "Stonesplit",
   castTag: CAST.phalanxQSoul,
   receives: [BUFF.cleftpeakDeflect, ...PHALANXBANE_BLADE_RECEIVES, BUFF.starweaveMartialBoost],
-  triggersBuffs: [BUFF.ironGuards, BUFF.throatPierced, BUFF.totalAnnihilationSupremeShield, BUFF.jadeware],
+  triggersBuffs: [
+    BUFF.ironGuards,
+    BUFF.throatPierced,
+    BUFF.totalAnnihilationSupremeShield,
+    BUFF.jadeware,
+  ],
   triggersBuffsAtFrame: { [BUFF.totalAnnihilationSupremeShield]: 49, [BUFF.jadeware]: 7 },
   castConditions: [{ buffId: BUFF.ironGuards, op: "gte", stacks: 1, source: "buffEngine" }],
   castFrames: 49,

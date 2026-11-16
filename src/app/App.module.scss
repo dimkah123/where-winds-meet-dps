@@ -155,7 +155,9 @@
     color: #ffd88a;
   }
   50% {
-    box-shadow: 0 0 16px rgba(245, 166, 35, 0.95), inset 0 0 8px rgba(245, 166, 35, 0.3);
+    box-shadow:
+      0 0 16px rgba(245, 166, 35, 0.95),
+      inset 0 0 8px rgba(245, 166, 35, 0.3);
     border-color: #f5a623;
     color: #ffffff;
   }

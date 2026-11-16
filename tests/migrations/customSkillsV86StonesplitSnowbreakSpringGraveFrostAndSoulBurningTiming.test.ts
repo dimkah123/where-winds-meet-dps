@@ -71,9 +71,9 @@ const builtinOf = (id: string): Skill =>
 
 const fieldsOf = (skill: Skill) =>
   Object.fromEntries(
-    CHECKED_FIELDS.filter(
-      (field) => !(MOVED_AGAIN_FIELDS[skill.id] ?? []).includes(field),
-    ).map((field) => [field, skill[field]]),
+    CHECKED_FIELDS.filter((field) => !(MOVED_AGAIN_FIELDS[skill.id] ?? []).includes(field)).map(
+      (field) => [field, skill[field]],
+    ),
   )
 
 describe("custom-skills v85 fixture", () => {

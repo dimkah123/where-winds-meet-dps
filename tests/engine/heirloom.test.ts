@@ -377,13 +377,7 @@ describe("heirloom — stonesplit build and attribute attack matching", () => {
       (b) => b.name === "Min Build",
     )!
     const weapon = minBuild.gear.find((p) => p.slot === "leftWeapon")!
-    const userWeapon = pieceFrom(weapon, [
-      "minPhys",
-      "agility",
-      "modaoBoost",
-      "crit",
-      "minPhys",
-    ])
+    const userWeapon = pieceFrom(weapon, ["minPhys", "agility", "modaoBoost", "crit", "minPhys"])
     const swap = heirloomSwapFor(userWeapon, {
       classId: "stonesplitStrength",
       graduationBuildId: minBuild.id,

@@ -269,7 +269,14 @@ export function StatsOverviewPanel({ inputs, onChange }: Props) {
     }
     if (pen !== 0 || inputs.statOverrides?.[`${key}.penetration`] !== undefined || isPrimary) {
       penetrationRows.push(
-        row(statPathLabel(`${key}.penetration`, t), pen, false, undefined, true, `${key}.penetration`),
+        row(
+          statPathLabel(`${key}.penetration`, t),
+          pen,
+          false,
+          undefined,
+          true,
+          `${key}.penetration`,
+        ),
       )
     }
   }
@@ -293,15 +300,36 @@ export function StatsOverviewPanel({ inputs, onChange }: Props) {
   )
 
   const damageBoostRows: RowEntry[] = DAMAGE_BOOST_PATHS.map((path) =>
-    row(statPathLabel(path, t), readPath(withSets, path), PERCENT_PATHS.has(path), undefined, false, path),
+    row(
+      statPathLabel(path, t),
+      readPath(withSets, path),
+      PERCENT_PATHS.has(path),
+      undefined,
+      false,
+      path,
+    ),
   )
 
   const martialBoostRows: RowEntry[] = MARTIAL_BOOST_PATHS.map((path) =>
-    row(statPathLabel(path, t), readPath(withSets, path), PERCENT_PATHS.has(path), undefined, false, path),
+    row(
+      statPathLabel(path, t),
+      readPath(withSets, path),
+      PERCENT_PATHS.has(path),
+      undefined,
+      false,
+      path,
+    ),
   ).filter((entry) => entry.value !== 0 || inputs.statOverrides?.[entry.path ?? ""] !== undefined)
 
   const targetBoostRows: RowEntry[] = TARGET_BOOST_PATHS.map((path) =>
-    row(statPathLabel(path, t), readPath(withSets, path), PERCENT_PATHS.has(path), undefined, false, path),
+    row(
+      statPathLabel(path, t),
+      readPath(withSets, path),
+      PERCENT_PATHS.has(path),
+      undefined,
+      false,
+      path,
+    ),
   ).filter((entry) => entry.value !== 0 || inputs.statOverrides?.[entry.path ?? ""] !== undefined)
 
   const classBuffRows: RowEntry[] = school.classSpecificAttunements.map((attunementId) => {

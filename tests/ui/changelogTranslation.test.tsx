@@ -25,12 +25,7 @@ describe("changelog translation depending on selected language", () => {
   it("renders in Russian when Russian locale is active", async () => {
     const details = await entry.loadDetails()
     renderWithLocale(
-      <ChangelogDetails
-        entry={entry}
-        details={details}
-        isLoading={false}
-        hasFailed={false}
-      />,
+      <ChangelogDetails entry={entry} details={details} isLoading={false} hasFailed={false} />,
       "ru",
     )
 
@@ -59,12 +54,7 @@ describe("changelog translation depending on selected language", () => {
   it("renders in English when English locale is active", async () => {
     const details = await entry.loadDetails()
     renderWithLocale(
-      <ChangelogDetails
-        entry={entry}
-        details={details}
-        isLoading={false}
-        hasFailed={false}
-      />,
+      <ChangelogDetails entry={entry} details={details} isLoading={false} hasFailed={false} />,
       "en",
     )
 
@@ -88,18 +78,15 @@ describe("changelog translation depending on selected language", () => {
   it("renders in Chinese when Chinese locale is active", async () => {
     const details = await entry.loadDetails()
     renderWithLocale(
-      <ChangelogDetails
-        entry={entry}
-        details={details}
-        isLoading={false}
-        hasFailed={false}
-      />,
+      <ChangelogDetails entry={entry} details={details} isLoading={false} hasFailed={false} />,
       "zh",
     )
 
     // Headline in Chinese
     expect(
-      screen.getByText("\u6c14\u7edd\u672f\u8bed\u4e0e\u5e03\u5c40\u4f18\u5316\uff0c\u6e05\u6670\u7684\u5faa\u73af\u884c"),
+      screen.getByText(
+        "\u6c14\u7edd\u672f\u8bed\u4e0e\u5e03\u5c40\u4f18\u5316\uff0c\u6e05\u6670\u7684\u5faa\u73af\u884c",
+      ),
     ).toBeInTheDocument()
 
     // Section labels in Chinese

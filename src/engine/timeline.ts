@@ -1838,7 +1838,8 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
         resolvedStep = { step: resolvedStep.step, skill: fallback }
         const fbWeapon = weaponTagOf(fallback)
         if (fbWeapon && fbWeapon !== drawnWeapon) {
-          if (drawnWeapon !== null) ledger.recordStack(drawnWeaponStatusId(drawnWeapon), startFrame, 0)
+          if (drawnWeapon !== null)
+            ledger.recordStack(drawnWeaponStatusId(drawnWeapon), startFrame, 0)
           ledger.recordStack(drawnWeaponStatusId(fbWeapon), startFrame, 1)
           drawnWeapon = fbWeapon
         }

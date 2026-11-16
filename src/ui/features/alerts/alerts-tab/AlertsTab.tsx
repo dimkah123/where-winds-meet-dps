@@ -206,9 +206,7 @@ export function AlertsTab({
                           </span>
                         </div>
                       </div>
-                      <div className={styles.alertBody}>
-                        {t("alerts.damageLowBody")}
-                      </div>
+                      <div className={styles.alertBody}>{t("alerts.damageLowBody")}</div>
                       <div className={styles.alertFooter}>
                         <span className={styles.recommendation}>
                           {t("alerts.damageLowRecommendation")}
@@ -217,7 +215,9 @@ export function AlertsTab({
                           {onToggleAcknowledge && (
                             <button
                               type="button"
-                              className={isAck ? styles.acknowledgedButton : styles.acknowledgeButton}
+                              className={
+                                isAck ? styles.acknowledgedButton : styles.acknowledgeButton
+                              }
                               onClick={() => onToggleAcknowledge(alertKey)}
                             >
                               {isAck ? `✓ ${t("alerts.acknowledged")}` : t("alerts.acknowledge")}
@@ -247,9 +247,7 @@ export function AlertsTab({
                         <span>{t("alerts.generalWarningsTitle")}</span>
                       </span>
                       {isAck && (
-                        <span className={styles.acknowledgedTag}>
-                          ✓ {t("alerts.acknowledged")}
-                        </span>
+                        <span className={styles.acknowledgedTag}>✓ {t("alerts.acknowledged")}</span>
                       )}
                     </div>
                     <div className={styles.alertBody}>⚠️ {warning}</div>

@@ -41,9 +41,10 @@ describe("SnowpartingCharged[Forgetfulness] automatic fallback", () => {
     expect(illegalWarnings).toHaveLength(0)
 
     // Should have a diagnostic fallback warning
-    const fallbackWarning = res.warnings.find((w) =>
-      w.includes("calculated damage is too low for rotation timing") &&
-      w.includes("used SnowpartingCharged instead"),
+    const fallbackWarning = res.warnings.find(
+      (w) =>
+        w.includes("calculated damage is too low for rotation timing") &&
+        w.includes("used SnowpartingCharged instead"),
     )
     expect(fallbackWarning).toBeDefined()
 

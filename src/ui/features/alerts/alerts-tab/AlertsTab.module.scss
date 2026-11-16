@@ -155,7 +155,10 @@
   flex-direction: column;
   gap: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  transition: border-color 0.15s, opacity 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    opacity 0.15s,
+    background 0.15s;
 
   &:hover {
     border-color: #d88e28;

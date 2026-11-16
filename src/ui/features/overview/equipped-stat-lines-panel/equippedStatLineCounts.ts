@@ -22,10 +22,7 @@ export interface EquippedStatLineCounts {
   wantedTotal: number | null
 }
 
-function countWords(
-  pieces: readonly GearPiece[],
-  classId?: string | null,
-): Map<string, number> {
+function countWords(pieces: readonly GearPiece[], classId?: string | null): Map<string, number> {
   const counts = new Map<string, number>()
   for (const piece of pieces) {
     for (const entry of piece.words) {
