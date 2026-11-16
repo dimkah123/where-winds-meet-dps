@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useRef, useState } from "react"
+import { Fragment, useEffect, useMemo, useRef, useState } from "react"
 import type {
   Inputs,
   Result,
@@ -33,6 +33,7 @@ import { builtinBuffsForClass } from "../../../../engine/builtinBuffs"
 import { openingStackBuffIds } from "../../../../definitions/innerWays/registry"
 import { classDefinition } from "../../../../definitions/classes/registry"
 import { inDisplayUnits } from "../../../../definitions/resources/meterDef"
+import { PROP } from "../../../../data/skills/ids"
 import { buildReadsTargetDistance, hiddenTimelineBuffIds } from "../../../../engine/buffs/catalog"
 import { STAT_DEF_BY_KEY } from "../../../../engine/statRegistry"
 import {
@@ -171,12 +172,183 @@ function MeterLevelChip({ level }: { level: CastMeterLevel }) {
   )
 }
 
-function DistanceChip({ distanceMeters }: { distanceMeters: number }) {
+function DistanceChip({
+  distanceMeters,
+  stepDistanceMeters,
+  isCustom,
+  onSetDistance,
+  onApplyToAllSame,
+  skillName,
+}: {
+  distanceMeters: number
+  stepDistanceMeters?: number
+  isCustom?: boolean
+  onSetDistance?: (distance: number | undefined) => void
+  onApplyToAllSame?: (distance: number | undefined) => void
+  skillName?: string
+}) {
   const { t } = useI18n()
+  const [open, setOpen] = useState(false)
+  const [customValue, setCustomValue] = useState(
+    stepDistanceMeters !== undefined
+      ? String(stepDistanceMeters)
+      : String(distanceMeters.toFixed(1)),
+  )
+  const popoverRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handleClickOutside(e: MouseEvent) {
+      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [open])
+
+  const isOverridden = stepDistanceMeters !== undefined
+
+  if (!isCustom || !onSetDistance) {
+    return (
+      <span
+        className={`${styles.meterLevel} ${isOverridden ? styles.distanceChipOverridden : ""}`}
+        title={
+          isOverridden
+            ? `${t("rotation.editor.distanceM")} ${stepDistanceMeters}m (${t(
+                "rotation.editor.customDistance",
+                "Custom",
+              )})`
+            : undefined
+        }
+      >
+        {t("rotation.editor.distanceM")} {distanceMeters.toFixed(1)}
+        {isOverridden ? "*" : ""}
+      </span>
+    )
+  }
+
+  const handleSelect = (meters: number | undefined, applyAll = false) => {
+    if (applyAll && onApplyToAllSame) {
+      onApplyToAllSame(meters)
+    } else {
+      onSetDistance(meters)
+    }
+    setOpen(false)
+  }
+
+  const handleCustomSubmit = (e?: React.FormEvent, applyAll = false) => {
+    e?.preventDefault()
+    const n = parseFloat(customValue)
+    if (Number.isFinite(n) && n >= 0 && n <= PREFERRED_DISTANCE_METERS_MAX) {
+      handleSelect(n, applyAll)
+    }
+  }
+
   return (
-    <span className={styles.meterLevel}>
-      {t("rotation.editor.distanceM")} {distanceMeters.toFixed(1)}
-    </span>
+    <div className={styles.distanceChipContainer} ref={popoverRef}>
+      <button
+        type="button"
+        className={`${styles.meterLevel} ${styles.distanceChipBtn} ${
+          isOverridden ? styles.distanceChipOverridden : ""
+        }`}
+        onClick={() => {
+          setCustomValue(
+            stepDistanceMeters !== undefined
+              ? String(stepDistanceMeters)
+              : String(distanceMeters.toFixed(1)),
+          )
+          setOpen(!open)
+        }}
+        title={
+          isOverridden
+            ? `${t("rotation.editor.distanceM")}: ${stepDistanceMeters}m (${t(
+                "rotation.editor.customDistance",
+                "Custom",
+              )}) — ${t("rotation.editor.clickToEdit", "Click to edit")}`
+            : `${t("rotation.editor.distanceM")}: ${distanceMeters.toFixed(1)}m — ${t(
+                "rotation.editor.clickToEdit",
+                "Click to edit",
+              )}`
+        }
+      >
+        {t("rotation.editor.distanceM")} {distanceMeters.toFixed(1)}
+        {isOverridden ? "*" : ""}
+        <span className={styles.chipDropdownArrow}>▾</span>
+      </button>
+
+      {open && (
+        <div className={styles.distancePopover}>
+          <div className={styles.distancePopoverHeader}>
+            <span>{t("rotation.editor.setCastDistance", "Cast Distance")}</span>
+            <button
+              type="button"
+              className={styles.closePopoverBtn}
+              onClick={() => setOpen(false)}
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className={styles.distancePresets}>
+            {[1, 2, 3, 5].map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                className={`btn small ${stepDistanceMeters === preset ? "primary" : ""}`}
+                onClick={() => handleSelect(preset)}
+              >
+                {preset}m
+              </button>
+            ))}
+            <button
+              type="button"
+              className={`btn small ${stepDistanceMeters === undefined ? "secondary" : "danger"}`}
+              onClick={() => handleSelect(undefined)}
+              title={t("rotation.editor.autoDistance", "Auto")}
+            >
+              {t("rotation.editor.autoDistance", "Auto")}
+            </button>
+          </div>
+
+          <form onSubmit={(e) => handleCustomSubmit(e)} className={styles.distanceInputRow}>
+            <input
+              type="number"
+              step="0.5"
+              min={PREFERRED_DISTANCE_METERS_MIN}
+              max={PREFERRED_DISTANCE_METERS_MAX}
+              value={customValue}
+              onChange={(e) => setCustomValue(e.target.value)}
+              className={styles.distanceInputField}
+              placeholder="m"
+            />
+            <button type="submit" className="btn small primary">
+              OK
+            </button>
+          </form>
+
+          {onApplyToAllSame && skillName && (
+            <div className={styles.distanceBatchActions}>
+              <button
+                type="button"
+                className="btn small"
+                onClick={() => {
+                  const n = parseFloat(customValue)
+                  const targetMeters =
+                    Number.isFinite(n) && n >= 0 ? n : stepDistanceMeters ?? 5
+                  handleSelect(targetMeters, true)
+                }}
+              >
+                {t("rotation.editor.applyToAllSameSkill", "Apply to all {skill}").replace(
+                  "{skill}",
+                  skillName,
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -381,6 +553,25 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
   }
   function setPreferredDistanceMeters(preferredDistanceMeters: number) {
     commitRotation((rotation) => ({ ...rotation, preferredDistanceMeters }))
+  }
+  function setAllChargedDistance(meters: number | undefined) {
+    commitRotation((rotation) => ({
+      ...rotation,
+      steps: rotation.steps.map((s) => {
+        const skill = skillsById.get(s.skillId)
+        const isCharged =
+          s.skillId.includes("phalanxcharged") ||
+          s.skillId.includes("charged") ||
+          Boolean(skill?.tags?.includes(PROP.isCharged))
+        if (isCharged) {
+          const next = { ...s }
+          if (meters === undefined) delete next.distanceMeters
+          else next.distanceMeters = meters
+          return next
+        }
+        return s
+      }),
+    }))
   }
   function setFixedWindowSec(windowSec: number | undefined) {
     commitRotation((rotation) => {
@@ -643,24 +834,61 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
               </span>
             </label>
             {showDistance ? (
-              <label className={styles.field} title={t("rotation.editor.preferredDistanceHint")}>
-                <span>{t("rotation.editor.preferredDistanceM")}</span>
-                <span className={styles.fixedWindow}>
-                  <NumInput
-                    value={activeRotation.preferredDistanceMeters}
-                    min={PREFERRED_DISTANCE_METERS_MIN}
-                    disabled={!isCustom}
-                    onChange={(next) =>
-                      setPreferredDistanceMeters(
-                        Math.min(
-                          PREFERRED_DISTANCE_METERS_MAX,
-                          Math.max(PREFERRED_DISTANCE_METERS_MIN, next),
-                        ),
-                      )
-                    }
-                  />
-                </span>
-              </label>
+              <div className={styles.distanceToolbarGroup}>
+                <label className={styles.field} title={t("rotation.editor.preferredDistanceHint")}>
+                  <span>{t("rotation.editor.preferredDistanceM")}</span>
+                  <span className={styles.fixedWindow}>
+                    <NumInput
+                      value={activeRotation.preferredDistanceMeters}
+                      min={PREFERRED_DISTANCE_METERS_MIN}
+                      disabled={!isCustom}
+                      onChange={(next) =>
+                        setPreferredDistanceMeters(
+                          Math.min(
+                            PREFERRED_DISTANCE_METERS_MAX,
+                            Math.max(PREFERRED_DISTANCE_METERS_MIN, next),
+                          ),
+                        )
+                      }
+                    />
+                  </span>
+                </label>
+                {isCustom && (
+                  <div className={styles.distanceQuickPresets}>
+                    {[2, 3, 5].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        className={`btn small ${activeRotation.preferredDistanceMeters === preset ? "primary" : ""}`}
+                        onClick={() => setPreferredDistanceMeters(preset)}
+                        title={`Set preferred distance to ${preset}m`}
+                      >
+                        {preset}m
+                      </button>
+                    ))}
+                    {inputs.classId === "stonesplitStrength" && (
+                      <>
+                        <button
+                          type="button"
+                          className="btn small"
+                          onClick={() => setAllChargedDistance(5)}
+                          title={t("rotation.editor.applyToAllCharged", "All Charged to 5m")}
+                        >
+                          {t("rotation.editor.applyToAllCharged", "All Charged to 5m")}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn small"
+                          onClick={() => setAllChargedDistance(2)}
+                          title={t("rotation.editor.applyToAllCharged2m", "All Charged to 2m")}
+                        >
+                          {t("rotation.editor.applyToAllCharged2m", "All Charged to 2m")}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
             ) : null}
             <div className={styles.actions}>
               {isCustom ? (
@@ -817,7 +1045,39 @@ export function RotationEditorPanel({ inputs, onChange, result }: Props) {
                         <MeterLevelChip key={level.id} level={level} />
                       ))}
                       {showDistance && cast ? (
-                        <DistanceChip distanceMeters={cast.distanceMeters} />
+                        <DistanceChip
+                          distanceMeters={cast.distanceMeters}
+                          stepDistanceMeters={step.distanceMeters}
+                          isCustom={isCustom}
+                          skillName={skill ? t(skillKey(skill), skill.name) : undefined}
+                          onSetDistance={(meters) => updateStep(idx, { distanceMeters: meters })}
+                          onApplyToAllSame={
+                            step.skillId
+                              ? (meters) => {
+                                  const isCharged =
+                                    step.skillId.includes("phalanxcharged") ||
+                                    Boolean(skill?.tags?.includes(PROP.isCharged))
+                                  commitRotation((rot) => ({
+                                    ...rot,
+                                    steps: rot.steps.map((s) => {
+                                      const sSkill = skillsById.get(s.skillId)
+                                      const match = isCharged
+                                        ? s.skillId.includes("phalanxcharged") ||
+                                          Boolean(sSkill?.tags?.includes(PROP.isCharged))
+                                        : s.skillId === step.skillId
+                                      if (match) {
+                                        const next = { ...s }
+                                        if (meters === undefined) delete next.distanceMeters
+                                        else next.distanceMeters = meters
+                                        return next
+                                      }
+                                      return s
+                                    }),
+                                  }))
+                                }
+                              : undefined
+                          }
+                        />
                       ) : null}
                       {qiCell?.status ? <QiStatusChip status={qiCell.status} /> : null}
                     </div>

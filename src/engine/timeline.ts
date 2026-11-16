@@ -1758,20 +1758,26 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
   }
 
   function writeCastDistance(cast: PendingCast, skill: Skill): void {
-    const displacingSkill: Skill = {
-      ...skill,
-      displacement:
-        activeVariantDisplacement(skill.hits, (condition) =>
-          conditionHolds(condition, cast.startFrame),
-        ) ?? skill.displacement,
+    const stepDistance = cast.resolvedStep.step.distanceMeters
+    let distance: number
+    if (stepDistance !== undefined) {
+      distance = stepDistance
+    } else {
+      const displacingSkill: Skill = {
+        ...skill,
+        displacement:
+          activeVariantDisplacement(skill.hits, (condition) =>
+            conditionHolds(condition, cast.startFrame),
+          ) ?? skill.displacement,
+      }
+      const reader = distanceReaderAtCast(
+        displacingSkill,
+        defaultMeleeReachMeters,
+        preferredDistanceMeters,
+        cast.distanceBeforeCast,
+      )
+      distance = reader(Infinity)
     }
-    const reader = distanceReaderAtCast(
-      displacingSkill,
-      defaultMeleeReachMeters,
-      preferredDistanceMeters,
-      cast.distanceBeforeCast,
-    )
-    const distance = reader(Infinity)
     if (cast.writtenDistance !== distance) {
       ledger.recordStack(TARGET_DISTANCE_STATUS, Math.max(cast.startFrame, loopFrame), distance)
       cast.writtenDistance = distance
@@ -1890,6 +1896,9 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
       scheduleReleaseGate(cast)
       return
     }
+    if (resolvedStep.step.distanceMeters !== undefined) {
+      writeCastDistance(cast, resolvedStep.skill)
+    }
     finalizeCast(cast)
   }
 
@@ -1939,18 +1948,22 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
       ? resolvedStep
       : resolveChargeRelease({ step: resolvedStep.step, skill: cast.current }, startFrame)
     const holdsHere = (condition: TriggerCondition) => conditionHolds(condition, startFrame)
-    if (!prePull) writeCastDistance(cast, castResolution.skill)
-    const castDistanceReader = distanceReaderAtCast(
-      {
-        ...castResolution.skill,
-        displacement:
-          activeVariantDisplacement(castResolution.skill.hits, holdsHere) ??
-          castResolution.skill.displacement,
-      },
-      defaultMeleeReachMeters,
-      preferredDistanceMeters,
-      prePull ? preferredDistanceMeters : cast.distanceBeforeCast,
-    )
+    const stepDistance = cast.resolvedStep.step.distanceMeters
+    if (!prePull || stepDistance !== undefined) writeCastDistance(cast, castResolution.skill)
+    const castDistanceReader: HitDistance =
+      stepDistance !== undefined
+        ? () => stepDistance
+        : distanceReaderAtCast(
+            {
+              ...castResolution.skill,
+              displacement:
+                activeVariantDisplacement(castResolution.skill.hits, holdsHere) ??
+                castResolution.skill.displacement,
+            },
+            defaultMeleeReachMeters,
+            preferredDistanceMeters,
+            prePull ? preferredDistanceMeters : cast.distanceBeforeCast,
+          )
     const nextStepSkillId = resolvedSteps
       .slice(stepIndex + 1)
       .find((followingStep) => !directSwapSkills.has(followingStep.skill))?.skill.id
@@ -2040,7 +2053,12 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
       generated: false,
       inheritedBuffIds: [],
       holds: holdsHere,
-      distanceMeters: prePull ? targetDistanceAt(startFrame) : castDistanceReader(Infinity),
+      distanceMeters:
+        stepDistance !== undefined
+          ? stepDistance
+          : prePull
+            ? targetDistanceAt(startFrame)
+            : castDistanceReader(Infinity),
       midCastExtraFrames,
     })
     const next = chainSuccessor[stepIndex]

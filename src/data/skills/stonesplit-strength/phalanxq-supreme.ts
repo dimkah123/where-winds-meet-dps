@@ -24,6 +24,7 @@ export const phalanxqSupreme = defineSkill({
   triggersBuffsAtFrame: { [BUFF.totalAnnihilationSupremeShield]: 221.76, [BUFF.jadeware]: 179.76 },
   castFrames: 221.76,
   triggerable: true,
+  reachMeters: 6,
   hits: [
     hit(0, {
       frame: 194.12,

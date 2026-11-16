@@ -43,8 +43,7 @@ export const phalanxchargedS2Innerpassion = defineSkill({
   meterDrains: BURNING_HEART_INNER_PASSION_STAGE_2_DRAIN,
   castFrames: 118,
   triggerable: true,
-  reachMeters: 4.5,
-  displacement: { kind: "towardTarget", referenceMeters: 1.75 },
+  reachMeters: 6,
   hits: [
     hit(0, {
       frame: 57,

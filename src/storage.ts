@@ -941,6 +941,12 @@ export function importCustomRotation(text: string): Rotation {
         .map((s) => ({
           id: newStepId(),
           skillId: s.skillId,
+          ...(typeof s.distanceMeters === "number" &&
+          Number.isFinite(s.distanceMeters) &&
+          s.distanceMeters >= 0 &&
+          s.distanceMeters <= 40
+            ? { distanceMeters: s.distanceMeters }
+            : {}),
         }))
     : []
   const fresh: Rotation = {

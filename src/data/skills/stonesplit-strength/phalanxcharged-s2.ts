@@ -43,8 +43,7 @@ export const phalanxchargedS2 = defineSkill({
   meterDrains: BURNING_HEART_STAGE_2_DRAIN,
   castFrames: 137,
   triggerable: true,
-  reachMeters: 4.5,
-  displacement: { kind: "towardTarget", referenceMeters: 1.75 },
+  reachMeters: 6,
   hits: [
     hit(0, {
       frame: 76,

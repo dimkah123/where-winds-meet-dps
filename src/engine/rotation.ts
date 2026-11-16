@@ -7,11 +7,16 @@ import {
   isValidPingMs,
   isValidServerProcessingMs,
 } from "./pingFps"
-import { DEFAULT_PREFERRED_DISTANCE_METERS, isValidPreferredDistanceMeters } from "./distance"
+import {
+  DEFAULT_PREFERRED_DISTANCE_METERS,
+  PREFERRED_DISTANCE_METERS_MAX,
+  isValidPreferredDistanceMeters,
+} from "./distance"
 
 export interface RotationStep {
   id: string
   skillId: string
+  distanceMeters?: number
 }
 
 export interface Rotation {
@@ -78,6 +83,15 @@ export function isRotationStep(x: unknown): x is RotationStep {
   const s = x as Record<string, unknown>
   if (typeof s.id !== "string" || !s.id) return false
   if (typeof s.skillId !== "string") return false
+  if (
+    s.distanceMeters !== undefined &&
+    (typeof s.distanceMeters !== "number" ||
+      !Number.isFinite(s.distanceMeters) ||
+      s.distanceMeters < 0 ||
+      s.distanceMeters > PREFERRED_DISTANCE_METERS_MAX)
+  ) {
+    return false
+  }
   return true
 }
 

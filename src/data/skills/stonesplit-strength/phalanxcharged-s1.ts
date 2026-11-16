@@ -33,8 +33,7 @@ export const phalanxchargedS1 = defineSkill({
   triggersBuffs: [BUFF.throatPierced, BUFF.chargeEnhancement],
   castFrames: 79,
   triggerable: true,
-  reachMeters: 4.5,
-  displacement: { kind: "towardTarget", referenceMeters: 1.75 },
+  reachMeters: 6,
   hits: [
     hit(0, {
       frame: 48,

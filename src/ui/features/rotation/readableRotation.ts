@@ -250,6 +250,12 @@ export function readableRotationText(
       (cast.skillName ? ({ id: skillId, name: cast.skillName } as Skill) : undefined)
     const name = getSkillShortName(skill, skillId)
 
+    const step =
+      cast.stepIndex !== undefined
+        ? steps[cast.stepIndex]
+        : steps.find((s) => s.id === cast.stepId)
+    const distTag = step?.distanceMeters !== undefined ? ` (${step.distanceMeters}m)` : ""
+
     if (i === startCastIndex) {
       // Fight start cast
       if (skill?.hits && skill.hits.length > 0) {
@@ -263,21 +269,21 @@ export function readableRotationText(
             .slice(0, hitIndex + 1)
             .filter((h) => hitDealsDamage(h)).length
           if (hitNumber > 1) {
-            entries.push(`${name} (start at hit ${hitNumber})`)
+            entries.push(`${name} (start at hit ${hitNumber})${distTag}`)
             continue
           }
         }
       }
-      entries.push(`${name} (start)`)
+      entries.push(`${name} (start)${distTag}`)
       continue
     }
 
     if (breakCastStepIds.has(cast.stepId)) {
-      entries.push(`${name} (break)`)
+      entries.push(`${name} (break)${distTag}`)
       continue
     }
 
-    entries.push(name)
+    entries.push(`${name}${distTag}`)
   }
 
   const groups = entries.reduce<Array<{ text: string; count: number }>>((acc, text) => {
@@ -301,7 +307,10 @@ export function readableRotationFromSteps(
     const step = filteredSteps[i]
     const skillId = step.skillId
     const skill = skillsById.get(skillId)
-    entries.push(getSkillShortName(skill, skillId))
+    const baseName = getSkillShortName(skill, skillId)
+    const text =
+      step.distanceMeters !== undefined ? `${baseName} (${step.distanceMeters}m)` : baseName
+    entries.push(text)
   }
 
   const groups = entries.reduce<Array<{ text: string; count: number }>>((acc, text) => {
@@ -698,13 +707,24 @@ export function parseReadableRotation(
   for (let i = 0; i < rawSegments.length; i++) {
     const raw = rawSegments[i]
 
+    // Extract distance override e.g. "(5m)", "[5m]", "(5 m)", "(2m)", etc.
+    let distanceMeters: number | undefined
+    const distMatch = raw.match(/(?:\(|\[)\s*(\d+(?:\.\d+)?)\s*m\s*(?:\)|\])/i)
+    if (distMatch) {
+      const parsedDist = parseFloat(distMatch[1])
+      if (Number.isFinite(parsedDist) && parsedDist >= 0 && parsedDist <= 40) {
+        distanceMeters = parsedDist
+      }
+    }
+    const withoutDist = raw.replace(/(?:\(|\[)\s*\d+(?:\.\d+)?\s*m\s*(?:\)|\])/gi, "").trim()
+
     // Extract multiplier e.g. "Mo Charged x3", "Mo Charged * 3", "Mo Charged ×3"
     let multiplier = 1
-    let base = raw
-    const multiplierMatch = raw.match(/\s*(?:[xX*×]\s*(\d+))\s*$/)
+    let base = withoutDist
+    const multiplierMatch = withoutDist.match(/\s*(?:[xX*×]\s*(\d+))\s*$/)
     if (multiplierMatch) {
       multiplier = Math.max(1, Math.min(100, parseInt(multiplierMatch[1], 10)))
-      base = raw.slice(0, multiplierMatch.index).trim()
+      base = withoutDist.slice(0, multiplierMatch.index).trim()
     }
 
     // Strip tags: (start), (break), (start at hit 6), etc.
@@ -805,6 +825,7 @@ export function parseReadableRotation(
         steps.push({
           id: newStepId(),
           skillId: resolvedSkillId,
+          ...(distanceMeters !== undefined ? { distanceMeters } : {}),
         })
       }
     } else {

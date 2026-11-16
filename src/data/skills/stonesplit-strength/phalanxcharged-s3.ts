@@ -46,10 +46,7 @@ export const phalanxchargedS3 = defineSkill({
   // threshold (in-game values as of 2026-09-24).
   castFrames: 173,
   triggerable: true,
-  // In-game values as of 2026-09-28: 4.5 m approach reach, plus a further
-  // 1.75 m shrink-only pull once in range.
-  reachMeters: 4.5,
-  displacement: { kind: "towardTarget", referenceMeters: 1.75 },
+  reachMeters: 6,
   // The downward- and leaping-slash Mo Blade Anxi Soldier cues fire during
   // the hold, ahead of the slam itself (in-game values as of 2026-09-24).
   hits: [

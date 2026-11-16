@@ -5,6 +5,7 @@
     "Fixed": "Исправлено"
   },
   "headlines": {
+    "1.1.12": "Настройка дистанции каста и радиус заряженных атак Мо",
     "1.1.11": "Исправление коэффициентов Bursting Nine и обновление основной ротации",
     "1.1.10": "Вариант Heng Special 6 Hit для опенера в бок",
     "1.1.5": "Авто-объединение одинаковых навыков (x2, x3) и умный ввод",
@@ -20,6 +21,11 @@
     "1.0.0": "Релиз калькулятора УВС для Расколотого пика (Сила)"
   },
   "items": {
+    "Removed unintended forward pull displacement (1.75m) from Mo Charged attacks and expanded reach to 6m, allowing charged hits, soldiers, and flute ticks to properly scale at 2m and 5m distance bands.": "Убрано паразитное притягивание вперёд (1.75 м) у заряженных атак Мо и радиус расширен до 6 м, благодаря чему удары заряжки, солдаты и тики дудки корректно получают скейлинг дистанции на 2 и 5 метрах.",
+    "Added individual cast distance override support (`distanceMeters`) per rotation step in the simulation engine, timeline, and storage.": "Добавлена поддержка индивидуальной дальности каста (`distanceMeters`) для каждого шага ротации в симуляторе, таймлайне и хранилище.",
+    "Made distance chips interactive in the Rotation Editor table with a quick popover selector (1m, 2m, 3m, 5m, custom input, and batch-apply to all identical skills).": "Чипы дистанции в таблице редактора ротации стали интерактивными: доступно всплывающее меню с быстрыми пресетами (1м, 2м, 3м, 5м), полем ввода и пакетным применением ко всем одинаковым навыкам.",
+    "Added quick distance preset buttons (2m, 3m, 5m) and one-click 'All Charged to 5m' / 'All Charged to 2m' batch buttons in the rotation toolbar.": "На панель редактора ротации вынесены быстрые пресеты дистанции (2м, 3м, 5м) и кнопки быстрой настройки всех заряжек Мо («Заряжки Мо 5м» / «Заряжки Мо 2м»).",
+    "Integrated distance tag parsing and generation into readable rotation strings (e.g. `Mo Charged x4 (5m)` or `(2m)`).": "Интегрировано распознавание и вывод тегов дистанции в читабельном формате ротации (например, `Mo Charged x4 (5m)` или `(2m)`).",
     "Corrected Bursting Nine [7 hits] repeated arrow diminishing returns (30% on 2nd arrow, 20% on arrows 3-7) to match exact in-game mechanics and editor coefficients.": "Исправлено затухание урона повторных стрел Bursting Nine [7 hits] (30% на 2-й стреле, 20% на стрелах 3-7) в точном соответствии с механикой игры и коэффициентами редактора.",
     "Fixed potential undefined stepId access in readable rotation generator.": "Исправлена потенциальная ошибка с отсутствующим stepId в генераторе читабельного формата ротации.",
     "Updated Stonesplit Strength main rotation ('Mixed Dummy 1 Min') to the optimized 42-step sequence with Heng Special 6-Hit opener, Bursting Nine, and Qi-break Mo Charged alignment.": "Основная ротация Расколотого пика ('Mixed Dummy 1 Min') обновлена до оптимизированной цепочки из 42 шагов с открытием через Heng Special 6 Hit, Bursting Nine и выравниванием заряженных атак Мо под окно истощения Ци.",

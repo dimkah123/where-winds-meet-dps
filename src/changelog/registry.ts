@@ -2,6 +2,12 @@ import type { ChangelogEntry } from "./types"
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: "1.1.12",
+    date: "2026-11-16",
+    headline: "Custom Cast Distance per Step & Mo Charged Range Scaling",
+    loadDetails: () => import("./entries/v1-1-12").then((module) => module.details),
+  },
+  {
     version: "1.1.11",
     date: "2026-11-16",
     headline: "Bursting Nine Coefficients Fix & Updated Stonesplit 1-Min Main Rotation",

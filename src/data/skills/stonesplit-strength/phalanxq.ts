@@ -24,6 +24,7 @@ export const phalanxq = defineSkill({
   triggersBuffsAtFrame: { [BUFF.jadeware]: 7 },
   castFrames: 49,
   triggerable: true,
+  reachMeters: 6,
   hits: [
     hit(0, {
       frame: 25.65,

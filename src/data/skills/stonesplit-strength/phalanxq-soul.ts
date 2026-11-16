@@ -27,6 +27,7 @@ export const phalanxqSoul = defineSkill({
   castConditions: [{ buffId: BUFF.ironGuards, op: "gte", stacks: 1, source: "buffEngine" }],
   castFrames: 49,
   triggerable: true,
+  reachMeters: 6,
   hits: [
     hit(0, {
       frame: 25.65,
