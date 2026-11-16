@@ -122,6 +122,7 @@ export const SKILL_SHORT_NAMES: Record<string, string> = {
   "bamboocutDraught-deflect-cancel-prepull": "Deflect",
 
   // Mystic Arts
+  "mystic-bursting-nine-7-hits": "Bursting Nine",
   "mystic-flute-of-the-tides-cancel": "Flute Cancel",
   "mystic-flute-of-the-tides-prepull": "Flute Cancel",
   "mystic-flute-of-the-tides-full": "Flute Full",
@@ -461,6 +462,8 @@ export const CANONICAL_SKILLS_BY_CLASS: Record<string, Record<string, string>> =
 }
 
 export const COMMON_MYSTIC_AND_UNIVERSAL: Record<string, string> = {
+  "bursting nine": "mystic-bursting-nine-7-hits",
+  "bursting nine [7 hits]": "mystic-bursting-nine-7-hits",
   "flute cancel": "mystic-flute-of-the-tides-cancel",
   "flute full": "mystic-flute-of-the-tides-full",
   drink: "mystic-drunkenpoet-prepull",
@@ -641,14 +644,14 @@ export function parseReadableRotation(
         valid: true,
       })
 
-      // Automatically generate both slide steps in correct order
-      steps.push({
-        id: newStepId(),
-        skillId: "stonesplitStrength-snowpartingslide-reslide-prepull",
-      })
+      // Automatically generate both slide steps in correct order: slide first, then re-slide
       steps.push({
         id: newStepId(),
         skillId: "stonesplitStrength-snowpartingslide-prepull",
+      })
+      steps.push({
+        id: newStepId(),
+        skillId: "stonesplitStrength-snowpartingslide-reslide-prepull",
       })
       continue
     }

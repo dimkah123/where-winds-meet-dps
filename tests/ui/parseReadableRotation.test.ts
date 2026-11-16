@@ -51,8 +51,19 @@ describe("parseReadableRotation", () => {
     expect(parsed.validCount).toBe(10)
     // 10 tokens where Heng Q produces 2 slide steps + 1 skill with x3 = 13 steps
     expect(parsed.totalSteps).toBe(13)
-    expect(parsed.steps[1].skillId).toBe("stonesplitStrength-snowpartingslide-reslide-prepull")
-    expect(parsed.steps[2].skillId).toBe("stonesplitStrength-snowpartingslide-prepull")
+    expect(parsed.steps[1].skillId).toBe("stonesplitStrength-snowpartingslide-prepull")
+    expect(parsed.steps[2].skillId).toBe("stonesplitStrength-snowpartingslide-reslide-prepull")
+  })
+
+  it("resolves Bursting Nine mystic art in rotation", () => {
+    const skills = builtinSkillsForClass("stonesplitStrength")
+    const skillsById = new Map(skills.map((s) => [s.id, s]))
+
+    const input = "Heng Special (start) > Bursting Nine > Heng Tab"
+    const parsed = parseReadableRotation(input, "stonesplitStrength", skillsById)
+
+    expect(parsed.hasErrors).toBe(false)
+    expect(parsed.steps[1].skillId).toBe("mystic-bursting-nine-7-hits")
   })
 
   it("handles unknown skills gracefully with error tokens", () => {

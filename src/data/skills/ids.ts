@@ -18,6 +18,7 @@ export const CAST = {
   bloombreak: "cast:bloombreak",
   boundvessel: "cast:boundvessel",
   bladeVessel: "cast:bladeVessel",
+  burstingNine7Hits: "cast:burstingNine7Hits",
   whaledraftTap: "cast:whaledraftTap",
   whaledraftHold: "cast:whaledraftHold",
   whaledraftHoldShort: "cast:whaledraftHoldShort",

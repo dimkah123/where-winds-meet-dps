@@ -1,4 +1,5 @@
 export const SKILL = {
+  burstingNine7Hits: "mystic-bursting-nine-7-hits",
   dragonFireSmolder1Hit: "mystic-dragon-fire-smolder-1-hit",
   dragonFireSmolder2Hits: "mystic-dragon-fire-smolder-2-hits",
   dragonHeadPlus: "mystic-dragon-head-plus",

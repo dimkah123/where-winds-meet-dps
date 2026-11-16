@@ -1,4 +1,5 @@
 import type { Skill } from "../../../engine/skill"
+import { burstingNine7Hits } from "./bursting-nine-7-hits"
 import { dragonFireSmolder1Hit } from "./dragon-fire-smolder-1-hit"
 import { dragonFireSmolder2Hits } from "./dragon-fire-smolder-2-hits"
 import { dragonHeadPlus } from "./dragon-head-plus"
@@ -28,6 +29,7 @@ import { wolflikeFrenzy } from "./wolflike-frenzy"
 export { MYSTIC_DEBUFFS } from "./debuffs"
 
 export const MYSTIC_SKILLS: readonly Skill[] = [
+  burstingNine7Hits,
   dragonFireSmolder1Hit,
   dragonFireSmolder2Hits,
   dragonHeadPlus,
