@@ -31,7 +31,7 @@ export const SKILL_SHORT_NAMES: Record<string, string> = {
   "stonesplitStrength-snowpartingq": "Heng Q",
   "stonesplitStrength-snowpartingslide": "Heng Q",
   "stonesplitStrength-snowpartingslide-prepull": "Heng Q",
-  "stonesplitStrength-snowpartingslide-reslide-prepull": "Heng Q",
+  "stonesplitStrength-snowpartingslide-reslide-prepull": "Heng Q2",
   "stonesplitStrength-snowpartingslide-prepull-hit": "Heng Q",
   "stonesplitStrength-snowpartingdual": "Heng Tab",
   "stonesplitStrength-snowpartingdual-prepull": "Heng Tab",
@@ -235,10 +235,6 @@ export function readableRotationText(
 
   const entries: string[] = []
 
-  const isPrepullSlide = (id?: string) =>
-    id === "stonesplitStrength-snowpartingslide-prepull" ||
-    id === "stonesplitStrength-snowpartingslide-reslide-prepull"
-
   for (let i = 0; i < casts.length; i++) {
     const cast = casts[i]
     const skillId =
@@ -246,22 +242,6 @@ export function readableRotationText(
       (cast.stepIndex !== undefined && steps[cast.stepIndex]?.skillId) ||
       cast.fallbackFromSkillId ||
       ""
-
-    // Collapse consecutive prepull slides into a single "Heng Q"
-    if (isPrepullSlide(skillId) && i < startCastIndex) {
-      const nextCast = casts[i + 1]
-      const nextSkillId =
-        (nextCast &&
-          (stepSkillIdMap.get(nextCast.stepId) ||
-            (nextCast.stepIndex !== undefined && steps[nextCast.stepIndex]?.skillId) ||
-            nextCast.fallbackFromSkillId)) ||
-        ""
-      if (isPrepullSlide(nextSkillId)) {
-        entries.push("Heng Q")
-        i++ // Skip second slide cast
-        continue
-      }
-    }
 
     const skill =
       skillsById.get(skillId) ||
@@ -316,21 +296,9 @@ export function readableRotationFromSteps(
   const filteredSteps = steps.filter((step) => Boolean(step.skillId))
   const entries: string[] = []
 
-  const isPrepullSlide = (id?: string) =>
-    id === "stonesplitStrength-snowpartingslide-prepull" ||
-    id === "stonesplitStrength-snowpartingslide-reslide-prepull"
-
   for (let i = 0; i < filteredSteps.length; i++) {
     const step = filteredSteps[i]
     const skillId = step.skillId
-    const nextSkillId = filteredSteps[i + 1]?.skillId
-
-    if (isPrepullSlide(skillId) && isPrepullSlide(nextSkillId)) {
-      entries.push("Heng Q")
-      i++ // Skip second slide step
-      continue
-    }
-
     const skill = skillsById.get(skillId)
     entries.push(getSkillShortName(skill, skillId))
   }
@@ -397,6 +365,7 @@ export const CANONICAL_SKILLS_BY_CLASS: Record<string, Record<string, string>> =
     "mo sweep": "stonesplitStrength-anxisoldiermosweep",
     "heng special": "stonesplitStrength-snowpartingspecial",
     "heng q": "stonesplitStrength-snowpartingq-slash",
+    "heng q2": "stonesplitStrength-snowpartingslide-reslide-prepull",
     "heng q stab": "stonesplitStrength-snowpartingq-stab",
     "heng tab": "stonesplitStrength-snowpartingdual",
     "heng vc": "stonesplitStrength-snowpartingvc",
@@ -509,6 +478,7 @@ export const QUICK_ADD_GROUPS_BY_CLASS: Record<string, QuickAddGroup[]> = {
       skills: [
         { shortName: "Heng Special", skillId: "stonesplitStrength-snowpartingspecial" },
         { shortName: "Heng Q", skillId: "stonesplitStrength-snowpartingq-slash" },
+        { shortName: "Heng Q2", skillId: "stonesplitStrength-snowpartingslide-reslide-prepull" },
         { shortName: "Heng Q Stab", skillId: "stonesplitStrength-snowpartingq-stab" },
         { shortName: "Heng Tab", skillId: "stonesplitStrength-snowpartingdual" },
         { shortName: "Heng VC", skillId: "stonesplitStrength-snowpartingvc" },
@@ -713,7 +683,6 @@ export function parseReadableRotation(
   const startIndex = rawSegments.findIndex((seg) =>
     /\(start(?:\s+at\s+hit\s+\d+)?\)/i.test(seg),
   )
-  let prepullSlideExpanded = false
 
   for (let i = 0; i < rawSegments.length; i++) {
     const raw = rawSegments[i]
@@ -735,48 +704,6 @@ export function parseReadableRotation(
     const normKey = cleanName.toLowerCase().replace(/\s+/g, " ")
     const isPrepull = startIndex >= 0 ? i < startIndex : i <= 4
 
-    // Special automation for Stonesplit Heng Q slide in prepull:
-    if (
-      classId === "stonesplitStrength" &&
-      isPrepull &&
-      (normKey === "heng q" || normKey === "heng q2")
-    ) {
-      if (prepullSlideExpanded) {
-        // Already expanded prepull slide from preceding token (e.g. user typed Heng Q2 > Heng Q or Heng Q > Heng Q2)
-        // Mark this token valid as part of the slide, without adding duplicate steps
-        tokens.push({
-          raw,
-          cleanName,
-          multiplier,
-          skillId: "stonesplitStrength-snowpartingslide-prepull",
-          skillName: "SnowpartingSlide Prepull",
-          valid: true,
-        })
-        continue
-      }
-
-      prepullSlideExpanded = true
-      tokens.push({
-        raw,
-        cleanName,
-        multiplier,
-        skillId: "stonesplitStrength-snowpartingslide-prepull",
-        skillName: "SnowpartingSlide Prepull",
-        valid: true,
-      })
-
-      // Automatically generate both slide steps in correct order: slide first, then re-slide
-      steps.push({
-        id: newStepId(),
-        skillId: "stonesplitStrength-snowpartingslide-prepull",
-      })
-      steps.push({
-        id: newStepId(),
-        skillId: "stonesplitStrength-snowpartingslide-reslide-prepull",
-      })
-      continue
-    }
-
     // Match resolution:
     let resolvedSkillId: string | undefined
 
@@ -788,6 +715,12 @@ export function parseReadableRotation(
           skillsById.has("stonesplitStrength-phalanxspecial-prepull")
         ) {
           resolvedSkillId = "stonesplitStrength-phalanxspecial-prepull"
+        }
+        if (
+          normKey === "heng q" &&
+          skillsById.has("stonesplitStrength-snowpartingslide-prepull")
+        ) {
+          resolvedSkillId = "stonesplitStrength-snowpartingslide-prepull"
         }
       }
       if (normKey === "flute cancel" && skillsById.has("mystic-flute-of-the-tides-prepull")) {

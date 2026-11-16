@@ -84,7 +84,12 @@ describe("ReadableRotationDialog", () => {
     const quickHengQ = screen.getByRole("button", { name: "+Heng Q" })
     fireEvent.click(quickHengQ)
     expect(textarea.value).toBe("Mo Special > Heng Q > ")
-    expect(screen.queryByRole("button", { name: "+Heng Q2" })).not.toBeInTheDocument()
+
+    const quickHengQ2 = screen.getByRole("button", { name: "+Heng Q2" })
+    expect(quickHengQ2).toBeInTheDocument()
+    fireEvent.click(quickHengQ2)
+    expect(textarea.value).toBe("Mo Special > Heng Q > Heng Q2 > ")
+
     expect(screen.queryByRole("button", { name: "+Mo A1" })).not.toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "+Mo A2" })).not.toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "+Mo A3" })).not.toBeInTheDocument()
@@ -94,21 +99,21 @@ describe("ReadableRotationDialog", () => {
     const quickHengLC = screen.getByRole("button", { name: "+Heng LC" })
     expect(quickHengLC).toBeInTheDocument()
     fireEvent.click(quickHengLC)
-    expect(textarea.value).toBe("Mo Special > Heng Q > Heng LC > ")
+    expect(textarea.value).toBe("Mo Special > Heng Q > Heng Q2 > Heng LC > ")
 
     const quickMoCharged = screen.getByRole("button", { name: "+Mo Charged" })
     fireEvent.click(quickMoCharged)
-    expect(textarea.value).toBe("Mo Special > Heng Q > Heng LC > Mo Charged > ")
+    expect(textarea.value).toBe("Mo Special > Heng Q > Heng Q2 > Heng LC > Mo Charged > ")
 
     // Consecutive clicks on +Mo Charged should increment multiplier x2, x3, x4
     fireEvent.click(quickMoCharged)
-    expect(textarea.value).toBe("Mo Special > Heng Q > Heng LC > Mo Charged x2 > ")
+    expect(textarea.value).toBe("Mo Special > Heng Q > Heng Q2 > Heng LC > Mo Charged x2 > ")
 
     fireEvent.click(quickMoCharged)
-    expect(textarea.value).toBe("Mo Special > Heng Q > Heng LC > Mo Charged x3 > ")
+    expect(textarea.value).toBe("Mo Special > Heng Q > Heng Q2 > Heng LC > Mo Charged x3 > ")
 
     fireEvent.click(quickMoCharged)
-    expect(textarea.value).toBe("Mo Special > Heng Q > Heng LC > Mo Charged x4 > ")
+    expect(textarea.value).toBe("Mo Special > Heng Q > Heng Q2 > Heng LC > Mo Charged x4 > ")
   })
 
   it("shows unknown skill highlight warning when typo is present", () => {
