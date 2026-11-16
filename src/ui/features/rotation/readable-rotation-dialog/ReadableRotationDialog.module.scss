@@ -185,17 +185,47 @@
   color: var(--color-text-muted);
 }
 
-.quickAddList {
+.quickAddGroups {
   display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.quickAddRow {
+  display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 6px;
-  max-height: 72px;
-  overflow-y: auto;
-  padding-bottom: 2px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 5px 8px;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.055);
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+}
+
+.quickAddGroupBadge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-accent);
+  background: rgba(220, 170, 70, 0.12);
+  border: 1px solid rgba(220, 170, 70, 0.25);
+  border-radius: 4px;
+  padding: 2px 7px;
+  margin-right: 2px;
+  flex-shrink: 0;
 }
 
 .quickAddButton {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 4px;
   color: var(--color-text);
@@ -209,7 +239,7 @@
     color 0.15s;
 
   &:hover {
-    background: rgba(220, 170, 70, 0.15);
+    background: rgba(220, 170, 70, 0.18);
     border-color: var(--color-accent);
     color: var(--color-accent);
   }

@@ -6,6 +6,7 @@ import type { RotationStep } from "../../../../engine/rotation"
 import {
   collapseConsecutiveSkills,
   getAvailableSkillSuggestions,
+  getQuickAddGroups,
   parseReadableRotation,
   type SkillSuggestion,
 } from "../readableRotation"
@@ -40,6 +41,11 @@ export function ReadableRotationDialog({
   const availableSuggestions = useMemo(
     () => getAvailableSkillSuggestions(classId, skillsById),
     [classId, skillsById],
+  )
+
+  const quickAddGroups = useMemo(
+    () => getQuickAddGroups(classId, availableSuggestions),
+    [classId, availableSuggestions],
   )
 
   // Current token being typed before cursor
@@ -336,19 +342,24 @@ export function ReadableRotationDialog({
         </div>
 
         {/* Quick Add Palette */}
-        {availableSuggestions.length > 0 && (
+        {quickAddGroups.length > 0 && (
           <div className={styles.quickAddSection}>
             <span className={styles.quickAddLabel}>{t("rotation.editor.quickAdd")}:</span>
-            <div className={styles.quickAddList}>
-              {availableSuggestions.slice(0, 17).map((s) => (
-                <button
-                  key={`quick-${s.skillId}-${s.shortName}`}
-                  type="button"
-                  className={styles.quickAddButton}
-                  onClick={() => insertQuickSkill(s.shortName)}
-                >
-                  +{s.shortName}
-                </button>
+            <div className={styles.quickAddGroups}>
+              {quickAddGroups.map((group) => (
+                <div key={group.label} className={styles.quickAddRow}>
+                  <span className={styles.quickAddGroupBadge}>{group.label}</span>
+                  {group.skills.map((s) => (
+                    <button
+                      key={`quick-${s.skillId}-${s.shortName}`}
+                      type="button"
+                      className={styles.quickAddButton}
+                      onClick={() => insertQuickSkill(s.shortName)}
+                    >
+                      +{s.shortName}
+                    </button>
+                  ))}
+                </div>
               ))}
             </div>
           </div>

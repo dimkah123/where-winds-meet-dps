@@ -488,6 +488,127 @@ export interface SkillSuggestion {
   category: "class" | "mystic" | "universal"
 }
 
+export interface QuickAddGroup {
+  label: string
+  skills: Array<{ shortName: string; skillId: string }>
+}
+
+export const QUICK_ADD_GROUPS_BY_CLASS: Record<string, QuickAddGroup[]> = {
+  stonesplitStrength: [
+    {
+      label: "Mo",
+      skills: [
+        { shortName: "Mo Special", skillId: "stonesplitStrength-phalanxspecial" },
+        { shortName: "Mo Charged", skillId: "stonesplitStrength-phalanxcharged-s3-innerpassion" },
+        { shortName: "Mo QQ", skillId: "stonesplitStrength-phalanxq-soul" },
+        { shortName: "Mo Tab", skillId: "stonesplitStrength-mo-blade-dual" },
+      ],
+    },
+    {
+      label: "Heng",
+      skills: [
+        { shortName: "Heng Special", skillId: "stonesplitStrength-snowpartingspecial" },
+        { shortName: "Heng Q", skillId: "stonesplitStrength-snowpartingq-slash" },
+        { shortName: "Heng Q Stab", skillId: "stonesplitStrength-snowpartingq-stab" },
+        { shortName: "Heng Tab", skillId: "stonesplitStrength-snowpartingdual" },
+        { shortName: "Heng VC", skillId: "stonesplitStrength-snowpartingvc" },
+        { shortName: "Heng LC", skillId: "stonesplitStrength-snowpartingcharged-forgetfulness" },
+      ],
+    },
+  ],
+  bellstrikeUmbra: [
+    {
+      label: "Sword",
+      skills: [
+        { shortName: "Sword Charged", skillId: "bellstrikeUmbra-sword-charge-stage-1-4-hit" },
+        { shortName: "Sword Special", skillId: "bellstrikeUmbra-swordspecial-3-hit" },
+        { shortName: "Sword Q", skillId: "bellstrikeUmbra-swordq" },
+        { shortName: "Sword QQ", skillId: "bellstrikeUmbra-swordqfollowup" },
+        { shortName: "Sword QQQ", skillId: "bellstrikeUmbra-sword-martial-qqq" },
+        { shortName: "Sword Followup", skillId: "bellstrikeUmbra-sword-r-charge-follow-up-1-hit-cancel" },
+      ],
+    },
+    {
+      label: "Spear",
+      skills: [
+        { shortName: "Spear Special", skillId: "bellstrikeUmbra-spearspecial-1-hit-cancel" },
+        { shortName: "Spear Q", skillId: "bellstrikeUmbra-spearq-5-hit-cancel" },
+        { shortName: "Crosswind", skillId: "bellstrikeUmbra-crosswind-blade-cancel" },
+      ],
+    },
+  ],
+  bellstrikeSplendor: [
+    {
+      label: "Sword",
+      skills: [
+        { shortName: "Sword Charged", skillId: "bellstrikeSplendor-swordheavycharged" },
+        { shortName: "Sword Q", skillId: "bellstrikeSplendor-swordq" },
+      ],
+    },
+    {
+      label: "Spear",
+      skills: [
+        { shortName: "Spear Q", skillId: "bellstrikeSplendor-spearq" },
+        { shortName: "Energy Surge", skillId: "bellstrikeSplendor-energysurge" },
+      ],
+    },
+  ],
+  silkbindJade: [
+    {
+      label: "Umbrella",
+      skills: [
+        { shortName: "Umbrella Q", skillId: "silkbindJade-umbq" },
+        { shortName: "Umbrella Light Charged", skillId: "silkbindJade-umblightcharge" },
+        { shortName: "Umbrella Heavy", skillId: "silkbindJade-umb-heavylight" },
+        { shortName: "Colorful Phoenix", skillId: "silkbindJade-umbdronelaunch-20hit" },
+      ],
+    },
+    {
+      label: "Fan",
+      skills: [
+        { shortName: "Fan Special", skillId: "silkbindJade-fanspecial" },
+        { shortName: "Fan Q", skillId: "silkbindJade-fanq" },
+        { shortName: "Fan Light Charged", skillId: "silkbindJade-fanlightcharged" },
+        { shortName: "Fan Heavy", skillId: "silkbindJade-fanheavypursuit-3-hit" },
+      ],
+    },
+  ],
+  bamboocutDraught: [
+    {
+      label: "Gauntlet & Brew",
+      skills: [
+        { shortName: "Flamelash", skillId: "bamboocutDraught-dragonquench-inebriate-cancel" },
+        { shortName: "Hero's Blood", skillId: "bamboocutDraught-heros-blood" },
+        { shortName: "Nightwick", skillId: "bamboocutDraught-nightwick-primepick" },
+        { shortName: "Gauntlet Q", skillId: "bamboocutDraught-peakfall" },
+        { shortName: "Drink", skillId: "bamboocutDraught-quick-drink-cancel" },
+        { shortName: "Reveldrift", skillId: "bamboocutDraught-reveldrift-cancel" },
+        { shortName: "Castlink", skillId: "bamboocutDraught-castlink" },
+      ],
+    },
+  ],
+}
+
+export function getQuickAddGroups(
+  classId: string,
+  availableSuggestions: SkillSuggestion[],
+): QuickAddGroup[] {
+  const configured = QUICK_ADD_GROUPS_BY_CLASS[classId]
+  if (configured && configured.length > 0) {
+    return configured
+  }
+
+  return [
+    {
+      label: "Skills",
+      skills: availableSuggestions.slice(0, 12).map((s) => ({
+        shortName: s.shortName,
+        skillId: s.skillId,
+      })),
+    },
+  ]
+}
+
 export function getAvailableSkillSuggestions(
   classId: string,
   skillsById: Map<string, Skill>,

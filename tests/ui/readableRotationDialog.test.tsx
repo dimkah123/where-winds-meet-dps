@@ -85,6 +85,11 @@ describe("ReadableRotationDialog", () => {
     fireEvent.click(quickHengQ)
     expect(textarea.value).toBe("Mo Special > Heng Q > ")
     expect(screen.queryByRole("button", { name: "+Heng Q2" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "+Mo A1" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "+Mo A2" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "+Mo A3" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "+Mo Down" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "+Mo Jump" })).not.toBeInTheDocument()
 
     const quickHengLC = screen.getByRole("button", { name: "+Heng LC" })
     expect(quickHengLC).toBeInTheDocument()
