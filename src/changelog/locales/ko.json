@@ -5,6 +5,7 @@
     "Fixed": "수정됨"
   },
   "headlines": {
+    "1.1.3": "대화형 로테이션 편집기, T9 입력 및 알림 개선",
     "1.1.2": "기파 파괴 용어 및 레이아웃 개선, 깔끔한 로테이션 행",
     "1.1.1": "특성 현지화 및 초기 설정 마법사 경험 개선",
     "1.1.0": "러시아어 현지화 및 로테이션 자동 대체 배지",
@@ -15,6 +16,12 @@
     "1.0.0": "벽석파옥 (힘) DPS 계산기 출시"
   },
   "items": {
+    "Interactive readable rotation format editor with live syntax highlights, chip badges, and one-click copy.": "실시간 구문 강조, 칩 배지 및 원클릭 복사 기능이 포함된 대화형 가독성 로테이션 편집기.",
+    "Smart T9 autocomplete for fast rotation typing with skill prefixes, brackets, and quick-add palette.": "스킬 접두사, 괄호 및 빠른 추가 팔레트로 빠른 로테이션 입력을 지원하는 스마트 T9 자동 완성.",
+    "Replaced temporary rotation Qi break reminders with a permanent 'Don't show again' action.": "임시 로테이션 기파 파괴 알림을 영구적인 '다시 표시 안 함' 버튼으로 교체.",
+    "Dynamic translation of patch notes and changelog based on the currently active language.": "현재 선택된 언어에 따른 패치 노트 및 변경 로그 동적 번역 지원.",
+    "Removed pre-fight countdown times from readable format for cleaner sequence overview.": "보다 깔끔한 시퀀스 개요를 위해 가독성 형식에서 전투 전 카운트다운 시간 제거.",
+    "Fixed Stonesplit heirloom attribute matching and weapon affixes in min build.": "벽석파옥 전승 속성 매칭 및 최소 빌드의 무기 옵션 수정.",
     "Proper Russian pluralization for skill hit counts in the rotation timeline (1 удар, 2 удара, 5 ударов).": "로테이션 타임라인의 스킬 타격 수에 대한 러시아어 복수형 표기 지원 (1 удар, 2 удара, 5 ударов).",
     "Localization for pre-pull skills, Blade Momentum meter, and crafting scripts (Purewrath Script, Convergence Script).": "전투 전 준비 스킬, 도세 게이지 및 제작 두루마리 아이템(순수한 분노의 두루마리, 수렴의 두루마리) 현지화.",
     "Redesigned Qi Break rows in Rotation Editor with multi-column span and clean separator to eliminate text overlap.": "로테이션 편집기의 기파 파괴 행 레이아웃을 다중 열 확장 및 깔끔한 구분선으로 재설계하여 텍스트 겹침 문제 해결.",

@@ -20,7 +20,7 @@ function renderWithLocale(ui: React.ReactNode, locale: Locale) {
 }
 
 describe("changelog translation depending on selected language", () => {
-  const entry = CHANGELOG_ENTRIES[0] // v1.1.2
+  const entry = CHANGELOG_ENTRIES.find((candidate) => candidate.version === "1.1.2")!
 
   it("renders in Russian when Russian locale is active", async () => {
     const details = await entry.loadDetails()

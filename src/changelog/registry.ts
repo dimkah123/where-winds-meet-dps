@@ -2,6 +2,12 @@ import type { ChangelogEntry } from "./types"
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: "1.1.3",
+    date: "2026-11-16",
+    headline: "Interactive Rotation Editor, T9 Input & Alert Polish",
+    loadDetails: () => import("./entries/v1-1-3").then((module) => module.details),
+  },
+  {
     version: "1.1.2",
     date: "2026-11-15",
     headline: "Qi Break Terminology & Layout Polish, Clean Rotation Rows",

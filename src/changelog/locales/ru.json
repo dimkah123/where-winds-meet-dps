@@ -5,6 +5,7 @@
     "Fixed": "Исправлено"
   },
   "headlines": {
+    "1.1.3": "Интерактивный редактор ротаций, T9-ввод и алерты",
     "1.1.2": "Терминология истощения Ци, улучшение интерфейса и строки ротаций",
     "1.1.1": "Локализация талантов и улучшения мастера начальной настройки",
     "1.1.0": "Русская локализация и бейджи авто-переключения в ротации",
@@ -15,6 +16,12 @@
     "1.0.0": "Релиз калькулятора УВС для Расколотого пика (Сила)"
   },
   "items": {
+    "Interactive readable rotation format editor with live syntax highlights, chip badges, and one-click copy.": "Интерактивный редактор читабельного формата ротации с подсветкой синтаксиса, бейджами навыков и копированием в один клик.",
+    "Smart T9 autocomplete for fast rotation typing with skill prefixes, brackets, and quick-add palette.": "Умный Т9-автокомплит для быстрого набора ротаций с префиксами навыков, скобками и палитрой быстрой вставки.",
+    "Replaced temporary rotation Qi break reminders with a permanent 'Don't show again' action.": "Временные напоминания об истощении Ци заменены на постоянную кнопку «Больше не показывать».",
+    "Dynamic translation of patch notes and changelog based on the currently active language.": "Динамический перевод истории изменений и патчноутов в зависимости от выбранного языка.",
+    "Removed pre-fight countdown times from readable format for cleaner sequence overview.": "Убрано отображение времени обратного отсчёта до боя в читабельном формате для чистоты обзора цепочки.",
+    "Fixed Stonesplit heirloom attribute matching and weapon affixes in min build.": "Исправлено сопоставление атрибутов реликвий для Расколотого пика и аффиксы оружия в мин. билде.",
     "Proper Russian pluralization for skill hit counts in the rotation timeline (1 удар, 2 удара, 5 ударов).": "Корректные окончания числительных для количества ударов в таймлайне ротации (1 удар, 2 удара, 5 ударов).",
     "Localization for pre-pull skills, Blade Momentum meter, and crafting scripts (Purewrath Script, Convergence Script).": "Локализация навыков подготовки, шкалы импульса клинка и свитков ремесла (Свиток чистой ярости, Свиток схождения).",
     "Redesigned Qi Break rows in Rotation Editor with multi-column span and clean separator to eliminate text overlap.": "Обновлён макет строк истощения Ци в редакторе ротации: объединение колонок и разделитель исключают наложение текста.",

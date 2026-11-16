@@ -5,6 +5,7 @@
     "Fixed": "修复"
   },
   "headlines": {
+    "1.1.3": "交互式循环编辑器、T9 输入与告警优化",
     "1.1.2": "气绝术语与布局优化，清晰的循环行",
     "1.1.1": "天赋本地化与初始设置向导体验优化",
     "1.1.0": "俄语本地化与循环自动回退标识",
@@ -15,6 +16,12 @@
     "1.0.0": "劈石破玉（力）DPS 计算器发布"
   },
   "items": {
+    "Interactive readable rotation format editor with live syntax highlights, chip badges, and one-click copy.": "带有实时语法高亮、技能标签和一键复制功能的交互式易读格式循环编辑器。",
+    "Smart T9 autocomplete for fast rotation typing with skill prefixes, brackets, and quick-add palette.": "支持技能前缀、括号和快捷添加调色板的智能 T9 自动补全，助您快速输入循环。",
+    "Replaced temporary rotation Qi break reminders with a permanent 'Don't show again' action.": "将临时的循环气绝提醒替换为永久的“不再显示”操作。",
+    "Dynamic translation of patch notes and changelog based on the currently active language.": "根据当前选择的语言动态翻译更新日志与补丁说明。",
+    "Removed pre-fight countdown times from readable format for cleaner sequence overview.": "从易读格式中移除了战斗前倒计时时间，使技能序列概览更加整洁。",
+    "Fixed Stonesplit heirloom attribute matching and weapon affixes in min build.": "修复了劈石破玉传世属性匹配以及小外流配装中的武器词条。",
     "Proper Russian pluralization for skill hit counts in the rotation timeline (1 удар, 2 удара, 5 ударов).": "循环时间轴中技能打击次数的正确俄语复数形式（1 удар, 2 удара, 5 ударов）。",
     "Localization for pre-pull skills, Blade Momentum meter, and crafting scripts (Purewrath Script, Convergence Script).": "战斗前准备技能、刀势计和锻造心法道具（纯怒残卷、汇聚残卷）的本地化。",
     "Redesigned Qi Break rows in Rotation Editor with multi-column span and clean separator to eliminate text overlap.": "重新设计循环编辑器中的气绝行布局，通过多列跨度和整洁的分隔线消除文本重叠。",
