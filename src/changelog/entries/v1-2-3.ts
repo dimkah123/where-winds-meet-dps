@@ -21,6 +21,10 @@ export const details: ChangelogEntryDetails = {
           text: "History of changes with Undo (Ctrl+Z) and Redo (Ctrl+Y / Ctrl+Shift+Z), plus quick toolbar buttons.",
           authors: ["dimkah123"],
         },
+        {
+          text: "Russian language OCR recognition support for gear screenshots (stats, levels, slots, retunes, and attunements).",
+          authors: ["dimkah123"],
+        },
       ],
     },
   ],

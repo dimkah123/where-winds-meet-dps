@@ -15,6 +15,8 @@ import type {
   Inputs,
 } from "../../../../engine/types"
 import { newGearPieceId, sanitizeGearPieceText } from "../../../../storage"
+import ruTranslations from "../../../../i18n/locales/ru.json"
+import { attunementKey, statLineKey } from "../../../../i18n/contentKeys"
 
 export type GearScreenshotFieldConfidence = "read" | "guessed" | "unresolved"
 
@@ -87,6 +89,25 @@ const SLOT_NAME_TO_ID: Readonly<Record<string, GearSlot>> = {
   charm: "disc",
   pendant: "pendant",
   ward: "pendant",
+  шлем: "helm",
+  корона: "helm",
+  голова: "helm",
+  доспех: "armor",
+  броня: "armor",
+  нагрудник: "armor",
+  поножи: "greaves",
+  сапоги: "greaves",
+  штаны: "greaves",
+  наручи: "bracer",
+  перчатки: "bracer",
+  браслет: "bracer",
+  браслеты: "bracer",
+  диск: "disc",
+  шарм: "disc",
+  амулет: "disc",
+  кулон: "pendant",
+  подвеска: "pendant",
+  оберег: "pendant",
 }
 
 const RETUNE_BRACKET_WORDS: ReadonlySet<string> = new Set([
@@ -96,6 +117,11 @@ const RETUNE_BRACKET_WORDS: ReadonlySet<string> = new Set([
   "tuned",
   "retune",
   "retuned",
+  "перекован",
+  "перековано",
+  "перековка",
+  "закалка",
+  "перекованный",
 ])
 
 const NAME_DISTANCE_MIN = 2
@@ -104,7 +130,7 @@ const NAME_DISTANCE_SCALE = 0.25
 function normalizeStatName(label: string): string {
   return label
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/[^a-zа-яё0-9]+/gu, " ")
     .trim()
 }
 
@@ -113,18 +139,82 @@ interface NormalizedNameEntry<T> {
   value: T
 }
 
-const GEAR_WORD_NAME_INDEX: readonly NormalizedNameEntry<GearWordId>[] = GEAR_WORD_LINES.map(
-  (line) => ({ normalized: normalizeStatName(line.label), value: line.id as GearWordId }),
-)
+const RUSSIAN_STAT_ALIASES: readonly [string, GearWordId][] = [
+  ["крит", "crit"],
+  ["шанс крита", "crit"],
+  ["критический удар", "crit"],
+  ["мин физ атака", "minPhys"],
+  ["мин атака", "minPhys"],
+  ["макс физ атака", "maxPhys"],
+  ["макс атака", "maxPhys"],
+  ["физ защита", "physDef"],
+  ["защита", "physDef"],
+  ["физ проникновение", "physicalPenetration"],
+  ["проникновение", "physicalPenetration"],
+  ["сродство", "affinity"],
+  ["шанс сродства", "affinity"],
+  ["точность", "precision"],
+  ["сила", "power"],
+  ["ловкость", "agility"],
+  ["импульс", "momentum"],
+  ["телосложение", "body"],
+  ["макс hp", "maxHp"],
+  ["хп", "maxHp"],
+  ["мин атака камнелома", "minStonesplit"],
+  ["макс атака камнелома", "maxStonesplit"],
+]
+
+const RUSSIAN_ATTUNEMENT_ALIASES: readonly [string, string][] = [
+  ["физическое проникновение", "physPen"],
+  ["физ проникновение", "physPen"],
+  ["проникновение камнелома", "stonesplitPen"],
+  ["проникновение колокола", "bellstrikePen"],
+  ["проникновение шелка", "silkbindPen"],
+  ["проникновение бамбука", "bamboocutPen"],
+  ["проникновение без формы", "formlessPen"],
+]
+
+const GEAR_WORD_NAME_INDEX: readonly NormalizedNameEntry<GearWordId>[] = (() => {
+  const entries: NormalizedNameEntry<GearWordId>[] = []
+  const translations = ruTranslations as Record<string, string>
+  for (const line of GEAR_WORD_LINES) {
+    entries.push({ normalized: normalizeStatName(line.label), value: line.id as GearWordId })
+    const ruLabel = translations[statLineKey(line.id)]
+    if (ruLabel) {
+      entries.push({ normalized: normalizeStatName(ruLabel), value: line.id as GearWordId })
+    }
+  }
+  for (const [alias, id] of RUSSIAN_STAT_ALIASES) {
+    entries.push({ normalized: normalizeStatName(alias), value: id })
+  }
+  return entries
+})()
 
 // Every attunement option, every slot, every class — including labels for
 // classes other than the one selected — so a correctly-read attunement is
 // never vetoed by a wrong slot guess or a different class being selected.
-const ATTUNEMENT_NAME_INDEX: readonly NormalizedNameEntry<AttunementOption>[] =
-  ATTUNEMENT_OPTIONS.map((option) => ({
-    normalized: normalizeStatName(option.label),
-    value: option,
-  }))
+const ATTUNEMENT_NAME_INDEX: readonly NormalizedNameEntry<AttunementOption>[] = (() => {
+  const entries: NormalizedNameEntry<AttunementOption>[] = []
+  const translations = ruTranslations as Record<string, string>
+  for (const option of ATTUNEMENT_OPTIONS) {
+    entries.push({
+      normalized: normalizeStatName(option.label),
+      value: option,
+    })
+    const ruLabel = translations[attunementKey(option.id)]
+    if (ruLabel) {
+      entries.push({
+        normalized: normalizeStatName(ruLabel),
+        value: option,
+      })
+    }
+  }
+  for (const [alias, id] of RUSSIAN_ATTUNEMENT_ALIASES) {
+    const opt = ATTUNEMENT_OPTIONS.find((o) => o.id === id)
+    if (opt) entries.push({ normalized: normalizeStatName(alias), value: opt })
+  }
+  return entries
+})()
 
 function levenshteinDistance(left: string, right: string): number {
   const distances: number[][] = Array.from({ length: left.length + 1 }, () =>
@@ -249,7 +339,7 @@ function stripRetuneBracket(row: string): {
   if (openIndex < 0) return { remaining: row, retuned: false, recognized: true }
 
   const afterOpen = row.slice(openIndex + 1)
-  const wordMatch = /^\s*([a-zA-Z]+)/.exec(afterOpen)
+  const wordMatch = /^\s*([a-zA-Zа-яА-ЯёЁ]+)/.exec(afterOpen)
   if (!wordMatch) return { remaining: row, retuned: false, recognized: true }
 
   const bracketWord = wordMatch[1]!
@@ -301,7 +391,7 @@ function roundAttunementValue(value: number): number {
 function guessSlot(titleLine: string, fallbackSlot: GearSlot): { slot: GearSlot; read: boolean } {
   const words = titleLine
     .toLowerCase()
-    .split(/[^a-z]+/)
+    .split(/[^a-zа-яё]+/u)
     .filter(Boolean)
   for (let index = words.length - 1; index >= 0; index -= 1) {
     const word = words[index]!
@@ -313,7 +403,9 @@ function guessSlot(titleLine: string, fallbackSlot: GearSlot): { slot: GearSlot;
 }
 
 function parseLevel(headerLine: string): { level: GearLevel; read: boolean } {
-  const match = /tier\s*(\d+)/i.exec(headerLine)
+  const match =
+    /(?:tier|уровень|ранг|тир|ур\.?|lvl|level|lv)\s*(\d+)/i.exec(headerLine) ||
+    /\b(86|91|96|100|105)\b/.exec(headerLine)
   const candidate = match ? Number(match[1]) : null
   const isValidLevel = candidate !== null && VALID_LEVELS.includes(candidate as GearLevel)
   return isValidLevel
@@ -671,7 +763,9 @@ export function parseGearScreenshot(
   if (lines.length === 0) return emptyParse(fallbackSlot, "empty")
 
   const [titleLine, ...rest] = lines
-  const headerIndex = rest.findIndex((line) => /relaying|tier\s*\d/i.test(line))
+  const headerIndex = rest.findIndex((line) =>
+    /relaying|tier\s*\d|ранг|тир|уровень|ур\.?\s*\d|наследован/i.test(line),
+  )
   const headerLine = headerIndex >= 0 ? rest[headerIndex] : undefined
   const bodyLines =
     headerIndex >= 0 ? [...rest.slice(0, headerIndex), ...rest.slice(headerIndex + 1)] : rest
@@ -690,7 +784,8 @@ export function parseGearScreenshot(
   const headerBarLevel = parseLevel(headerBarText)
   const headerLevelGuess = headerBarLevel.read ? headerBarLevel : parseLevel(headerLine ?? "")
   const headerRelayedGuess =
-    /relaying/i.test(headerBarText) || (headerLine ? /relaying/i.test(headerLine) : false)
+    /relaying|наследован/i.test(headerBarText) ||
+    (headerLine ? /relaying|наследован/i.test(headerLine) : false)
 
   // A gear piece always has exactly five word slots: an unread row is an
   // empty, editable slot, never a shorter array — so each index is looked up

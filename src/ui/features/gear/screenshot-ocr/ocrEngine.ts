@@ -11,7 +11,7 @@ const CORE_PATH = "/ocr/core"
 const LANG_PATH = "/ocr/lang"
 
 export const CHAR_WHITELIST =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-.%[]·&/ "
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя0123456789+-.%[]·&/ "
 
 let workerPromise: Promise<TesseractWorker> | null = null
 let currentProgressHandler: ((progress: number) => void) | null = null
@@ -21,7 +21,7 @@ async function getWorker(): Promise<TesseractWorker> {
   if (!workerPromise) {
     workerPromise = (async () => {
       const { createWorker } = await import("tesseract.js")
-      const worker = await createWorker("eng", 1, {
+      const worker = await createWorker("eng+rus", 1, {
         workerPath: WORKER_PATH,
         corePath: CORE_PATH,
         langPath: LANG_PATH,
