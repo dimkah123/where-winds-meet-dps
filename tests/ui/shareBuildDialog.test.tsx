@@ -167,22 +167,25 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
 
       minPhys: 2751.66,
       maxPhys: 2501.22,
-      physPenetration: 51.1,
+      physPenetration: 0.511,
       primaryAttributeName: "Камнелом",
       primaryAttributeMin: 374.3,
       primaryAttributeMax: 845.72,
-      primaryAttributePenetration: 29.6,
+      primaryAttributePenetration: 0.296,
+      foreignAttributeMin: 144.96,
+      foreignAttributeMax: 0,
 
       critRate: 0.7803,
       critDamageBoost: 0.54,
       precisionRate: 0.931,
       affinityRate: 0.1033,
+      directCritRate: 0.092,
 
       allMartialBoost: 0.0676,
       attributeDamageBoost: 0.118,
       bossBoost: 0.0737,
       topClassBoost: {
-        label: "Phalanxbane Blade - Charged Skill DMG Boost",
+        label: "Mo - Charge Boost",
         value: 0.279,
       },
 
@@ -214,6 +217,7 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
       physPenLabel: "Физ. пробитие",
       attrAttackLabel: "Атака: {attr}",
       attrPenLabel: "Пробитие: {attr}",
+      foreignAttrLabel: "Чужая атака атрибута",
       agilityLabel: "Ловкость (Agility)",
       powerLabel: "Сила (Power)",
       physDefenseLabel: "Физ. защита",
@@ -222,6 +226,7 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
       critDmgLabel: "Крит. урон",
       precisionLabel: "Точность (Precision)",
       affinityLabel: "Сокрушение (Affinity)",
+      directCritLabel: "Прямой крит (Direct Crit)",
       allMartialArtsLabel: "Все боевые искусства",
       attributeDmgLabel: "Урон атрибута",
       bossBoostLabel: "Урон против боссов",
@@ -229,8 +234,9 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
       armorSetLabel: "Комплект брони (4/4):",
       bowSetLabel: "Комплект лука (2/2):",
       scriptLabel: "Крафтовый свиток:",
+      divinecraftLabel: "Ремесло / Масло:",
+      foodLabel: "Боевая еда:",
       noScript: "Без свитка",
-      encounterLabel: "Ремесло и Еда:",
       innerWaysLabel: "Внутренние пути (4/4):",
       notEquipped: "Не надет",
       generated: "Сгенерировано:",
@@ -243,11 +249,13 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
     // Verify key rendered values exist in text draws
     expect(filledTexts.some((t) => t.includes("83,676"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("Лёха"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("5,020,541") || t.includes("5.0M"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("5.0M") || t.includes("5,020,541"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("Mixed 1 Min"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("2,752 – 2,501"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("51.1"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("374 – 846"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("29.6"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("145 – 0"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("517.6"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("656.2"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("217,849"))).toBe(true)
@@ -256,7 +264,9 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
     expect(filledTexts.some((t) => t.includes("+6.8%"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("+11.8%"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("+7.4%"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("Mo - Charge Boost"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("+27.9%"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("9.2%"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("Frost-Clad Night"))).toBe(true)
   })
 })

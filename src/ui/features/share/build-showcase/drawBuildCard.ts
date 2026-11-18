@@ -1,4 +1,5 @@
 import { formatCompactDamage, formatNumber } from "../../../utils/numberFormatting"
+import { fmtPenetration } from "../../../utils/statFormatting"
 
 export interface BuildCardData {
   author: string
@@ -18,12 +19,15 @@ export interface BuildCardData {
   primaryAttributeMin?: number
   primaryAttributeMax?: number
   primaryAttributePenetration?: number
+  foreignAttributeMin?: number
+  foreignAttributeMax?: number
 
   // Core Rates
   critRate: number
   critDamageBoost: number
   precisionRate: number
   affinityRate: number
+  directCritRate?: number
 
   // Key Damage Boosts
   allMartialBoost?: number
@@ -63,6 +67,7 @@ export interface BuildCardLabels {
   physPenLabel?: string
   attrAttackLabel?: string
   attrPenLabel?: string
+  foreignAttrLabel?: string
   agilityLabel?: string
   powerLabel?: string
   physDefenseLabel?: string
@@ -72,6 +77,7 @@ export interface BuildCardLabels {
   critDmgLabel?: string
   precisionLabel?: string
   affinityLabel?: string
+  directCritLabel?: string
   allMartialArtsLabel?: string
   attributeDmgLabel?: string
   bossBoostLabel?: string
@@ -80,13 +86,49 @@ export interface BuildCardLabels {
   armorSetLabel?: string
   bowSetLabel?: string
   scriptLabel?: string
+  divinecraftLabel?: string
+  foodLabel?: string
   noScript?: string
-  encounterLabel?: string
   innerWaysLabel?: string
   notEquipped?: string
 
   generated?: string
   locale?: string
+}
+
+export function formatClassBoostLabel(attunementId?: string, label?: string): string {
+  const id = attunementId || ""
+  if (id === "phalanxChargeDamage" || label?.includes("Phalanxbane Blade - Charged Skill")) {
+    return "Mo - Charge Boost"
+  }
+  if (id === "phalanxbaneQ" || label?.includes("Phalanxbane Blade - Martial Art")) {
+    return "Mo - Skill Boost"
+  }
+  if (id === "snowpartingCharged" || label?.includes("Snowparting Blade - Charged Skill")) {
+    return "Heng - Charge Boost"
+  }
+  if (id === "snowpartingQ" || label?.includes("Snowparting Blade - Martial Art")) {
+    return "Heng - Skill Boost"
+  }
+  if (id === "snowpartingVariedCombo" || label?.includes("Snowparting Blade - Light/Heavy")) {
+    return "Heng - Combo Boost"
+  }
+  if (id === "spearCharged" || label?.includes("Spear - Charged")) {
+    return "Spear - Charge Boost"
+  }
+  if (id === "spearQ" || label?.includes("Spear - Q")) {
+    return "Spear - Skill Boost"
+  }
+  if (id === "swordSpecial" || label?.includes("Sword - Special")) {
+    return "Sword - Special Boost"
+  }
+  if (id === "swordQ" || label?.includes("Sword - Q")) {
+    return "Sword - Skill Boost"
+  }
+  if (id === "bleedingDamage" || label?.includes("Bleed")) {
+    return "Bleed DMG Boost"
+  }
+  return label ? label.replace(" - Martial Art Skill DMG Boost", " - Skill Boost").replace(" - Charged Skill DMG Boost", " - Charge Boost") : "Class Boost"
 }
 
 function truncateText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
@@ -111,15 +153,15 @@ export function drawBuildCard(
 
   // 1. Deep charcoal-grey background matching the site
   const bgGrad = ctx.createLinearGradient(0, 0, 0, height)
-  bgGrad.addColorStop(0, "#141414")
-  bgGrad.addColorStop(0.45, "#181818")
-  bgGrad.addColorStop(1, "#1d1d1d")
+  bgGrad.addColorStop(0, "#131313")
+  bgGrad.addColorStop(0.4, "#171717")
+  bgGrad.addColorStop(1, "#1c1c1c")
   ctx.fillStyle = bgGrad
   ctx.fillRect(0, 0, width, height)
 
   // Subtle radial gold glow behind hero DPS
-  const radialGlow = ctx.createRadialGradient(240, 150, 20, 240, 150, 420)
-  radialGlow.addColorStop(0, "rgba(192, 160, 96, 0.09)")
+  const radialGlow = ctx.createRadialGradient(200, 70, 10, 200, 70, 360)
+  radialGlow.addColorStop(0, "rgba(192, 160, 96, 0.08)")
   radialGlow.addColorStop(1, "rgba(0, 0, 0, 0)")
   ctx.fillStyle = radialGlow
   ctx.fillRect(0, 0, width, height)
@@ -149,92 +191,89 @@ export function drawBuildCard(
   ctx.fillRect(width - 15 - cornerSize, height - 17, cornerSize, 2)
   ctx.fillRect(width - 17, height - 15 - cornerSize, 2, cornerSize)
 
-  // 3. Header
-  // Brand tag on the right
-  ctx.font = "700 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-  ctx.fillStyle = "#8a8a8a"
-  ctx.textAlign = "right"
-  ctx.fillText("WHERE WINDS MEET · DPS CALCULATOR", width - 36, 44)
+  // 3. Compact Streamlined Header Box (Unified Showcase Header)
+  const headerX = 32
+  const headerY = 24
+  const headerW = width - 64
+  const headerH = 78
 
-  // Player & Title on the left
-  ctx.textAlign = "left"
-  ctx.font = "400 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-  ctx.fillStyle = "#8c8c8c"
-  const prefixText = labels?.playerBuildPrefix || "Сборка игрока:"
-  ctx.fillText(prefixText, 36, 45)
-
-  const prefixW = ctx.measureText(prefixText).width
-  const authorText = data.author.trim() || labels?.defaultPlayer || "Игрок"
-  ctx.font = "700 24px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-  ctx.fillStyle = "#f5f0e6"
-  ctx.fillText(authorText, 36 + prefixW + 8, 46)
-
-  // Subtitle / Class & Breakthrough info
-  ctx.font = "600 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-  ctx.fillStyle = "#c0a060"
-  const buildTitle = data.title.trim() ? `«${data.title.trim()}» · ` : ""
-  ctx.fillText(`${buildTitle}${data.classDisplayName} · ${data.breakthroughText}`, 36, 74)
-
-  // 4. Hero DPS Card
-  const heroY = 88
-  const heroH = 124
-  const heroW = width - 72
-
-  // Background for hero box
-  ctx.fillStyle = "rgba(28, 28, 28, 0.95)"
+  // Panel background
+  ctx.fillStyle = "rgba(22, 22, 22, 0.95)"
   ctx.beginPath()
   if (typeof ctx.roundRect === "function") {
-    ctx.roundRect(36, heroY, heroW, heroH, 6)
+    ctx.roundRect(headerX, headerY, headerW, headerH, 6)
   } else {
-    ctx.rect(36, heroY, heroW, heroH)
+    ctx.rect(headerX, headerY, headerW, headerH)
   }
   ctx.fill()
-  ctx.strokeStyle = "rgba(192, 160, 96, 0.35)"
+
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.08)"
   ctx.lineWidth = 1
   ctx.stroke()
 
-  // Top gold highlight stripe
+  // Top antique gold stripe
   ctx.fillStyle = "#c0a060"
-  ctx.fillRect(36, heroY, heroW, 2)
+  ctx.fillRect(headerX, headerY, headerW, 2)
 
-  // DPS Label
-  ctx.font = "700 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-  ctx.fillStyle = "#c0a060"
-  ctx.fillText(labels?.heroDpsTitle || "ИТОГОВЫЙ УРОН В СЕКУНДУ (DPS)", 58, heroY + 28)
-
-  // Large DPS Value with gold gradient
+  // DPS Value with gold gradient
   const dpsText = formatNumber(data.dps, 0)
-  ctx.font = "800 58px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-  const dpsGrad = ctx.createLinearGradient(58, heroY + 36, 58, heroY + 98)
+  ctx.font = "800 44px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  ctx.textAlign = "left"
+  const dpsGrad = ctx.createLinearGradient(headerX + 20, headerY + 16, headerX + 20, headerY + 64)
   dpsGrad.addColorStop(0, "#fff5cc")
   dpsGrad.addColorStop(0.5, "#e8c772")
   dpsGrad.addColorStop(1, "#c0a060")
   ctx.fillStyle = dpsGrad
-  ctx.fillText(dpsText, 58, heroY + 86)
+  ctx.fillText(dpsText, headerX + 20, headerY + 54)
 
-  const dpsMetrics = ctx.measureText(dpsText)
+  const dpsW = ctx.measureText(dpsText).width
+  const badgeX = headerX + 20 + dpsW + 10
+  const badgeY = headerY + 31
+
   // Gold badge "DPS"
-  const badgeX = 58 + dpsMetrics.width + 14
-  const badgeY = heroY + 54
   ctx.fillStyle = "rgba(192, 160, 96, 0.15)"
   ctx.beginPath()
   if (typeof ctx.roundRect === "function") {
-    ctx.roundRect(badgeX, badgeY, 44, 26, 4)
+    ctx.roundRect(badgeX, badgeY, 36, 20, 3)
   } else {
-    ctx.rect(badgeX, badgeY, 44, 26)
+    ctx.rect(badgeX, badgeY, 36, 20)
   }
   ctx.fill()
   ctx.strokeStyle = "#c0a060"
   ctx.lineWidth = 1
   ctx.stroke()
-  ctx.font = "700 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  ctx.font = "700 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#d8b070"
-  ctx.fillText("DPS", badgeX + 9, badgeY + 18)
+  ctx.fillText("DPS", badgeX + 7, badgeY + 14)
 
-  // Sub-metrics cards on the right of Hero box
-  const chipW = 185
-  const chipH = 68
-  const chipY = heroY + 28
+  // Vertical separator between DPS and Player info
+  const sepX = badgeX + 48
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.1)"
+  ctx.beginPath()
+  ctx.moveTo(sepX, headerY + 14)
+  ctx.lineTo(sepX, headerY + headerH - 14)
+  ctx.stroke()
+
+  // Player Name and Class / Breakthrough
+  const authorText = data.author.trim() || labels?.defaultPlayer || "Игрок"
+  const isTitleDifferent =
+    data.title.trim() &&
+    data.title.trim().toLowerCase() !== (data.rotationName || "").trim().toLowerCase()
+  const titleText = isTitleDifferent ? ` · «${data.title.trim()}»` : ""
+
+  ctx.font = "700 20px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  ctx.fillStyle = "#f5f0e6"
+  const maxAuthorW = headerW - (sepX - headerX) - 470
+  ctx.fillText(truncateText(ctx, `${authorText}${titleText}`, maxAuthorW), sepX + 16, headerY + 35)
+
+  ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  ctx.fillStyle = "#c0a060"
+  ctx.fillText(`${data.classDisplayName} · ${data.breakthroughText}`, sepX + 16, headerY + 58)
+
+  // Right sub-metric chips (Total DMG, Duration, Rotation)
+  const chipW = 140
+  const chipH = 52
+  const chipY = headerY + 13
 
   const chipData = [
     {
@@ -249,14 +288,14 @@ export function drawBuildCard(
     },
     {
       label: labels?.rotation || "РОТАЦИЯ",
-      val: truncateText(ctx, data.rotationName || "—", chipW - 24),
+      val: truncateText(ctx, data.rotationName || "—", chipW - 16),
       color: "#d8b070",
     },
   ]
 
   chipData.forEach((chip, idx) => {
-    const chipX = heroW + 36 - (3 - idx) * (chipW + 14) - 10
-    ctx.fillStyle = "#222222"
+    const chipX = headerW + 32 - (3 - idx) * (chipW + 8) - 10
+    ctx.fillStyle = "#1c1c1c"
     ctx.beginPath()
     if (typeof ctx.roundRect === "function") {
       ctx.roundRect(chipX, chipY, chipW, chipH, 4)
@@ -268,22 +307,22 @@ export function drawBuildCard(
     ctx.lineWidth = 1
     ctx.stroke()
 
-    ctx.font = "600 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    ctx.font = "600 10px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     ctx.fillStyle = "#8a8a8a"
-    ctx.fillText(chip.label, chipX + 12, chipY + 24)
+    ctx.fillText(chip.label, chipX + 10, chipY + 19)
 
-    ctx.font = "700 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    ctx.font = "700 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     ctx.fillStyle = chip.color
-    ctx.fillText(chip.val, chipX + 12, chipY + 52)
+    ctx.fillText(chip.val, chipX + 10, chipY + 41)
   })
 
-  // 5. Three Columns: Attack & Attributes, Rates & Boosts, Gear & Encounter
-  const colY = 224
-  const colH = 406
-  const colW = (heroW - 28) / 3
+  // 4. Three Columns: Attack & Attributes, Rates & Boosts, Gear & Encounter
+  const colY = 116
+  const colH = 518
+  const colW = (headerW - 24) / 3
 
   // Column 1: Attack & Attributes
-  const col1X = 36
+  const col1X = 32
   drawSectionBox(ctx, col1X, colY, colW, colH, labels?.attackTitle || "АТАКА И ХАРАКТЕРИСТИКИ")
 
   const attrAttackLabel = data.primaryAttributeName
@@ -301,7 +340,7 @@ export function drawBuildCard(
     },
     {
       label: labels?.physPenLabel || "Физ. пробитие",
-      val: formatNumber(data.physPenetration ?? 0, 1),
+      val: fmtPenetration(data.physPenetration ?? 0),
       highlight: false,
     },
     {
@@ -311,8 +350,13 @@ export function drawBuildCard(
     },
     {
       label: attrPenLabel,
-      val: formatNumber(data.primaryAttributePenetration ?? 0, 1),
+      val: fmtPenetration(data.primaryAttributePenetration ?? 0),
       highlight: true,
+    },
+    {
+      label: labels?.foreignAttrLabel || "Чужая атака атрибута",
+      val: `${formatNumber(data.foreignAttributeMin ?? 0, 0)} – ${formatNumber(data.foreignAttributeMax ?? 0, 0)}`,
+      highlight: (data.foreignAttributeMin ?? 0) > 0 || (data.foreignAttributeMax ?? 0) > 0,
     },
     {
       label: labels?.agilityLabel || "Ловкость (Agility)",
@@ -337,15 +381,15 @@ export function drawBuildCard(
     },
   ]
 
-  let rowY = colY + 62
-  const rowStep = 43
+  let rowY = colY + 68
+  const rowStep = 47
   col1Rows.forEach((r) => {
     drawStatRow(ctx, col1X + 16, rowY, colW - 32, r.label, r.val, r.highlight ? "#d8b070" : r.color || "#f0f0f0")
     rowY += rowStep
   })
 
   // Column 2: Rates & Damage Boosts
-  const col2X = col1X + colW + 14
+  const col2X = col1X + colW + 12
   drawSectionBox(ctx, col2X, colY, colW, colH, labels?.ratesTitle || "ТОЧНОСТЬ И УСИЛЕНИЯ УРОНА")
 
   const col2Rows = [
@@ -389,19 +433,24 @@ export function drawBuildCard(
       val: data.topClassBoost ? `+${formatNumber(data.topClassBoost.value * 100, 1)}%` : "+0.0%",
       highlight: true,
     },
+    {
+      label: labels?.directCritLabel || "Прямой крит (Direct Crit)",
+      val: `${formatNumber((data.directCritRate ?? 0) * 100, 1)}%`,
+      highlight: false,
+    },
   ]
 
-  rowY = colY + 62
+  rowY = colY + 68
   col2Rows.forEach((r) => {
     drawStatRow(ctx, col2X + 16, rowY, colW - 32, r.label, r.val, r.highlight ? "#d8b070" : "#f0f0f0")
     rowY += rowStep
   })
 
   // Column 3: Gear Sets & Encounter
-  const col3X = col2X + colW + 14
+  const col3X = col2X + colW + 12
   drawSectionBox(ctx, col3X, colY, colW, colH, labels?.gearTitle || "КОМПЛЕКТЫ И СТОЛКНОВЕНИЕ")
 
-  let setY = colY + 62
+  let setY = colY + 66
   // Armor Set
   ctx.font = "400 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#8c8c8c"
@@ -410,7 +459,7 @@ export function drawBuildCard(
   setY += 24
   drawGoldBadge(ctx, col3X + 16, setY - 18, data.armorSetName || labels?.notEquipped || "Не надет", colW - 32)
 
-  setY += 42
+  setY += 38
   // Bow Set
   ctx.font = "400 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#8c8c8c"
@@ -422,56 +471,82 @@ export function drawBuildCard(
     : labels?.notEquipped || "Не надет"
   drawGoldBadge(ctx, col3X + 16, setY - 18, bowText, colW - 32)
 
-  setY += 44
-  // Script & Divinecraft
+  setY += 40
+  // Separator
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.06)"
+  ctx.beginPath()
+  ctx.moveTo(col3X + 16, setY - 8)
+  ctx.lineTo(col3X + colW - 16, setY - 8)
+  ctx.stroke()
+
+  // Crafting Script
   ctx.font = "400 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#8c8c8c"
-  ctx.fillText(labels?.scriptLabel || "Крафтовый свиток:", col3X + 16, setY)
+  ctx.fillText(labels?.scriptLabel || "Крафтовый свиток:", col3X + 16, setY + 10)
 
-  ctx.font = "600 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = data.scriptName ? "#f0f0f0" : "#777777"
   ctx.textAlign = "right"
-  ctx.fillText(truncateText(ctx, data.scriptName || labels?.noScript || "Без свитка", 200), col3X + colW - 16, setY)
+  ctx.fillText(truncateText(ctx, data.scriptName || labels?.noScript || "Без свитка", 200), col3X + colW - 16, setY + 10)
   ctx.textAlign = "left"
 
+  setY += 34
   // Separator
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.05)"
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.06)"
   ctx.beginPath()
-  ctx.moveTo(col3X + 16, setY + 12)
-  ctx.lineTo(col3X + colW - 16, setY + 12)
+  ctx.moveTo(col3X + 16, setY - 8)
+  ctx.lineTo(col3X + colW - 16, setY - 8)
   ctx.stroke()
 
-  setY += 34
-  // Divinecraft & Food
+  // Divinecraft
   ctx.font = "400 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#8c8c8c"
-  ctx.fillText(labels?.encounterLabel || "Ремесло и Еда:", col3X + 16, setY)
+  ctx.fillText(labels?.divinecraftLabel || "Ремесло / Масло:", col3X + 16, setY + 10)
 
-  const buffText = [data.divinecraftName, data.foodName].filter(Boolean).join(" · ") || "—"
-  ctx.font = "600 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-  ctx.fillStyle = "#d8b070"
+  ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  ctx.fillStyle = data.divinecraftName ? "#d8b070" : "#777777"
   ctx.textAlign = "right"
-  ctx.fillText(truncateText(ctx, buffText, 210), col3X + colW - 16, setY)
+  ctx.fillText(truncateText(ctx, data.divinecraftName || "—", 200), col3X + colW - 16, setY + 10)
   ctx.textAlign = "left"
 
+  setY += 34
   // Separator
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.05)"
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.06)"
   ctx.beginPath()
-  ctx.moveTo(col3X + 16, setY + 12)
-  ctx.lineTo(col3X + colW - 16, setY + 12)
+  ctx.moveTo(col3X + 16, setY - 8)
+  ctx.lineTo(col3X + colW - 16, setY - 8)
   ctx.stroke()
 
+  // Food Buff
+  ctx.font = "400 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  ctx.fillStyle = "#8c8c8c"
+  ctx.fillText(labels?.foodLabel || "Боевая еда:", col3X + 16, setY + 10)
+
+  ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  ctx.fillStyle = data.foodName ? "#d8b070" : "#777777"
+  ctx.textAlign = "right"
+  ctx.fillText(truncateText(ctx, data.foodName || "—", 200), col3X + colW - 16, setY + 10)
+  ctx.textAlign = "left"
+
   setY += 34
+  // Separator
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.06)"
+  ctx.beginPath()
+  ctx.moveTo(col3X + 16, setY - 8)
+  ctx.lineTo(col3X + colW - 16, setY - 8)
+  ctx.stroke()
+
   // Inner Ways
+  setY += 16
   ctx.font = "400 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#8c8c8c"
   ctx.fillText(labels?.innerWaysLabel || "Внутренние пути (4/4):", col3X + 16, setY)
 
-  setY += 18
+  setY += 16
   const ways = data.innerWays && data.innerWays.length > 0 ? data.innerWays : ["—"]
   drawInnerWayPills(ctx, col3X + 16, setY, colW - 32, ways)
 
-  // 6. Footer
+  // 5. Footer
   ctx.font = "400 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#707070"
   ctx.textAlign = "left"
@@ -494,7 +569,7 @@ function drawSectionBox(
   title: string,
 ) {
   // Charcoal panel background
-  ctx.fillStyle = "rgba(24, 24, 24, 0.92)"
+  ctx.fillStyle = "rgba(22, 22, 22, 0.94)"
   ctx.beginPath()
   if (typeof ctx.roundRect === "function") {
     ctx.roundRect(x, y, w, h, 6)
@@ -534,12 +609,12 @@ function drawStatRow(
   val: string,
   valColor: string,
 ) {
-  ctx.font = "400 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  ctx.font = "400 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#9c9c9c"
   ctx.textAlign = "left"
-  ctx.fillText(truncateText(ctx, label, w - 110), x, y)
+  ctx.fillText(truncateText(ctx, label, w - 105), x, y)
 
-  ctx.font = "700 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  ctx.font = "700 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = valColor
   ctx.textAlign = "right"
   ctx.fillText(val, x + w, y)
@@ -547,8 +622,8 @@ function drawStatRow(
   // Separator
   ctx.strokeStyle = "rgba(255, 255, 255, 0.05)"
   ctx.beginPath()
-  ctx.moveTo(x, y + 14)
-  ctx.lineTo(x + w, y + 14)
+  ctx.moveTo(x, y + 11)
+  ctx.lineTo(x + w, y + 11)
   ctx.stroke()
 }
 
@@ -592,14 +667,14 @@ function drawInnerWayPills(
   ways: string[],
 ) {
   const pillW = (w - 8) / 2
-  const pillH = 26
+  const pillH = 30
   ways.slice(0, 4).forEach((way, idx) => {
     const col = idx % 2
     const row = Math.floor(idx / 2)
     const px = x + col * (pillW + 8)
-    const py = y + row * (pillH + 6)
+    const py = y + row * (pillH + 8)
 
-    ctx.fillStyle = "#202020"
+    ctx.fillStyle = "#1e1e1e"
     ctx.beginPath()
     if (typeof ctx.roundRect === "function") {
       ctx.roundRect(px, py, pillW, pillH, 4)
@@ -612,9 +687,9 @@ function drawInnerWayPills(
     ctx.lineWidth = 1
     ctx.stroke()
 
-    ctx.font = "500 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    ctx.font = "600 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     ctx.fillStyle = "#d0d0d0"
     ctx.textAlign = "center"
-    ctx.fillText(truncateText(ctx, way, pillW - 12), px + pillW / 2, py + 17)
+    ctx.fillText(truncateText(ctx, way, pillW - 12), px + pillW / 2, py + 19)
   })
 }

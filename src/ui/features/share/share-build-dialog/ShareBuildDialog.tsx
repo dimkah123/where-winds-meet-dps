@@ -1,7 +1,11 @@
 import { useEffect, useId, useRef, useState } from "react"
 import { Dialog } from "../../../components/dialog/Dialog"
 import { SubTabs } from "../../../components/sub-tabs/SubTabs"
-import { drawBuildCard, type BuildCardLabels } from "../build-showcase/drawBuildCard"
+import {
+  drawBuildCard,
+  formatClassBoostLabel,
+  type BuildCardLabels,
+} from "../build-showcase/drawBuildCard"
 import { encodeSharedBuild } from "../../../../engine/shareBuild"
 import type { Inputs, Result } from "../../../../engine/types"
 import { useI18n } from "../../../../i18n/i18nContext"
@@ -154,6 +158,15 @@ export function ShareBuildDialog({
     const primaryAttributePenetration = readPath(withSets, `${primaryAttrKey}.penetration`)
     const physPenetration = readPath(withSets, "phys.penetration")
 
+    let foreignAttributeMin = 0
+    let foreignAttributeMax = 0
+    for (const key of ["bellstrike", "stonesplit", "silkbind", "bamboocut"] as const) {
+      if (key !== primaryAttrKey) {
+        foreignAttributeMin += readPath(withSets, `${key}.min`)
+        foreignAttributeMax += readPath(withSets, `${key}.max`)
+      }
+    }
+
     const equippedPieces = equippedPiecesFor(inputs)
     const enhancedSlots = enhancedSlotsOf(inputs)
     const enhancements = effectiveEnhancementLevels(inputs.enhancements, inputs.breakthrough)
@@ -207,7 +220,7 @@ export function ShareBuildDialog({
         maxClassVal = val
         const option = getAttunement(attId)
         topClassBoost = {
-          label: option ? t(attunementKey(option.id), option.label) : attId,
+          label: formatClassBoostLabel(attId, option ? t(attunementKey(option.id), option.label) : attId),
           value: val,
         }
       }
@@ -226,8 +239,11 @@ export function ShareBuildDialog({
         ? OPTION_LABEL_KEYS[refinementOptionId(inputs.divinecraftRefinement)]
         : null
       const baseDc = dcKey ? t(dcKey) : ""
-      const ref = refKey ? ` (${t(refKey)})` : ""
-      divinecraftName = baseDc ? `${baseDc}${ref}` : null
+      let refText = refKey ? t(refKey) : ""
+      if (baseDc && refText.startsWith(`${baseDc}: `)) {
+        refText = refText.slice(baseDc.length + 2)
+      }
+      divinecraftName = refText ? `${baseDc} (${refText})` : baseDc || null
     }
 
     let foodName: string | null = null
@@ -262,6 +278,7 @@ export function ShareBuildDialog({
       physPenLabel: t("share.card.physPenLabel", "Физ. пробитие"),
       attrAttackLabel: t("share.card.attrAttackLabel", "Атака: {attr}"),
       attrPenLabel: t("share.card.attrPenLabel", "Пробитие: {attr}"),
+      foreignAttrLabel: t("share.card.foreignAttrLabel", "Чужая атака атрибута"),
       agilityLabel: t("share.card.agilityLabel", "Ловкость (Agility)"),
       powerLabel: t("share.card.powerLabel", "Сила (Power)"),
       physDefenseLabel: t("share.card.physDefenseLabel", "Физ. защита"),
@@ -271,6 +288,7 @@ export function ShareBuildDialog({
       critDmgLabel: t("share.card.critDmgLabel", "Крит. урон"),
       precisionLabel: t("share.card.precisionLabel", "Точность (Precision)"),
       affinityLabel: t("share.card.affinityLabel", "Сокрушение (Affinity)"),
+      directCritLabel: t("share.card.directCritLabel", "Прямой крит (Direct Crit)"),
       allMartialArtsLabel: t("share.card.allMartialArtsLabel", "Все боевые искусства"),
       attributeDmgLabel: t("share.card.attributeDmgLabel", "Урон атрибута"),
       bossBoostLabel: t("share.card.bossBoostLabel", "Урон против боссов"),
@@ -279,8 +297,9 @@ export function ShareBuildDialog({
       armorSetLabel: t("share.card.armorSetLabel", "Комплект брони (4/4):"),
       bowSetLabel: t("share.card.bowSetLabel", "Комплект лука (2/2):"),
       scriptLabel: t("share.card.scriptLabel", "Крафтовый свиток:"),
+      divinecraftLabel: t("share.card.divinecraftLabel", "Ремесло / Масло:"),
+      foodLabel: t("share.card.foodLabel", "Боевая еда:"),
       noScript: t("share.card.noScript", "Без свитка"),
-      encounterLabel: t("share.card.encounterLabel", "Ремесло и Еда:"),
       innerWaysLabel: t("share.card.innerWaysLabel", "Внутренние пути (4/4):"),
       notEquipped: t("share.card.notEquipped", "Не надет"),
 
@@ -307,11 +326,14 @@ export function ShareBuildDialog({
         primaryAttributeMin,
         primaryAttributeMax,
         primaryAttributePenetration,
+        foreignAttributeMin,
+        foreignAttributeMax,
 
         critRate: finalRates.critRate,
         critDamageBoost: readPath(withSets, "critDamageBoost"),
         precisionRate: eff.precision,
         affinityRate: finalRates.affinityRate,
+        directCritRate: withSets.directCritRate,
 
         allMartialBoost,
         attributeDamageBoost,
