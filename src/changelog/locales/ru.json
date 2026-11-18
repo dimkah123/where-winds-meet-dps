@@ -5,6 +5,7 @@
     "Fixed": "Исправлено"
   },
   "headlines": {
+    "1.2.0": "Тайминги дистанции заряженных атак Мо (3м / 5м / 2м) и обновление Min Build",
     "1.1.12": "Настройка дистанции каста и радиус заряженных атак Мо",
     "1.1.11": "Исправление коэффициентов Bursting Nine и обновление основной ротации",
     "1.1.10": "Вариант Heng Special 6 Hit для опенера в бок",
@@ -21,6 +22,10 @@
     "1.0.0": "Релиз калькулятора УВС для Расколотого пика (Сила)"
   },
   "items": {
+    "Accurate staged distance timings for Mo Charged attacks: 1st soldier (MoDown) spawns at 3m (+4% Flute of the Tides bonus), 2nd soldier (MoJump) spawns at 5m (+8% Flute bonus), and the slam lands at 2m (+3% Flute bonus).": "Точные тайминги дистанции заряженных атак Мо: 1-й солдат (MoDown) вылетает на 3 м (+4% от Флейты), 2-й солдат (MoJump) вылетает на 5 м (+8% от Флейты), а приземление удара заряжки происходит на 2 м (+3% от Флейты).",
+    "Flute of the Tides damage ticks during Mo Charged attacks now dynamically scale based on the exact distance of each charge phase.": "Тики урона Флейты прилива во время заряженной атаки Мо динамически масштабируются по текущей дистанции каждой фазы заряда.",
+    "Updated Stonesplit Strength Min Build graduation preset gear stats and attunements to match the latest in-game heirloom setup.": "Характеристики экипировки и тюнинг пресета Min Build для Раскола скал обновлены под актуальный игровой сетап реликвий.",
+    "Cleaned up default 'Mixed Dummy 1 Min' rotation steps to use stock skill distance behavior automatically without artificial overrides.": "Шаги стандартной ротации 'Mixed Dummy 1 Min' очищены от искусственных фиксаций дистанции и теперь автоматически используют естественную динамику дистанций навыков.",
     "Removed unintended forward pull displacement (1.75m) from Mo Charged attacks and expanded reach to 6m, allowing charged hits, soldiers, and flute ticks to properly scale at 2m and 5m distance bands.": "Убрано паразитное притягивание вперёд (1.75 м) у заряженных атак Мо и радиус расширен до 6 м, благодаря чему удары заряжки, солдаты и тики дудки корректно получают скейлинг дистанции на 2 и 5 метрах.",
     "Added individual cast distance override support (`distanceMeters`) per rotation step in the simulation engine, timeline, and storage.": "Добавлена поддержка индивидуальной дальности каста (`distanceMeters`) для каждого шага ротации в симуляторе, таймлайне и хранилище.",
     "Made distance chips interactive in the Rotation Editor table with a quick popover selector (1m, 2m, 3m, 5m, custom input, and batch-apply to all identical skills).": "Чипы дистанции в таблице редактора ротации стали интерактивными: доступно всплывающее меню с быстрыми пресетами (1м, 2м, 3м, 5м), полем ввода и пакетным применением ко всем одинаковым навыкам.",

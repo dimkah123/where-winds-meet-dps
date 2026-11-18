@@ -44,6 +44,7 @@ export const phalanxchargedS2Innerpassion = defineSkill({
   castFrames: 118,
   triggerable: true,
   reachMeters: 6,
+  displacement: { kind: "toTarget", meters: 2 },
   hits: [
     hit(0, {
       frame: 57,

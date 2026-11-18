@@ -44,6 +44,7 @@ export const phalanxchargedS2 = defineSkill({
   castFrames: 137,
   triggerable: true,
   reachMeters: 6,
+  displacement: { kind: "toTarget", meters: 2 },
   hits: [
     hit(0, {
       frame: 76,

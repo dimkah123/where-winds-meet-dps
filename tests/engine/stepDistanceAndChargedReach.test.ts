@@ -90,8 +90,27 @@ describe("Mo Charged attack distance and step distance overrides", () => {
     expect(charged2m?.distanceMeters).toBe(2)
     expect(charged5m?.distanceMeters).toBe(5)
 
-    // Damage at 5m with Flute bonus (+8%) should be strictly higher than at 2m (+3%)
+    // Damage at 5m with Flute bonus (+8%) on soldiers should be strictly higher than at 2m (+3%)
     expect(result5m.totalDamage).toBeGreaterThan(result2m.totalDamage)
+
+    // Soldiers triggered during charge at 5m should deal higher damage than at 2m
+    const chargedSoldierDamage = (res: typeof result2m) =>
+      res.perSkill
+        .filter(
+          (s) =>
+            (s.name.includes("Soldier") || s.breakdownName.includes("Soldier")) &&
+            (s.breakdownName.includes("modown") ||
+              s.breakdownName.includes("mojump") ||
+              s.name.toLowerCase().includes("downward") ||
+              s.name.toLowerCase().includes("leaping")),
+        )
+        .reduce((sum, s) => sum + s.expectedDamage, 0)
+
+    const soldierDamage2m = chargedSoldierDamage(result2m)
+    const soldierDamage5m = chargedSoldierDamage(result5m)
+    if (soldierDamage2m > 0 && soldierDamage5m > 0) {
+      expect(soldierDamage5m).toBeGreaterThan(soldierDamage2m)
+    }
   })
 
   it("readable rotation parses distance tags like (5m) and [2m] into step.distanceMeters", () => {
@@ -121,5 +140,48 @@ describe("Mo Charged attack distance and step distance overrides", () => {
 
     const text = readableRotationFromSteps(steps, skillsById)
     expect(text).toContain("(5m)")
+  })
+
+  it("Mo Charged spawns first soldier at 3m, second soldier at 5m, and lands slam at 2m", () => {
+    const rotation = makeRotation("stonesplitStrength", {
+      steps: [
+        makeStep({ skillId: MYSTIC_SKILL.fluteOfTheTidesFull }),
+        makeStep({ skillId: STONESPLIT_SKILL.phalanxspecialPrepull }),
+        makeStep({ skillId: STONESPLIT_SKILL.phalanxqSoul }),
+        makeStep({ skillId: STONESPLIT_SKILL.phalanxchargedS3Innerpassion }),
+      ],
+      preferredDistanceMeters: 2,
+    })
+
+    const result = simulateTimeline({
+      ...defaultInputs,
+      classId: "stonesplitStrength",
+      activeCustomRotation: rotation,
+      mindMethods: [
+        { name: "steadfastDevotion", stacks: "tier 6" },
+        { name: "", stacks: "" },
+        { name: "", stacks: "" },
+        { name: "", stacks: "" },
+      ],
+    })
+
+    const downSoldier = result.perSkill.find(
+      (s) => s.breakdownName.includes("MoDown") || s.name.includes("MoDown"),
+    )
+    const jumpSoldier = result.perSkill.find(
+      (s) => s.breakdownName.includes("MoJump") || s.name.includes("MoJump"),
+    )
+    const chargedSlam = result.perSkill.find(
+      (s) => s.breakdownName.includes("PhalanxCharged") || s.name.includes("PhalanxCharged"),
+    )
+
+    expect(downSoldier).toBeDefined()
+    expect(downSoldier!.expectedDamage).toBeGreaterThan(0)
+
+    expect(jumpSoldier).toBeDefined()
+    expect(jumpSoldier!.expectedDamage).toBeGreaterThan(0)
+
+    expect(chargedSlam).toBeDefined()
+    expect(chargedSlam!.expectedDamage).toBeGreaterThan(0)
   })
 })

@@ -117,7 +117,11 @@ import {
   type DeferredBuffGrant,
 } from "./buffs/buffEngine"
 import { AFTER_HIT_SEC, SAME_FRAME_STEP_SEC } from "./buffs/frameOrder"
-import { distanceReaderAtCast, type Displacement } from "./distance"
+import {
+  distanceAfterApproach,
+  applyDisplacement,
+  type Displacement,
+} from "./distance"
 import { IN_COMBAT_STATUS } from "./combatState"
 import type { ConditionalFinalCrit } from "./buffs/buffModule"
 import { PROP_TO_PROPERTY, type SkillProperties } from "./effects/context"
@@ -154,7 +158,7 @@ import { deflectCancelSkillId, expandStepsWithDeflectCancels } from "./deflectCa
 import { innerWayTier } from "../definitions/innerWays/registry"
 import { paramSourceOf, type ParamSource } from "./buffs/paramSource"
 import "../definitions/consumables/registry"
-import { PROP } from "../data/skills/ids"
+import { PROP, ROLE } from "../data/skills/ids"
 import {
   HEALER_BUFF_AMOUNT,
   HEALER_BUFF_PANACEA_FAN_AMOUNT,
@@ -1759,25 +1763,15 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
 
   function writeCastDistance(cast: PendingCast, skill: Skill): void {
     const stepDistance = cast.resolvedStep.step.distanceMeters
-    let distance: number
-    if (stepDistance !== undefined) {
-      distance = stepDistance
-    } else {
-      const displacingSkill: Skill = {
-        ...skill,
-        displacement:
-          activeVariantDisplacement(skill.hits, (condition) =>
-            conditionHolds(condition, cast.startFrame),
-          ) ?? skill.displacement,
-      }
-      const reader = distanceReaderAtCast(
-        displacingSkill,
-        defaultMeleeReachMeters,
-        preferredDistanceMeters,
-        cast.distanceBeforeCast,
-      )
-      distance = reader(Infinity)
-    }
+    const distance: number =
+      stepDistance !== undefined
+        ? stepDistance
+        : distanceAfterApproach(
+            skill,
+            defaultMeleeReachMeters,
+            preferredDistanceMeters,
+            cast.distanceBeforeCast,
+          )
     if (cast.writtenDistance !== distance) {
       ledger.recordStack(TARGET_DISTANCE_STATUS, Math.max(cast.startFrame, loopFrame), distance)
       cast.writtenDistance = distance
@@ -1950,20 +1944,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
     const holdsHere = (condition: TriggerCondition) => conditionHolds(condition, startFrame)
     const stepDistance = cast.resolvedStep.step.distanceMeters
     if (!prePull || stepDistance !== undefined) writeCastDistance(cast, castResolution.skill)
-    const castDistanceReader: HitDistance =
-      stepDistance !== undefined
-        ? () => stepDistance
-        : distanceReaderAtCast(
-            {
-              ...castResolution.skill,
-              displacement:
-                activeVariantDisplacement(castResolution.skill.hits, holdsHere) ??
-                castResolution.skill.displacement,
-            },
-            defaultMeleeReachMeters,
-            preferredDistanceMeters,
-            prePull ? preferredDistanceMeters : cast.distanceBeforeCast,
-          )
+    const castStartDist = cast.writtenDistance ?? currentDistanceMeters
     const nextStepSkillId = resolvedSteps
       .slice(stepIndex + 1)
       .find((followingStep) => !directSwapSkills.has(followingStep.skill))?.skill.id
@@ -1975,6 +1956,65 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
     const midCastExtraFrames = prePull
       ? 0
       : (castResolution.skill.serverWaitsInCast ?? 0) * midCastWaitFrames
+    const displacement =
+      activeVariantDisplacement(castResolution.skill.hits, holdsHere) ??
+      castResolution.skill.displacement
+    const landingDistance = displacement
+      ? applyDisplacement(displacement, castStartDist)
+      : castStartDist
+    const firstDamagingHit = occurringHits.find((h) => hitDealsDamage(h))
+    const landingHit = firstDamagingHit ?? occurringHits[0]
+    const landingOffsetFrames = landingHit
+      ? resolvedHitFrame(landingHit, holdsHere, 0) + midCastExtraFrames
+      : 0
+    const landingFrame = Math.max(startFrame, startFrame + landingOffsetFrames)
+    const isPhalanxCharged = castResolution.skill.tags?.includes(ROLE.phalanxCharged)
+    const downSoldierHit = isPhalanxCharged
+      ? occurringHits.find((h) =>
+          h.triggers?.some((t) => t.kind === "castSkill" && t.targetId.includes("anxisoldiermodown")),
+        )
+      : undefined
+    const downOffsetFrames = downSoldierHit
+      ? resolvedHitFrame(downSoldierHit, holdsHere, 0) + midCastExtraFrames
+      : 0
+    const downFrame = Math.max(startFrame, startFrame + downOffsetFrames)
+
+    const jumpSoldierHit = isPhalanxCharged
+      ? occurringHits.find((h) =>
+          h.triggers?.some((t) => t.kind === "castSkill" && t.targetId.includes("anxisoldiermojump")),
+        )
+      : undefined
+    const jumpOffsetFrames = jumpSoldierHit
+      ? resolvedHitFrame(jumpSoldierHit, holdsHere, 0) + midCastExtraFrames
+      : 0
+    const jumpFrame = Math.max(startFrame, startFrame + jumpOffsetFrames)
+
+    if (downSoldierHit && downFrame > startFrame) {
+      ledger.recordStack(TARGET_DISTANCE_STATUS, Math.max(downFrame, loopFrame), 3)
+    }
+    if (jumpSoldierHit && jumpFrame > startFrame) {
+      ledger.recordStack(TARGET_DISTANCE_STATUS, Math.max(jumpFrame, loopFrame), 5)
+    }
+
+    if (displacement) {
+      if (landingFrame <= startFrame) {
+        ledger.recordStack(TARGET_DISTANCE_STATUS, Math.max(startFrame, loopFrame), landingDistance)
+        cast.writtenDistance = landingDistance
+        currentDistanceMeters = landingDistance
+      } else {
+        ledger.recordStack(TARGET_DISTANCE_STATUS, Math.max(landingFrame, loopFrame), landingDistance)
+        currentDistanceMeters = landingDistance
+      }
+    }
+    const castDistanceReader: HitDistance = (frame: number) => {
+      if (isPhalanxCharged) {
+        if (landingHit && frame >= landingOffsetFrames) return landingDistance
+        if (jumpSoldierHit && frame >= jumpOffsetFrames) return 5
+        if (downSoldierHit && frame >= downOffsetFrames) return 3
+        return castStartDist
+      }
+      return displacement && frame >= landingOffsetFrames ? landingDistance : castStartDist
+    }
     const hitDistanceMeters: HitDistance = castDistanceReader
     const castHitFrame = (hit: SkillHit): number =>
       resolvedHitFrame(hit, holdsHere, hitDistanceMeters) + midCastExtraFrames
@@ -2053,12 +2093,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
       generated: false,
       inheritedBuffIds: [],
       holds: holdsHere,
-      distanceMeters:
-        stepDistance !== undefined
-          ? stepDistance
-          : prePull
-            ? targetDistanceAt(startFrame)
-            : castDistanceReader(Infinity),
+      distanceMeters: castStartDist,
       midCastExtraFrames,
     })
     const next = chainSuccessor[stepIndex]

@@ -47,6 +47,7 @@ export const phalanxchargedS3 = defineSkill({
   castFrames: 173,
   triggerable: true,
   reachMeters: 6,
+  displacement: { kind: "toTarget", meters: 2 },
   // The downward- and leaping-slash Mo Blade Anxi Soldier cues fire during
   // the hold, ahead of the slam itself (in-game values as of 2026-09-24).
   hits: [
