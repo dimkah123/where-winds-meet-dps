@@ -25,6 +25,67 @@ describe("shareBuild engine", () => {
     expect(followed?.id).toBe("graduation-stonesplitStrength-max-build")
   })
 
+  it("decodes user payload from request 10 (Witness: 3 Heng + Bow)", async () => {
+    const userPayload =
+      "tZRLi9swFIX_ijnb3hjJivzQrp0ydNMHTKEL44USK46pYw-ymqEM-e9FdmfqiRNwFtXCmHOFzncf3GccoSLCFgq961rTPza1e3DWtJXbg7CB4imhgnoG858GijNGeILK8yimlIXrgnJOMgkFmx4vx8RClsUFDVfTMPNXhReTdVEQeihsG7Nzj0b_BEFDMYI-QrGQR-mJwC-aypDHIvt3Xq2SRGZvdZHSOg1FNEKKMJPTGy9oswcXwUVL4VIPJ0Q6lTNZUC59IE1F_D_wxFI8EQ014vKM7tZsLmawCHU9Q73Wz2spiMspCHlZv4aqoXjywsaSE0EuR8teR-1aRW_s8ZwmntFMR-hGWz52Uib8vJPLgZIr5eFjUyQf98PoFLPZihg2x_qvZRSm0zi_ZHkaJPyoXWv6HgQHBRF8Mm0VvAs-dE8gVBsoVFaXv7Sru3Y1322r13lcbW3tQCihsKut8b_WD2zdlsa-7_0a3A0DrH9_PZr2vtFuY40u_cUDFCdshv24gcoxPsYZKwawqXAiHA6-QLi3Xe9Wd40ugy91tffurjY2iFFQjs-d1Y0J7va6PYt839tOu9W32titeRt6cEaXO9274KM5dj7pSbw4_QE"
+    const decoded = await decodeSharedBuild(userPayload)
+    expect(decoded.author).toBe("Witness")
+    expect(decoded.title).toBe("3 Heng + Bow")
+    expect(decoded.inputs.classId).toBe("stonesplitStrength")
+    expect(decoded.inputs.breakthrough).toBe(18)
+    expect(decoded.inputs.food).toBe("clayOvenFlatbread")
+    expect(decoded.inputs.divinecraft).toBe("fire")
+    expect(decoded.inputs.divinecraftRefinement).toBe("cinderAsh")
+
+    const { withDerivedStats } = await import("../../src/engine/derivedInputs")
+    const { applySetBonuses } = await import("../../src/engine/setBonuses")
+    const { runEngine } = await import("../../src/engine/dps")
+    const readyInputs = applySetBonuses(withDerivedStats(decoded.inputs))
+    const dps = runEngine(readyInputs)
+    console.log("Calculated DPS for Witness 3 Heng + Bow:", dps.dps, "totalDamage:", dps.totalDamage)
+    expect(dps.dps).toBeGreaterThan(60000)
+  })
+
+  it("round-trips crafting script, combatSettings, and enforces max arsenal, oddities and enhancements", async () => {
+    const payload: SharedBuildPayload = {
+      v: 2,
+      author: "Lekha",
+      title: "Full Encounter Mo Build",
+      inputs: {
+        ...defaultInputs,
+        classId: "stonesplitStrength",
+        breakthrough: 18,
+        combatSettings: {
+          dragonsBreath: true,
+          healerBuff: true,
+          healerPanaceaFan: false,
+          breakExtension: true,
+          script: "wraithstrikeScript",
+          dragonHeadFullStacks: false,
+          dragonHeadLowHpMaxBonus: false,
+          fragrantOrchidBathBean: false,
+        },
+      },
+    }
+
+    const encoded = await encodeSharedBuild(payload)
+    const decoded = await decodeSharedBuild(encoded)
+
+    // Script & Combat Settings preserved
+    expect(decoded.inputs.combatSettings?.script).toBe("wraithstrikeScript")
+    expect(decoded.inputs.combatSettings?.dragonsBreath).toBe(true)
+    expect(decoded.inputs.combatSettings?.healerBuff).toBe(true)
+    expect(decoded.inputs.combatSettings?.breakExtension).toBe(true)
+    expect(decoded.inputs.combatSettings?.healerPanaceaFan).toBe(false)
+
+    // Max defaults enforced
+    expect(decoded.inputs.arsenal).toBe("stonesplit")
+    expect(decoded.inputs.unclaimedOddityNodes).toEqual({})
+    expect(decoded.inputs.disabledTalentNodes).toEqual([])
+    expect(decoded.inputs.arsenalScores[1]).toBeGreaterThan(0)
+    expect(decoded.inputs.enhancements.leftWeapon).toBeGreaterThanOrEqual(70)
+  })
+
   it("encodes and decodes a shared build payload accurately with compact v2 format", async () => {
     const payload: SharedBuildPayload = {
       v: 2,

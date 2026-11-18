@@ -1,11 +1,15 @@
-import type { GearLevel, GearPiece, GearWordEntry, Inputs } from "./types"
-import { GEAR_SLOTS } from "./types"
+import type { CombatSettings, GearLevel, GearPiece, GearWordEntry, Inputs, ScriptId } from "./types"
+import { defaultCombatSettings, GEAR_SLOTS } from "./types"
 import { defaultInputs, emptyMindMethod } from "./defaults"
 import { hydrateInputs, newGearPieceId } from "../storage"
 import { GEAR_WORD_IDS } from "../data/stats/statLines"
 import { ATTUNEMENT_OPTIONS } from "./attunements"
 import { gearBaseStatsFor } from "../data/stats/gearBaseStats"
 import { defaultGraduationBuildId } from "./graduation"
+import { defaultArsenalForClass } from "./panel"
+import { defaultArsenalScores } from "../definitions/baseStats/arsenal"
+import { defaultEnhancementLevels, getDefaultTalentsForClass } from "../definitions/baseStats"
+import { builtinRotationsForClass } from "./builtinLibrary"
 
 export interface SharedBuildPayload {
   v: number
@@ -36,11 +40,14 @@ interface CompactBuildV2 {
   c: string // classId
   b: number // breakthrough
   gb?: string // graduationBuildId
-  r?: string // rotation
+  r?: string // rotation or selectedBuiltinRotationId
   d?: string // divinecraft
   dr?: string // divinecraftRefinement
   f?: string // food
   hpf?: string // hpFood
+  sc?: string // script (inputs.combatSettings?.script)
+  cs?: number // combatSettings bitmask
+  ar?: string // arsenal (if customized)
   bg?: { b?: [string, number]; t?: [string, number] } // bowGear: bow, thumbRing
   mm?: [string, string][] // mindMethods
   dm?: 1 // dummyMode
@@ -50,6 +57,22 @@ interface CompactBuildV2 {
   g: Record<number, CompactGearPiece> // slotIndex -> piece
   st?: Record<string, number> // statOverrides
   cr?: any // activeCustomRotation
+}
+
+function resolveRotationId(classId: string, r?: string, title?: string): string | null {
+  const builtins = builtinRotationsForClass(classId)
+  if (r) {
+    const byId = builtins.find((b) => b.id === r)
+    if (byId) return byId.id
+    const byName = builtins.find((b) => b.name.toLowerCase() === r.toLowerCase())
+    if (byName) return byName.id
+    return r
+  }
+  if (title) {
+    const byName = builtins.find((b) => b.name.toLowerCase() === title.toLowerCase())
+    if (byName) return byName.id
+  }
+  return null
 }
 
 export function uint8ArrayToBase64Url(bytes: Uint8Array): string {
@@ -183,7 +206,8 @@ function encodeToCompactV2(payload: SharedBuildPayload): CompactBuildV2 {
   if (author.trim()) v2.a = author.trim()
   if (title.trim()) v2.t = title.trim()
   if (inputs.graduationBuildId) v2.gb = inputs.graduationBuildId
-  if (inputs.rotation) v2.r = inputs.rotation
+  const rotationId = inputs.selectedBuiltinRotationId || inputs.rotation
+  if (rotationId) v2.r = rotationId
   if (inputs.divinecraft) v2.d = inputs.divinecraft
   if (inputs.divinecraftRefinement) v2.dr = inputs.divinecraftRefinement
   if (inputs.food) v2.f = inputs.food
@@ -192,6 +216,24 @@ function encodeToCompactV2(payload: SharedBuildPayload): CompactBuildV2 {
   if (inputs.useGraduationQiBreak === false) v2.uqb = 0
   if (inputs.shareDebuff5HenZhi) v2.sh5 = 1
   if (inputs.shareEasyHurt) v2.she = 1
+
+  if (inputs.combatSettings?.script) {
+    v2.sc = inputs.combatSettings.script
+  }
+  if (inputs.combatSettings) {
+    let cs = 0
+    if (inputs.combatSettings.dragonsBreath) cs |= 1
+    if (inputs.combatSettings.healerBuff) cs |= 2
+    if (inputs.combatSettings.healerPanaceaFan) cs |= 4
+    if (inputs.combatSettings.breakExtension) cs |= 8
+    if (inputs.combatSettings.dragonHeadFullStacks) cs |= 16
+    if (inputs.combatSettings.dragonHeadLowHpMaxBonus) cs |= 32
+    if (inputs.combatSettings.fragrantOrchidBathBean) cs |= 64
+    if (cs > 0) v2.cs = cs
+  }
+  if (inputs.arsenal) {
+    v2.ar = inputs.arsenal
+  }
 
   if (inputs.bowGear) {
     const bg: NonNullable<CompactBuildV2["bg"]> = {}
@@ -300,11 +342,43 @@ function decodeFromCompactV2(v2: CompactBuildV2): SharedBuildPayload {
     })
   }
 
+  const arsenal = (v2.ar as any) || defaultArsenalForClass(v2.c)
+  const arsenalScores = defaultArsenalScores()
+  const unclaimedOddityNodes = {}
+  const disabledTalentNodes: number[] = []
+  const martialArtsTalents = getDefaultTalentsForClass(v2.c, v2.b).map((talent) => ({
+    ...talent,
+    enabled: true,
+  }))
+  const enhancements = defaultEnhancementLevels(v2.b, { inventory, equipped })
+
+  const combatSettings: CombatSettings = {
+    ...defaultCombatSettings(),
+    dragonsBreath: v2.cs ? !!(v2.cs & 1) : false,
+    healerBuff: v2.cs ? !!(v2.cs & 2) : false,
+    healerPanaceaFan: v2.cs ? !!(v2.cs & 4) : false,
+    breakExtension: v2.cs ? !!(v2.cs & 8) : false,
+    dragonHeadFullStacks: v2.cs ? !!(v2.cs & 16) : false,
+    dragonHeadLowHpMaxBonus: v2.cs ? !!(v2.cs & 32) : false,
+    fragrantOrchidBathBean: v2.cs ? !!(v2.cs & 64) : false,
+    script: (v2.sc as ScriptId) || null,
+  }
+
+  const resolvedRotation = resolveRotationId(v2.c, v2.r, v2.t)
+
   const inputs: Inputs = hydrateInputs({
     ...base,
     inventory,
     equipped,
-    rotation: v2.r ?? base.rotation,
+    arsenal,
+    arsenalScores,
+    unclaimedOddityNodes,
+    disabledTalentNodes,
+    martialArtsTalents,
+    enhancements,
+    combatSettings,
+    rotation: resolvedRotation ?? base.rotation,
+    selectedBuiltinRotationId: resolvedRotation ?? base.selectedBuiltinRotationId,
     divinecraft: v2.d ? (v2.d as any) : base.divinecraft,
     divinecraftRefinement: v2.dr ? (v2.dr as any) : base.divinecraftRefinement,
     food: v2.f ? (v2.f as any) : base.food,
