@@ -30,7 +30,7 @@ export function SharedBuildBanner({ author, title, onSave, onDismiss }: Props) {
         </span>
       </div>
       <div className={styles.actions}>
-        <button type="button" className="btn primary" onClick={onSave}>
+        <button type="button" className={`btn primary ${styles.saveBtn}`} onClick={onSave}>
           📥 {t("share.bannerSaveToProfiles", "Сохранить в мои профили")}
         </button>
         <button

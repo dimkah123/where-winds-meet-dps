@@ -574,19 +574,19 @@ function AppInner() {
           }}
         />
       )}
-      {sharedBannerInfo && (
-        <SharedBuildBanner
-          author={sharedBannerInfo.author}
-          title={sharedBannerInfo.title}
-          onSave={handleSaveSharedToProfiles}
-          onDismiss={() => setSharedBannerInfo(null)}
-        />
-      )}
       <div className={styles.appHeader}>
         <header className={styles.appTitlebar}>
           <div className={styles.appTitle}>
             <h1>{t("app.whereWindsMeetDps")}</h1>
             <ChangelogButton />
+            {sharedBannerInfo && (
+              <SharedBuildBanner
+                author={sharedBannerInfo.author}
+                title={sharedBannerInfo.title}
+                onSave={handleSaveSharedToProfiles}
+                onDismiss={() => setSharedBannerInfo(null)}
+              />
+            )}
           </div>
           <div className={styles.appTitlebarActions}>
             <LanguageSelect />
