@@ -168,31 +168,29 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
       minPhys: 2751.66,
       maxPhys: 2501.22,
       physPenetration: 0.511,
-      primaryAttributeName: "Камнелом",
-      primaryAttributeMin: 374.3,
-      primaryAttributeMax: 845.72,
-      primaryAttributePenetration: 0.296,
-      foreignAttributeMin: 144.96,
-      foreignAttributeMax: 0,
+
+      elements: [
+        { id: "stonesplit", name: "Камнелом", min: 374.3, max: 845.72, isPrimary: true, penetration: 0.296 },
+        { id: "bellstrike", name: "Колокольный Удар", min: 48.32, max: 0 },
+        { id: "bamboocut", name: "Бамбуковый клинок", min: 96.64, max: 0 },
+        { id: "silkbind", name: "Шелковые путы", min: 0, max: 0 },
+      ],
+      formlessMin: 26.4,
+      formlessMax: 123.32,
 
       critRate: 0.7803,
-      critDamageBoost: 0.54,
+      directCritRate: 0.092,
       precisionRate: 0.931,
       affinityRate: 0.1033,
-      directCritRate: 0.092,
+      agility: 517.64,
+      power: 187,
 
       allMartialBoost: 0.0676,
-      attributeDamageBoost: 0.118,
       bossBoost: 0.0737,
       topClassBoost: {
         label: "Mo - Charge Boost",
         value: 0.279,
       },
-
-      agility: 517.64,
-      power: 187,
-      physDefense: 656.19,
-      maxHp: 217849,
 
       armorSetName: "Шлем Туманистого хребта (4/4)",
       bowSetName: "Комплект Двойного дракона",
@@ -210,25 +208,21 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
       totalDamage: "Всего урона",
       duration: "Длительность",
       rotation: "Ротация",
-      attackTitle: "АТАКА И ХАРАКТЕРИСТИКИ",
-      ratesTitle: "ТОЧНОСТЬ И УСИЛЕНИЯ УРОНА",
+      attackTitle: "АТАКА И СТИХИИ",
+      ratesTitle: "ПАРАМЕТРЫ И УСИЛЕНИЯ",
       gearTitle: "КОМПЛЕКТЫ И СТОЛКНОВЕНИЕ",
       physAttackLabel: "Физ. атака (Мин – Макс)",
       physPenLabel: "Физ. пробитие",
       attrAttackLabel: "Атака: {attr}",
       attrPenLabel: "Пробитие: {attr}",
-      foreignAttrLabel: "Чужая атака атрибута",
+      formlessLabel: "Бесформенная атака",
       agilityLabel: "Ловкость (Agility)",
       powerLabel: "Сила (Power)",
-      physDefenseLabel: "Физ. защита",
-      maxHpLabel: "Макс. здоровье (HP)",
       critLabel: "Крит. шанс",
-      critDmgLabel: "Крит. урон",
+      critCombinedLabel: "Крит. шанс (+ Прямой)",
       precisionLabel: "Точность (Precision)",
       affinityLabel: "Сокрушение (Affinity)",
-      directCritLabel: "Прямой крит (Direct Crit)",
       allMartialArtsLabel: "Все боевые искусства",
-      attributeDmgLabel: "Урон атрибута",
       bossBoostLabel: "Урон против боссов",
       classSkillBoostLabel: "Навык класса",
       armorSetLabel: "Комплект брони (4/4):",
@@ -255,14 +249,17 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
     expect(filledTexts.some((t) => t.includes("51.1"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("374 – 846"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("29.6"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("145 – 0"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("48 – 0"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("97 – 0"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("0 – 0"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("26 – 123"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("78.0% + 9.2%"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("517.6"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("656.2"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("217,849"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("78.0%"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("+54.0%"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("+6.8%"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("+11.8%"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("+7.4%"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("Mo - Charge Boost"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("+27.9%"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("Frost-Clad Night"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("+7.4%"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("Mo - Charge Boost"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("+27.9%"))).toBe(true)

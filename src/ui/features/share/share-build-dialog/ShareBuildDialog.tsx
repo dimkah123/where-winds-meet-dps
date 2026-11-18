@@ -12,7 +12,7 @@ import { useI18n } from "../../../../i18n/i18nContext"
 import { attunementKey, classKey, innerWayKey, setKey } from "../../../../i18n/contentKeys"
 import { classDefinition } from "../../../../definitions/classes/registry"
 import { equippedPiecesFor, withDerivedStats } from "../../../../engine/derivedInputs"
-import { applySetBonuses, resolveActiveSets, setPhysDefBonus } from "../../../../engine/setBonuses"
+import { applySetBonuses, resolveActiveSets } from "../../../../engine/setBonuses"
 import { effectiveRates, getSchool } from "../../../../engine/panel"
 import { finalHitOutcomeRates } from "../../../components/stats-overview-panel/finalHitOutcomeRates"
 import { activeRotationName } from "../../rotation/rotationOptions"
@@ -22,11 +22,7 @@ import { BOW_SET_DEFS } from "../../../../data/sets/bowSets"
 import { formatSetBonusValue, setBonusStatKey } from "../../gear/shared/setBonusText"
 import { gearLevelForBreakthrough } from "../../../../definitions/baseStats/breakthroughs"
 import {
-  effectiveEnhancementLevels,
-  effectiveMaxHp,
-  enhancedSlotsOf,
-  totalMaxHp,
-  totalPhysDef,
+  totalFormlessAttack,
   totalPlayerAttributes,
 } from "../../../../definitions/baseStats"
 import { getAttunement } from "../../../../engine/attunements"
@@ -152,24 +148,9 @@ export function ShareBuildDialog({
 
     const school = getSchool(inputs.classId)
     const primaryAttrKey = school.primaryAttribute.toLowerCase()
-    const primaryAttributeName = t(`share.card.attrName.${school.primaryAttribute}`, school.primaryAttribute)
-    const primaryAttributeMin = readPath(withSets, `${primaryAttrKey}.min`)
-    const primaryAttributeMax = readPath(withSets, `${primaryAttrKey}.max`)
-    const primaryAttributePenetration = readPath(withSets, `${primaryAttrKey}.penetration`)
     const physPenetration = readPath(withSets, "phys.penetration")
 
-    let foreignAttributeMin = 0
-    let foreignAttributeMax = 0
-    for (const key of ["bellstrike", "stonesplit", "silkbind", "bamboocut"] as const) {
-      if (key !== primaryAttrKey) {
-        foreignAttributeMin += readPath(withSets, `${key}.min`)
-        foreignAttributeMax += readPath(withSets, `${key}.max`)
-      }
-    }
-
     const equippedPieces = equippedPiecesFor(inputs)
-    const enhancedSlots = enhancedSlotsOf(inputs)
-    const enhancements = effectiveEnhancementLevels(inputs.enhancements, inputs.breakthrough)
     const baseAttrs = totalPlayerAttributes(
       inputs.breakthrough,
       equippedPieces,
@@ -177,39 +158,39 @@ export function ShareBuildDialog({
     )
     const power = inputs.statOverrides?.power ?? baseAttrs.power
     const agility = inputs.statOverrides?.agility ?? baseAttrs.agility
-    const physDefense =
-      inputs.statOverrides?.physDef ??
-      totalPhysDef(
-        inputs.breakthrough,
-        equippedPieces,
-        inputs.disabledTalentNodes,
-        enhancements,
-        inputs.unclaimedOddityNodes,
-        setPhysDefBonus(inputs),
-        enhancedSlots,
-      )
-    const effHp = effectiveMaxHp(
-      inputs.breakthrough,
-      equippedPieces,
-      inputs.disabledTalentNodes,
-      enhancements,
-      inputs.unclaimedOddityNodes,
-      inputs.arsenalScores,
-      enhancedSlots,
-    )
-    const baseHp = totalMaxHp(
-      inputs.breakthrough,
-      equippedPieces,
-      inputs.disabledTalentNodes,
-      enhancements,
-      inputs.unclaimedOddityNodes,
-      inputs.arsenalScores,
-      enhancedSlots,
-    )
-    const maxHp = Math.round(inputs.statOverrides?.maxHp ?? effHp ?? baseHp)
+
+    const baseFormless = totalFormlessAttack(inputs, equippedPieces)
+    const formless = {
+      min: inputs.statOverrides?.["formlessAttack.min"] ?? baseFormless.min,
+      max: inputs.statOverrides?.["formlessAttack.max"] ?? baseFormless.max,
+    }
+
+    const ALL_ATTR_KEYS = ["Stonesplit", "Bellstrike", "Silkbind", "Bamboocut"] as const
+    const sortedAttrKeys = [
+      school.primaryAttribute,
+      ...ALL_ATTR_KEYS.filter((k) => k !== school.primaryAttribute),
+    ]
+
+    const elements = sortedAttrKeys.map((attrKey) => {
+      const lower = attrKey.toLowerCase()
+      const isPrimary = lower === primaryAttrKey
+      const rawMin = readPath(withSets, `${lower}.min`)
+      const rawMax = readPath(withSets, `${lower}.max`)
+      const minVal = isPrimary ? Math.max(0, rawMin - formless.min) : rawMin
+      const maxVal = isPrimary ? Math.max(0, rawMax - formless.max) : rawMax
+      const penetration = isPrimary ? readPath(withSets, `${lower}.penetration`) : undefined
+      const name = t(`share.card.attrName.${attrKey}`, attrKey)
+      return {
+        id: lower,
+        name,
+        min: minVal,
+        max: maxVal,
+        isPrimary,
+        penetration,
+      }
+    })
 
     const allMartialBoost = readPath(withSets, "allMartialBoost")
-    const attributeDamageBoost = readPath(withSets, "attributeDamageBoost")
     const bossBoost = readPath(withSets, "bossBoost")
 
     let topClassBoost: { label: string; value: number } | undefined
@@ -270,27 +251,23 @@ export function ShareBuildDialog({
       duration: t("share.card.duration", "Длительность"),
       rotation: t("share.card.rotation", "Ротация"),
 
-      attackTitle: t("share.card.attackTitle", "АТАКА И ХАРАКТЕРИСТИКИ"),
-      ratesTitle: t("share.card.ratesTitle", "ТОЧНОСТЬ И УСИЛЕНИЯ УРОНА"),
+      attackTitle: t("share.card.attackTitle", "АТАКА И СТИХИИ"),
+      ratesTitle: t("share.card.ratesTitle", "ПАРАМЕТРЫ И УСИЛЕНИЯ"),
       gearTitle: t("share.card.gearTitle", "КОМПЛЕКТЫ И СТОЛКНОВЕНИЕ"),
 
       physAttackLabel: t("share.card.physAttackLabel", "Физ. атака (Мин – Макс)"),
       physPenLabel: t("share.card.physPenLabel", "Физ. пробитие"),
       attrAttackLabel: t("share.card.attrAttackLabel", "Атака: {attr}"),
       attrPenLabel: t("share.card.attrPenLabel", "Пробитие: {attr}"),
-      foreignAttrLabel: t("share.card.foreignAttrLabel", "Чужая атака атрибута"),
+      formlessLabel: t("share.card.formlessLabel", "Бесформенная атака"),
       agilityLabel: t("share.card.agilityLabel", "Ловкость (Agility)"),
       powerLabel: t("share.card.powerLabel", "Сила (Power)"),
-      physDefenseLabel: t("share.card.physDefenseLabel", "Физ. защита"),
-      maxHpLabel: t("share.card.maxHpLabel", "Макс. здоровье (HP)"),
 
       critLabel: t("share.card.critLabel", "Крит. шанс"),
-      critDmgLabel: t("share.card.critDmgLabel", "Крит. урон"),
+      critCombinedLabel: t("share.card.critCombinedLabel", "Крит. шанс (+ Прямой)"),
       precisionLabel: t("share.card.precisionLabel", "Точность (Precision)"),
       affinityLabel: t("share.card.affinityLabel", "Сокрушение (Affinity)"),
-      directCritLabel: t("share.card.directCritLabel", "Прямой крит (Direct Crit)"),
       allMartialArtsLabel: t("share.card.allMartialArtsLabel", "Все боевые искусства"),
-      attributeDmgLabel: t("share.card.attributeDmgLabel", "Урон атрибута"),
       bossBoostLabel: t("share.card.bossBoostLabel", "Урон против боссов"),
       classSkillBoostLabel: t("share.card.classSkillBoostLabel", "Навык класса"),
 
@@ -322,28 +299,21 @@ export function ShareBuildDialog({
         minPhys: readPath(withSets, "phys.min"),
         maxPhys: readPath(withSets, "phys.max"),
         physPenetration,
-        primaryAttributeName,
-        primaryAttributeMin,
-        primaryAttributeMax,
-        primaryAttributePenetration,
-        foreignAttributeMin,
-        foreignAttributeMax,
+
+        elements,
+        formlessMin: formless.min,
+        formlessMax: formless.max,
 
         critRate: finalRates.critRate,
-        critDamageBoost: readPath(withSets, "critDamageBoost"),
+        directCritRate: withSets.directCritRate,
         precisionRate: eff.precision,
         affinityRate: finalRates.affinityRate,
-        directCritRate: withSets.directCritRate,
-
-        allMartialBoost,
-        attributeDamageBoost,
-        bossBoost,
-        topClassBoost,
-
         agility,
         power,
-        physDefense,
-        maxHp,
+
+        allMartialBoost,
+        bossBoost,
+        topClassBoost,
 
         armorSetName,
         bowSetName,

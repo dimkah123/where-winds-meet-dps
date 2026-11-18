@@ -1,6 +1,15 @@
 import { formatCompactDamage, formatNumber } from "../../../utils/numberFormatting"
 import { fmtPenetration } from "../../../utils/statFormatting"
 
+export interface BuildCardElement {
+  id: string
+  name: string
+  min: number
+  max: number
+  isPrimary?: boolean
+  penetration?: number
+}
+
 export interface BuildCardData {
   author: string
   title: string
@@ -11,35 +20,28 @@ export interface BuildCardData {
   rotationDuration: number
   rotationName: string
 
-  // Physical & Attributes
+  // Physical
   minPhys: number
   maxPhys: number
   physPenetration?: number
-  primaryAttributeName?: string
-  primaryAttributeMin?: number
-  primaryAttributeMax?: number
-  primaryAttributePenetration?: number
-  foreignAttributeMin?: number
-  foreignAttributeMax?: number
 
-  // Core Rates
+  // Elements & Formless
+  elements: BuildCardElement[]
+  formlessMin?: number
+  formlessMax?: number
+
+  // Core Rates & Attributes
   critRate: number
-  critDamageBoost: number
+  directCritRate?: number
   precisionRate: number
   affinityRate: number
-  directCritRate?: number
+  agility?: number
+  power?: number
 
   // Key Damage Boosts
   allMartialBoost?: number
-  attributeDamageBoost?: number
   bossBoost?: number
   topClassBoost?: { label: string; value: number }
-
-  // Player Attributes & Defense
-  agility?: number
-  power?: number
-  physDefense?: number
-  maxHp?: number
 
   // Gear & Encounter
   armorSetName?: string | null
@@ -67,19 +69,15 @@ export interface BuildCardLabels {
   physPenLabel?: string
   attrAttackLabel?: string
   attrPenLabel?: string
-  foreignAttrLabel?: string
+  formlessLabel?: string
   agilityLabel?: string
   powerLabel?: string
-  physDefenseLabel?: string
-  maxHpLabel?: string
 
   critLabel?: string
-  critDmgLabel?: string
+  critCombinedLabel?: string
   precisionLabel?: string
   affinityLabel?: string
-  directCritLabel?: string
   allMartialArtsLabel?: string
-  attributeDmgLabel?: string
   bossBoostLabel?: string
   classSkillBoostLabel?: string
 
@@ -316,23 +314,26 @@ export function drawBuildCard(
     ctx.fillText(chip.val, chipX + 10, chipY + 41)
   })
 
-  // 4. Three Columns: Attack & Attributes, Rates & Boosts, Gear & Encounter
+  // 4. Three Columns: Attack & Elements, Rates & Boosts, Gear & Encounter
   const colY = 116
   const colH = 518
   const colW = (headerW - 24) / 3
 
-  // Column 1: Attack & Attributes
+  // Column 1: Attack & Elements
   const col1X = 32
-  drawSectionBox(ctx, col1X, colY, colW, colH, labels?.attackTitle || "АТАКА И ХАРАКТЕРИСТИКИ")
+  drawSectionBox(ctx, col1X, colY, colW, colH, labels?.attackTitle || "АТАКА И СТИХИИ")
 
-  const attrAttackLabel = data.primaryAttributeName
-    ? (labels?.attrAttackLabel || `Атака: ${data.primaryAttributeName}`).replace("{attr}", data.primaryAttributeName)
+  const primaryElem = data.elements.find((e) => e.isPrimary) || data.elements[0]
+  const foreignElems = data.elements.filter((e) => !e.isPrimary)
+
+  const primaryAttackLabel = primaryElem
+    ? (labels?.attrAttackLabel || `Атака: {attr}`).replace("{attr}", primaryElem.name)
     : "Атака атрибута"
-  const attrPenLabel = data.primaryAttributeName
-    ? (labels?.attrPenLabel || `Пробитие: ${data.primaryAttributeName}`).replace("{attr}", data.primaryAttributeName)
+  const primaryPenLabel = primaryElem
+    ? (labels?.attrPenLabel || `Пробитие: {attr}`).replace("{attr}", primaryElem.name)
     : "Пробитие атрибута"
 
-  const col1Rows = [
+  const col1Rows: Array<{ label: string; val: string; highlight: boolean; dimmed?: boolean }> = [
     {
       label: labels?.physAttackLabel || "Физ. атака (Мин – Макс)",
       val: `${formatNumber(data.minPhys, 0)} – ${formatNumber(data.maxPhys, 0)}`,
@@ -344,63 +345,62 @@ export function drawBuildCard(
       highlight: false,
     },
     {
-      label: attrAttackLabel,
-      val: `${formatNumber(data.primaryAttributeMin ?? 0, 0)} – ${formatNumber(data.primaryAttributeMax ?? 0, 0)}`,
+      label: primaryAttackLabel,
+      val: primaryElem
+        ? `${formatNumber(primaryElem.min, 0)} – ${formatNumber(primaryElem.max, 0)}`
+        : "—",
       highlight: true,
     },
     {
-      label: attrPenLabel,
-      val: fmtPenetration(data.primaryAttributePenetration ?? 0),
+      label: primaryPenLabel,
+      val: fmtPenetration(primaryElem?.penetration ?? 0),
       highlight: true,
-    },
-    {
-      label: labels?.foreignAttrLabel || "Чужая атака атрибута",
-      val: `${formatNumber(data.foreignAttributeMin ?? 0, 0)} – ${formatNumber(data.foreignAttributeMax ?? 0, 0)}`,
-      highlight: (data.foreignAttributeMin ?? 0) > 0 || (data.foreignAttributeMax ?? 0) > 0,
-    },
-    {
-      label: labels?.agilityLabel || "Ловкость (Agility)",
-      val: formatNumber(data.agility ?? 0, 1),
-      highlight: true,
-    },
-    {
-      label: labels?.powerLabel || "Сила (Power)",
-      val: formatNumber(data.power ?? 0, 0),
-      highlight: false,
-    },
-    {
-      label: labels?.physDefenseLabel || "Физ. защита",
-      val: formatNumber(data.physDefense ?? 0, 1),
-      highlight: false,
-    },
-    {
-      label: labels?.maxHpLabel || "Макс. здоровье (HP)",
-      val: formatNumber(data.maxHp ?? 0, 0),
-      highlight: false,
-      color: "#5fb86b",
     },
   ]
 
+  // Add the 3 foreign elements (divided by element)
+  foreignElems.forEach((elem) => {
+    const hasValue = elem.min > 0 || elem.max > 0
+    col1Rows.push({
+      label: elem.name,
+      val: `${formatNumber(elem.min, 0)} – ${formatNumber(elem.max, 0)}`,
+      highlight: hasValue,
+      dimmed: !hasValue,
+    })
+  })
+
+  // Add Formless Attack as the 8th row
+  const hasFormless = (data.formlessMin ?? 0) > 0 || (data.formlessMax ?? 0) > 0
+  col1Rows.push({
+    label: labels?.formlessLabel || "Бесформенная атака",
+    val: `${formatNumber(data.formlessMin ?? 0, 0)} – ${formatNumber(data.formlessMax ?? 0, 0)}`,
+    highlight: hasFormless,
+    dimmed: !hasFormless,
+  })
+
   let rowY = colY + 68
-  const rowStep = 47
+  const rowStep = 48
   col1Rows.forEach((r) => {
-    drawStatRow(ctx, col1X + 16, rowY, colW - 32, r.label, r.val, r.highlight ? "#d8b070" : r.color || "#f0f0f0")
+    const valColor = r.dimmed ? "#666666" : r.highlight ? "#d8b070" : "#f0f0f0"
+    const labelColor = r.dimmed ? "#666666" : "#9c9c9c"
+    drawStatRow(ctx, col1X + 16, rowY, colW - 32, r.label, r.val, valColor, labelColor)
     rowY += rowStep
   })
 
-  // Column 2: Rates & Damage Boosts
+  // Column 2: Rates, Attributes & Damage Boosts
   const col2X = col1X + colW + 12
-  drawSectionBox(ctx, col2X, colY, colW, colH, labels?.ratesTitle || "ТОЧНОСТЬ И УСИЛЕНИЯ УРОНА")
+  drawSectionBox(ctx, col2X, colY, colW, colH, labels?.ratesTitle || "ПАРАМЕТРЫ И УСИЛЕНИЯ")
+
+  const critRateFormatted = `${formatNumber(data.critRate * 100, 1)}%`
+  const directCritFormatted = (data.directCritRate ?? 0) > 0
+    ? ` + ${formatNumber((data.directCritRate ?? 0) * 100, 1)}%`
+    : ""
+  const critCombinedVal = `${critRateFormatted}${directCritFormatted}`
 
   const col2Rows = [
     {
-      label: labels?.critLabel || "Крит. шанс",
-      val: `${formatNumber(data.critRate * 100, 1)}%`,
-      highlight: false,
-    },
-    {
-      label: labels?.critDmgLabel || "Крит. урон",
-      val: `+${formatNumber(data.critDamageBoost * 100, 1)}%`,
+      label: labels?.critCombinedLabel || labels?.critLabel || "Крит. шанс (+ Прямой)",
+      val: critCombinedVal,
       highlight: false,
     },
     {
@@ -414,13 +414,18 @@ export function drawBuildCard(
       highlight: false,
     },
     {
-      label: labels?.allMartialArtsLabel || "Все боевые искусства",
-      val: `+${formatNumber((data.allMartialBoost ?? 0) * 100, 1)}%`,
+      label: labels?.agilityLabel || "Ловкость (Agility)",
+      val: formatNumber(data.agility ?? 0, 1),
       highlight: true,
     },
     {
-      label: labels?.attributeDmgLabel || "Урон атрибута",
-      val: `+${formatNumber((data.attributeDamageBoost ?? 0) * 100, 1)}%`,
+      label: labels?.powerLabel || "Сила (Power)",
+      val: formatNumber(data.power ?? 0, 0),
+      highlight: false,
+    },
+    {
+      label: labels?.allMartialArtsLabel || "Все боевые искусства",
+      val: `+${formatNumber((data.allMartialBoost ?? 0) * 100, 1)}%`,
       highlight: true,
     },
     {
@@ -432,11 +437,6 @@ export function drawBuildCard(
       label: data.topClassBoost ? data.topClassBoost.label : (labels?.classSkillBoostLabel || "Навык класса"),
       val: data.topClassBoost ? `+${formatNumber(data.topClassBoost.value * 100, 1)}%` : "+0.0%",
       highlight: true,
-    },
-    {
-      label: labels?.directCritLabel || "Прямой крит (Direct Crit)",
-      val: `${formatNumber((data.directCritRate ?? 0) * 100, 1)}%`,
-      highlight: false,
     },
   ]
 
@@ -608,9 +608,10 @@ function drawStatRow(
   label: string,
   val: string,
   valColor: string,
+  labelColor = "#9c9c9c",
 ) {
   ctx.font = "400 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-  ctx.fillStyle = "#9c9c9c"
+  ctx.fillStyle = labelColor
   ctx.textAlign = "left"
   ctx.fillText(truncateText(ctx, label, w - 105), x, y)
 
