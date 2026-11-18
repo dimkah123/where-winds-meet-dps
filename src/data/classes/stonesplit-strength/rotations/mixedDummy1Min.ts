@@ -33,7 +33,6 @@ export default defineRotation({
     { skillId: "stonesplitStrength-phalanxcharged-s3-innerpassion" },
     { skillId: "stonesplitStrength-phalanxcharged-s3-innerpassion" },
     { skillId: "stonesplitStrength-phalanxcharged-s3-innerpassion" },
-    { skillId: "stonesplitStrength-phalanxcharged-s3-innerpassion" },
     { skillId: "stonesplitStrength-phalanxq-soul" },
     { skillId: "stonesplitStrength-phalanxcharged-s3-innerpassion" },
     { skillId: "stonesplitStrength-snowpartingslide" },
