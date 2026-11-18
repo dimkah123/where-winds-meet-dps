@@ -17,6 +17,10 @@ export const details: ChangelogEntryDetails = {
           text: "Top banner for incoming shared builds with instant one-click save into custom profile library.",
           authors: ["dimkah123"],
         },
+        {
+          text: "History of changes with Undo (Ctrl+Z) and Redo (Ctrl+Y / Ctrl+Shift+Z), plus quick toolbar buttons.",
+          authors: ["dimkah123"],
+        },
       ],
     },
   ],

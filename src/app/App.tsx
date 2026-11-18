@@ -40,6 +40,7 @@ import { SetupWizard, type SetupMode } from "../ui/features/setup/setup-wizard/S
 import { BreakthroughDataDialog } from "../ui/layout/breakthrough-data-dialog/BreakthroughDataDialog"
 import { breakthroughDataRequestFor } from "../ui/layout/breakthrough-data-dialog/breakthroughDataRequest"
 import { activeRotationName } from "../ui/features/rotation/rotationOptions"
+import { useUndoRedo } from "../ui/hooks/useUndoRedo"
 import { ShareBuildDialog } from "../ui/features/share/share-build-dialog/ShareBuildDialog"
 import { SharedBuildBanner } from "../ui/layout/shared-build-banner/SharedBuildBanner"
 import { decodeSharedBuild } from "../engine/shareBuild"
@@ -102,7 +103,15 @@ function AppInner() {
     activeId: initial.activeId,
   })
   const initialActive = committed.profiles.find((profile) => profile.id === committed.activeId)!
-  const [activeDraft, setActiveDraft] = useState<Inputs>(initialActive.inputs)
+  const {
+    state: activeDraft,
+    set: setActiveDraft,
+    reset: resetActiveDraft,
+    undo: handleUndo,
+    redo: handleRedo,
+    canUndo,
+    canRedo,
+  } = useUndoRedo<Inputs>(initialActive.inputs)
   const inputs = activeDraft
 
   function setInputs(next: Inputs) {
@@ -166,7 +175,7 @@ function AppInner() {
       activeId: newId,
     }
     persist(nextState)
-    setActiveDraft(sharedBannerInfo.inputs)
+    resetActiveDraft(sharedBannerInfo.inputs)
     setLastSavedJson(JSON.stringify(sharedBannerInfo.inputs))
     setSharedBannerInfo(null)
   }
@@ -262,7 +271,7 @@ function AppInner() {
     const active = committed.profiles.find((profile) => profile.id === committed.activeId)
     if (!active) return
     const restored = JSON.parse(JSON.stringify(active.inputs)) as Inputs
-    setActiveDraft(restored)
+    resetActiveDraft(restored)
     setLastSavedJson(JSON.stringify(restored))
     setSavedAt(null)
   }
@@ -275,7 +284,7 @@ function AppInner() {
     if (!target) return
     const next: ProfilesState = { ...committed, activeId: id }
     persist(next)
-    setActiveDraft(target.inputs)
+    resetActiveDraft(target.inputs)
     setLastSavedJson(JSON.stringify(target.inputs))
     setSavedAt(null)
   }
@@ -301,7 +310,7 @@ function AppInner() {
         ? { profiles: [profile], activeId: profile.id }
         : { profiles: [...committed.profiles, profile], activeId: profile.id }
     persist(next)
-    setActiveDraft(profile.inputs)
+    resetActiveDraft(profile.inputs)
     setLastSavedJson(JSON.stringify(profile.inputs))
     setSavedAt(null)
     setWizard(null)
@@ -340,7 +349,7 @@ function AppInner() {
       activeId: imported.id,
     }
     persist(next)
-    setActiveDraft(imported.inputs)
+    resetActiveDraft(imported.inputs)
     setLastSavedJson(JSON.stringify(imported.inputs))
     setSavedAt(null)
   }
@@ -352,7 +361,7 @@ function AppInner() {
     let nextActive = committed.activeId
     if (id === committed.activeId) {
       nextActive = remaining[0].id
-      setActiveDraft(remaining[0].inputs)
+      resetActiveDraft(remaining[0].inputs)
       setLastSavedJson(JSON.stringify(remaining[0].inputs))
       setSavedAt(null)
     }
@@ -566,6 +575,28 @@ function AppInner() {
             >
               🔗 {t("common.shareBuild")}
             </button>
+            <div className={styles.historyButtonGroup}>
+              <button
+                type="button"
+                className={styles.historyBtn}
+                onClick={handleUndo}
+                disabled={!canUndo || isSimulationRunning}
+                title="Отменить последнее действие (Ctrl+Z)"
+                aria-label="Отменить (Ctrl+Z)"
+              >
+                ↶
+              </button>
+              <button
+                type="button"
+                className={styles.historyBtn}
+                onClick={handleRedo}
+                disabled={!canRedo || isSimulationRunning}
+                title="Повторить отменённое действие (Ctrl+Y или Ctrl+Shift+Z)"
+                aria-label="Повторить (Ctrl+Y)"
+              >
+                ↷
+              </button>
+            </div>
             <button
               type="button"
               className={"save-btn" + (isDirty ? " dirty" : "")}
