@@ -1,3 +1,4 @@
+import { useI18n } from "../../../i18n/i18nContext"
 import styles from "./SharedBuildBanner.module.scss"
 
 interface Props {
@@ -8,7 +9,8 @@ interface Props {
 }
 
 export function SharedBuildBanner({ author, title, onSave, onDismiss }: Props) {
-  const displayAuthor = author.trim() || "Игрок"
+  const { t } = useI18n()
+  const displayAuthor = author.trim() || t("share.defaultPlayerName", "Игрок")
   const displayTitle = title.trim() ? `«${title.trim()}»` : ""
 
   return (
@@ -18,20 +20,25 @@ export function SharedBuildBanner({ author, title, onSave, onDismiss }: Props) {
           ⚔️
         </span>
         <span>
-          Загружена сборка игрока <span className={styles.author}>{displayAuthor}</span>
-          {displayTitle ? <>: <span className={styles.title}>{displayTitle}</span></> : null}
+          {t("share.bannerLoaded", "Загружена сборка игрока")}{" "}
+          <span className={styles.author}>{displayAuthor}</span>
+          {displayTitle ? (
+            <>
+              : <span className={styles.title}>{displayTitle}</span>
+            </>
+          ) : null}
         </span>
       </div>
       <div className={styles.actions}>
         <button type="button" className="btn primary" onClick={onSave}>
-          📥 Сохранить в мои профили
+          📥 {t("share.bannerSaveToProfiles", "Сохранить в мои профили")}
         </button>
         <button
           type="button"
           className={styles.closeBtn}
           onClick={onDismiss}
-          title="Скрыть уведомление"
-          aria-label="Закрыть"
+          title={t("share.bannerHideTooltip", "Скрыть уведомление")}
+          aria-label={t("common.close", "Закрыть")}
         >
           ✕
         </button>

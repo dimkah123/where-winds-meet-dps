@@ -20,7 +20,32 @@ export interface BuildCardData {
   bowSetBonus?: string | null
 }
 
-export function drawBuildCard(canvas: HTMLCanvasElement, data: BuildCardData) {
+export interface BuildCardLabels {
+  playerBuildPrefix?: string
+  defaultPlayer?: string
+  heroDpsTitle?: string
+  totalDamage?: string
+  duration?: string
+  rotation?: string
+  characterStatsTitle?: string
+  physAttackLabel?: string
+  critLabel?: string
+  precisionLabel?: string
+  affinityLabel?: string
+  gearSetsTitle?: string
+  armorSetLabel?: string
+  bowSetLabel?: string
+  notEquipped?: string
+  readyHint?: string
+  generated?: string
+  locale?: string
+}
+
+export function drawBuildCard(
+  canvas: HTMLCanvasElement,
+  data: BuildCardData,
+  labels?: BuildCardLabels,
+) {
   const ctx = canvas.getContext("2d")
   if (!ctx) return
 
@@ -71,9 +96,9 @@ export function drawBuildCard(canvas: HTMLCanvasElement, data: BuildCardData) {
   ctx.textAlign = "left"
   ctx.font = "400 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#9fa9b8"
-  ctx.fillText("Сборка игрока:", 46, 50)
+  ctx.fillText(labels?.playerBuildPrefix || "Сборка игрока:", 46, 50)
 
-  const authorText = data.author.trim() || "Игрок"
+  const authorText = data.author.trim() || labels?.defaultPlayer || "Игрок"
   ctx.font = "700 28px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#f5d77f"
   ctx.fillText(authorText, 175, 52)
@@ -105,7 +130,7 @@ export function drawBuildCard(canvas: HTMLCanvasElement, data: BuildCardData) {
   // DPS Label
   ctx.font = "600 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#d4af37"
-  ctx.fillText("ИТОГОВЫЙ УРОН В СЕКУНДУ (DPS)", 72, heroY + 36)
+  ctx.fillText(labels?.heroDpsTitle || "ИТОГОВЫЙ УРОН В СЕКУНДУ (DPS)", 72, heroY + 36)
 
   // Large DPS Value with gold gradient
   const dpsText = formatNumber(data.dps, 0)
@@ -125,9 +150,12 @@ export function drawBuildCard(canvas: HTMLCanvasElement, data: BuildCardData) {
   // Total damage / duration / rotation
   ctx.font = "400 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#9fa9b8"
-  const rotText = data.rotationName ? ` · Ротация: ${data.rotationName}` : ""
+  const rotLabel = labels?.rotation || "Ротация"
+  const rotText = data.rotationName ? ` · ${rotLabel}: ${data.rotationName}` : ""
+  const totalDmgLabel = labels?.totalDamage || "Всего урона"
+  const durLabel = labels?.duration || "Длительность"
   ctx.fillText(
-    `Всего урона: ${formatCompactDamage(data.totalDamage)} · Длительность: ${formatNumber(data.rotationDuration, 1)}с${rotText}`,
+    `${totalDmgLabel}: ${formatCompactDamage(data.totalDamage)} · ${durLabel}: ${formatNumber(data.rotationDuration, 1)}с${rotText}`,
     72,
     heroY + 138,
   )
@@ -138,18 +166,18 @@ export function drawBuildCard(canvas: HTMLCanvasElement, data: BuildCardData) {
   const colW = (width - 92 - 24) / 2
 
   // Column 1: Stats
-  drawSectionBox(ctx, 46, colY, colW, colH, "ХАРАКТЕРИСТИКИ ПЕРСОНАЖА")
+  drawSectionBox(ctx, 46, colY, colW, colH, labels?.characterStatsTitle || "ХАРАКТЕРИСТИКИ ПЕРСОНАЖА")
   const statsList = [
     {
-      label: "Физ. атака (Мин – Макс)",
+      label: labels?.physAttackLabel || "Физ. атака (Мин – Макс)",
       val: `${formatNumber(data.minPhys, 0)} – ${formatNumber(data.maxPhys, 0)}`,
     },
     {
-      label: "Крит. шанс / Крит. урон",
+      label: labels?.critLabel || "Крит. шанс / Крит. урон",
       val: `${formatNumber(data.critRate * 100, 1)}% / +${formatNumber(data.critDamageBoost * 100, 1)}%`,
     },
-    { label: "Точность (Precision)", val: `${formatNumber(data.precisionRate * 100, 1)}%` },
-    { label: "Сокрушение (Affinity)", val: `${formatNumber(data.affinityRate * 100, 1)}%` },
+    { label: labels?.precisionLabel || "Точность (Precision)", val: `${formatNumber(data.precisionRate * 100, 1)}%` },
+    { label: labels?.affinityLabel || "Сокрушение (Affinity)", val: `${formatNumber(data.affinityRate * 100, 1)}%` },
   ]
   let statRowY = colY + 70
   for (const st of statsList) {
@@ -175,40 +203,42 @@ export function drawBuildCard(canvas: HTMLCanvasElement, data: BuildCardData) {
 
   // Column 2: Sets & Gear
   const col2X = 46 + colW + 24
-  drawSectionBox(ctx, col2X, colY, colW, colH, "КОМПЛЕКТЫ И СНАРЯЖЕНИЕ")
+  drawSectionBox(ctx, col2X, colY, colW, colH, labels?.gearSetsTitle || "КОМПЛЕКТЫ И СНАРЯЖЕНИЕ")
 
   let setRowY = colY + 70
   // Armor Set
   ctx.font = "400 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#9fa9b8"
-  ctx.fillText("Комплект брони (4/4):", col2X + 24, setRowY)
+  ctx.fillText(labels?.armorSetLabel || "Комплект брони (4/4):", col2X + 24, setRowY)
 
   setRowY += 28
-  drawBadge(ctx, col2X + 24, setRowY - 18, data.armorSetName || "Не надет", "#28a745")
+  drawBadge(ctx, col2X + 24, setRowY - 18, data.armorSetName || labels?.notEquipped || "Не надет", "#28a745")
 
   setRowY += 54
   // Bow Set
   ctx.font = "400 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#9fa9b8"
-  ctx.fillText("Комплект лука (2/2):", col2X + 24, setRowY)
+  ctx.fillText(labels?.bowSetLabel || "Комплект лука (2/2):", col2X + 24, setRowY)
 
   setRowY += 28
   const bowText = data.bowSetName
     ? `${data.bowSetName}${data.bowSetBonus ? ` (${data.bowSetBonus})` : ""}`
-    : "Не надет"
+    : labels?.notEquipped || "Не надет"
   drawBadge(ctx, col2X + 24, setRowY - 18, bowText, "#28a745")
 
   setRowY += 56
   ctx.font = "400 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#717e91"
-  ctx.fillText("Готово к проверке и тестированию в калькуляторе.", col2X + 24, setRowY)
+  ctx.fillText(labels?.readyHint || "Готово к проверке и тестированию в калькуляторе.", col2X + 24, setRowY)
 
   // 6. Footer
   ctx.font = "400 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#636e7f"
   ctx.textAlign = "left"
-  const dateStr = new Date().toLocaleDateString("ru-RU")
-  ctx.fillText(`Сгенерировано: ${dateStr}`, 46, height - 32)
+  const dateLocale = labels?.locale === "ru" ? "ru-RU" : "en-US"
+  const dateStr = new Date().toLocaleDateString(dateLocale)
+  const genLabel = labels?.generated || "Сгенерировано:"
+  ctx.fillText(`${genLabel} ${dateStr}`, 46, height - 32)
 
   ctx.textAlign = "right"
   ctx.fillText("https://dimkah123.github.io/where-winds-meet-dps", width - 46, height - 32)

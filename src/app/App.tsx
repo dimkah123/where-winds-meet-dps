@@ -160,9 +160,12 @@ function AppInner() {
 
   function handleSaveSharedToProfiles() {
     if (!sharedBannerInfo) return
-    const authorName = sharedBannerInfo.author.trim() || "Игрок"
+    const authorName = sharedBannerInfo.author.trim() || t("share.defaultPlayerName", "Игрок")
     const buildTitle = sharedBannerInfo.title.trim()
-    const name = buildTitle ? `Сборка игрока ${authorName}: ${buildTitle}` : `Сборка игрока ${authorName}`
+    const template = buildTitle
+      ? t("share.profileNameWithTitle", "Сборка игрока {author}: {title}")
+      : t("share.profileName", "Сборка игрока {author}")
+    const name = template.replace("{author}", authorName).replace("{title}", buildTitle)
     const newId = newProfileId()
     const newProf: StoredProfile = {
       id: newId,

@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react"
 import { Dialog } from "../../../components/dialog/Dialog"
 import { SubTabs } from "../../../components/sub-tabs/SubTabs"
-import { drawBuildCard } from "../build-showcase/drawBuildCard"
+import { drawBuildCard, type BuildCardLabels } from "../build-showcase/drawBuildCard"
 import { encodeSharedBuild } from "../../../../engine/shareBuild"
 import type { Inputs, Result } from "../../../../engine/types"
 import { useI18n } from "../../../../i18n/i18nContext"
@@ -37,13 +37,13 @@ export function ShareBuildDialog({
   defaultTitle = "",
   onClose,
 }: Props) {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const titleId = useId()
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const [activeTab, setActiveTab] = useState<TabKey>("link")
   const [author, setAuthor] = useState(() => {
-    return defaultAuthor || localStorage.getItem("wwm.share.author") || "Игрок"
+    return defaultAuthor || localStorage.getItem("wwm.share.author") || t("share.defaultPlayerName", "Игрок")
   })
   const [title, setTitle] = useState(defaultTitle || "")
   const [encodedData, setEncodedData] = useState<string>("")
@@ -66,7 +66,7 @@ export function ShareBuildDialog({
 
     const timer = setTimeout(() => {
       encodeSharedBuild({
-        v: 1,
+        v: 2,
         author: author.trim(),
         title: title.trim(),
         inputs,
@@ -101,7 +101,10 @@ export function ShareBuildDialog({
     const classDef = classDefinition(inputs.classId)
     const classDisplayName = classDef ? t(classKey(classDef.id), classDef.displayName) : inputs.classId
     const lvl = gearLevelForBreakthrough(inputs.breakthrough)
-    const breakthroughText = `Прорыв ${inputs.breakthrough} (${lvl} ур.)`
+    const breakthroughTemplate = t("share.breakthroughText", "Прорыв {count} ({level} ур.)")
+    const breakthroughText = breakthroughTemplate
+      .replace("{count}", String(inputs.breakthrough))
+      .replace("{level}", String(lvl))
 
     const derived = withDerivedStats(inputs)
     const withSets = applySetBonuses(derived)
@@ -126,26 +129,51 @@ export function ShareBuildDialog({
         ? `${formatSetBonusValue(bowDef.stat, bowDef.value[activeBow.level] ?? 0)} ${t(setBonusStatKey(bowDef.stat))}`
         : null
 
-    drawBuildCard(canvasRef.current, {
-      author,
-      title,
-      classDisplayName,
-      breakthroughText,
-      dps: result.dps,
-      totalDamage: result.totalDamage,
-      rotationDuration: result.rotationDuration,
-      rotationName: activeRotationName(inputs) || "",
-      minPhys: readPath(withSets, "phys.min"),
-      maxPhys: readPath(withSets, "phys.max"),
-      critRate: finalRates.critRate,
-      critDamageBoost: readPath(withSets, "critDamageBoost"),
-      precisionRate: eff.precision,
-      affinityRate: finalRates.affinityRate,
-      armorSetName,
-      bowSetName,
-      bowSetBonus,
-    })
-  }, [activeTab, inputs, result, author, title, t])
+    const labels: BuildCardLabels = {
+      playerBuildPrefix: t("share.card.playerBuildPrefix", "Сборка игрока:"),
+      defaultPlayer: t("share.defaultPlayerName", "Игрок"),
+      heroDpsTitle: t("share.card.heroDpsTitle", "ИТОГОВЫЙ УРОН В СЕКУНДУ (DPS)"),
+      totalDamage: t("share.card.totalDamage", "Всего урона"),
+      duration: t("share.card.duration", "Длительность"),
+      rotation: t("share.card.rotation", "Ротация"),
+      characterStatsTitle: t("share.card.characterStatsTitle", "ХАРАКТЕРИСТИКИ ПЕРСОНАЖА"),
+      physAttackLabel: t("share.card.physAttackLabel", "Физ. атака (Мин – Макс)"),
+      critLabel: t("share.card.critLabel", "Крит. шанс / Крит. урон"),
+      precisionLabel: t("share.card.precisionLabel", "Точность"),
+      affinityLabel: t("share.card.affinityLabel", "Сокрушение"),
+      gearSetsTitle: t("share.card.gearSetsTitle", "КОМПЛЕКТЫ И СНАРЯЖЕНИЕ"),
+      armorSetLabel: t("share.card.armorSetLabel", "Комплект брони (4/4):"),
+      bowSetLabel: t("share.card.bowSetLabel", "Комплект лука (2/2):"),
+      notEquipped: t("share.card.notEquipped", "Не надет"),
+      readyHint: t("share.card.readyHint", "Готово к проверке и тестированию в калькуляторе."),
+      generated: t("share.card.generated", "Сгенерировано:"),
+      locale,
+    }
+
+    drawBuildCard(
+      canvasRef.current,
+      {
+        author,
+        title,
+        classDisplayName,
+        breakthroughText,
+        dps: result.dps,
+        totalDamage: result.totalDamage,
+        rotationDuration: result.rotationDuration,
+        rotationName: activeRotationName(inputs) || "",
+        minPhys: readPath(withSets, "phys.min"),
+        maxPhys: readPath(withSets, "phys.max"),
+        critRate: finalRates.critRate,
+        critDamageBoost: readPath(withSets, "critDamageBoost"),
+        precisionRate: eff.precision,
+        affinityRate: finalRates.affinityRate,
+        armorSetName,
+        bowSetName,
+        bowSetBonus,
+      },
+      labels,
+    )
+  }, [activeTab, inputs, result, author, title, t, locale])
 
   function handleCopyLink() {
     navigator.clipboard.writeText(shareUrl).then(() => {
@@ -190,9 +218,10 @@ export function ShareBuildDialog({
     if (!canvasRef.current) return
     const url = canvasRef.current.toDataURL("image/png")
     const anchor = document.createElement("a")
-    const safeAuthor = (author.trim() || "Игрок").replace(/[^\wа-яА-Я\-.]+/g, "_")
+    const safeAuthor = (author.trim() || t("share.defaultPlayerName", "Игрок")).replace(/[^\wа-яА-Я\-.]+/g, "_")
     anchor.href = url
-    anchor.download = `Сборка_${safeAuthor}.png`
+    const filePrefix = t("share.buildFilePrefix", "Сборка")
+    anchor.download = `${filePrefix}_${safeAuthor}.png`
     document.body.appendChild(anchor)
     anchor.click()
     document.body.removeChild(anchor)
@@ -202,12 +231,15 @@ export function ShareBuildDialog({
     <Dialog labelledBy={titleId} onClose={onClose} surfaceClassName={styles.surface}>
       <div className={styles.header}>
         <div className={styles.headerText}>
-          <span className={styles.kicker}>Экспорт и карточка билда</span>
+          <span className={styles.kicker}>{t("share.kicker", "Экспорт и карточка билда")}</span>
           <h2 id={titleId} className={styles.title}>
-            Поделиться сборкой
+            {t("share.title", "Поделиться сборкой")}
           </h2>
           <p className={styles.subtitle}>
-            Отправьте ссылку друзьям или скопируйте красивую карточку персонажа для Discord и соцсетей.
+            {t(
+              "share.subtitle",
+              "Отправьте ссылку друзьям или скопируйте красивую карточку персонажа для Discord и соцсетей.",
+            )}
           </p>
         </div>
         <button
@@ -222,31 +254,31 @@ export function ShareBuildDialog({
 
       <div className={styles.fieldsGrid}>
         <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>Имя игрока / Никнейм:</label>
+          <label className={styles.fieldLabel}>{t("share.playerLabel", "Имя игрока / Никнейм:")}</label>
           <input
             type="text"
             className={styles.input}
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
-            placeholder="Например: Dimka"
+            placeholder={t("share.playerPlaceholder", "Например: Dimka")}
           />
         </div>
         <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>Название сборки:</label>
+          <label className={styles.fieldLabel}>{t("share.buildTitleLabel", "Название сборки:")}</label>
           <input
             type="text"
             className={styles.input}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Например: Мо + Хэн 85к DPS"
+            placeholder={t("share.buildTitlePlaceholder", "Например: Мо + Хэн 85к DPS")}
           />
         </div>
       </div>
 
       <SubTabs
         tabs={[
-          { key: "link", label: "🔗 Ссылка на сборку" },
-          { key: "card", label: "🖼 Карточка персонажа (PNG)" },
+          { key: "link", label: `🔗 ${t("share.tabLink", "Ссылка на сборку")}` },
+          { key: "card", label: `🖼 ${t("share.tabCard", "Карточка персонажа (PNG)")}` },
         ]}
         active={activeTab}
         onSelect={setActiveTab}
@@ -255,13 +287,13 @@ export function ShareBuildDialog({
       {activeTab === "link" && (
         <div className={styles.linkSection}>
           <div className={styles.fieldGroup}>
-            <label className={styles.fieldLabel}>Прямая ссылка на билд:</label>
+            <label className={styles.fieldLabel}>{t("share.directLinkLabel", "Прямая ссылка на билд:")}</label>
             <div className={styles.linkBox}>
               <input
                 type="text"
                 readOnly
                 className={styles.linkInput}
-                value={isGenerating ? "Генерация ссылки..." : shareUrl}
+                value={isGenerating ? t("share.generatingLink", "Генерация ссылки...") : shareUrl}
                 onClick={(e) => (e.target as HTMLInputElement).select()}
               />
               <button
@@ -270,18 +302,21 @@ export function ShareBuildDialog({
                 onClick={handleCopyLink}
                 disabled={isGenerating || !encodedData}
               >
-                {copiedLink ? "✓ Скопировано!" : "Копировать ссылку"}
+                {copiedLink ? t("share.copiedSuccess", "✓ Скопировано!") : t("share.copyLinkButton", "Копировать ссылку")}
               </button>
             </div>
             {copiedLink && (
               <span className={styles.copySuccess}>
-                ✓ Ссылка скопирована в буфер обмена! При переходе откроется этот билд.
+                {t(
+                  "share.copyLinkSuccessMsg",
+                  "✓ Ссылка скопирована в буфер обмена! При переходе откроется этот билд.",
+                )}
               </span>
             )}
           </div>
 
           <div className={styles.fieldGroup} style={{ marginTop: 8 }}>
-            <label className={styles.fieldLabel}>Текстовый код сборки:</label>
+            <label className={styles.fieldLabel}>{t("share.rawCodeLabel", "Текстовый код сборки:")}</label>
             <div className={styles.linkBox}>
               <input
                 type="text"
@@ -296,11 +331,13 @@ export function ShareBuildDialog({
                 onClick={handleCopyCode}
                 disabled={isGenerating || !encodedData}
               >
-                {copiedCode ? "✓ Скопировано!" : "Копировать код"}
+                {copiedCode ? t("share.copiedSuccess", "✓ Скопировано!") : t("share.copyCodeButton", "Копировать код")}
               </button>
             </div>
             {copiedCode && (
-              <span className={styles.copySuccess}>✓ Код сборки скопирован!</span>
+              <span className={styles.copySuccess}>
+                {t("share.copyCodeSuccessMsg", "✓ Код сборки скопирован!")}
+              </span>
             )}
           </div>
         </div>
@@ -316,15 +353,20 @@ export function ShareBuildDialog({
           />
           <div className={styles.cardActions}>
             <button type="button" className="btn primary" onClick={handleCopyImage}>
-              {copiedImage ? "✓ Картинка скопирована!" : "📋 Скопировать картинку"}
+              {copiedImage
+                ? t("share.copiedImageSuccess", "✓ Картинка скопирована!")
+                : `📋 ${t("share.copyImageButton", "Скопировать картинку")}`}
             </button>
             <button type="button" className="btn" onClick={handleDownloadImage}>
-              💾 Скачать PNG
+              💾 {t("share.downloadImageButton", "Скачать PNG")}
             </button>
           </div>
           {copiedImage && (
             <span className={styles.copySuccess}>
-              ✓ Изображение скопировано в буфер обмена! Нажмите Ctrl+V в чате Discord или Telegram.
+              {t(
+                "share.copyImageSuccessMsg",
+                "✓ Изображение скопировано в буфер обмена! Нажмите Ctrl+V в чате Discord или Telegram.",
+              )}
             </span>
           )}
         </div>
