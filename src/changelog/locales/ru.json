@@ -5,6 +5,7 @@
     "Fixed": "Исправлено"
   },
   "headlines": {
+    "1.2.2": "Быстрый выбор сета лука и ротация '3 Heng + Bow'",
     "1.2.1": "Сохранение сета за слотом и предупреждения о неполных сетах",
     "1.2.0": "Тайминги дистанции заряженных атак Мо (3м / 5м / 2м) и обновление Min Build",
     "1.1.12": "Настройка дистанции каста и радиус заряженных атак Мо",
@@ -23,6 +24,12 @@
     "1.0.0": "Релиз калькулятора УВС для Расколотого пика (Сила)"
   },
   "items": {
+    "Quick bow set dropdown in set strip with one-click selector and live stat bonus preview.": "Быстрый выбор комплекта лука в строке сетов: удобный выпадающий список для мгновенного переключения между сетами с предпросмотром.",
+    "Smart bow and thumb ring auto-pairing when choosing a set, while preserving manual overrides.": "Умное авто-спаривание Лука и Кольца: выбор сета на одном предмете автоматически выставляет его и на втором, сохраняя ручную настройку.",
+    "Built-in '3 Heng + Bow' 1-minute Stonesplit rotation with 43 optimized steps and dual cancels.": "Новая встроенная 1-минутная ротация '3 Heng + Bow' из 43 шагов с 3 циклами Хэн, Bursting Nine и отменами парного оружия.",
+    "In-game compact DPS breakdown view with categorized skills and accurate attempt hit counts.": "Компактный вид DPS Breakdown под игру: группировка по игровым категориям навыков с точным числом попыток (Attempt).",
+    "Renamed default rotation 'Mixed Dummy 1 Min' to 'Mixed 1 Min' across all supported languages.": "Переименование стандартной ротации 'Mixed Dummy 1 Min' в 'Mixed 1 Min' на всех поддерживаемых языках.",
+    "Calibrated Mo Charged middle phase in 'Mixed 1 Min' to 7 charged attacks to match in-game logs.": "Калибровка средней фазы заряжек Мо в 'Mixed 1 Min' до 7 атак для точного соответствия логам игры.",
     "Preserved weapon gear sets per slot on equip: equipping an item into weapon slots (weapons, disc, pendant) automatically retains the slot's set, preventing unintended set bonus drops.": "Сохранение сета за слотом при смене экипировки: экипировка предмета в оружейный слот (оружие, диск, кулон) теперь автоматически сохраняет комплект слота, предотвращая случайную потерю бонуса 4 частей.",
     "Added visual warning indicators for incomplete sets (e.g. 3/4 or 1/4) and weapon slots without a set directly in the Gear Set strip and slot tiles.": "Добавлены визуальные предупреждающие индикаторы о неполных комплектах (например, 3/4 или 1/4) и слотах оружия без сета в строке комплектов и на плитках снаряжения.",
     "Added dedicated Gear Set Warnings section in the Alerts tab and corner toast notifications with one-click navigation to the Gear tab.": "Добавлен специальный раздел предупреждений по комплектам снаряжения во вкладке «Алерты» и всплывающих уведомлениях с переходом в «Снаряжение» в один клик.",

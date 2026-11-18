@@ -3,15 +3,6 @@ import type { ChangelogEntryDetails } from "../types"
 export const details: ChangelogEntryDetails = {
   sections: [
     {
-      label: "Fixed",
-      items: [
-        {
-          text: "Removed unintended forward pull displacement (1.75m) from Mo Charged attacks and expanded reach to 6m, allowing charged hits, soldiers, and flute ticks to properly scale at 2m and 5m distance bands.",
-          authors: ["dimkah123"],
-        },
-      ],
-    },
-    {
       label: "Added",
       items: [
         {
@@ -28,6 +19,15 @@ export const details: ChangelogEntryDetails = {
         },
         {
           text: "Integrated distance tag parsing and generation into readable rotation strings (e.g. `Mo Charged x4 (5m)` or `(2m)`).",
+          authors: ["dimkah123"],
+        },
+      ],
+    },
+    {
+      label: "Fixed",
+      items: [
+        {
+          text: "Removed unintended forward pull displacement (1.75m) from Mo Charged attacks and expanded reach to 6m, allowing charged hits, soldiers, and flute ticks to properly scale at 2m and 5m distance bands.",
           authors: ["dimkah123"],
         },
       ],

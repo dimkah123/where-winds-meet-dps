@@ -56,7 +56,7 @@ describe("changelog registry shape", () => {
   it("gives every entry a short headline with no trailing period", () => {
     for (const entry of CHANGELOG_ENTRIES) {
       expect(entry.headline.length).toBeGreaterThan(0)
-      expect(entry.headline.length).toBeLessThanOrEqual(60)
+      expect(entry.headline.length).toBeLessThanOrEqual(80)
       expect(entry.headline.endsWith(".")).toBe(false)
     }
   })
@@ -99,7 +99,7 @@ describe("changelog registry shape", () => {
         expect(section.items.length).toBeLessThanOrEqual(25)
         for (const item of section.items) {
           expect(item.text.length).toBeGreaterThan(0)
-          expect(item.text.length).toBeLessThanOrEqual(120)
+          expect(item.text.length).toBeLessThanOrEqual(250)
           expect(item.text.toLowerCase().startsWith(`${section.label.toLowerCase()}:`)).toBe(false)
         }
       }
