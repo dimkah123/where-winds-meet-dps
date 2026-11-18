@@ -35,7 +35,7 @@
   "app.gear": "装备",
   "app.saved": "已保存 ✓",
   "app.saved2": "已保存",
-  "app.saveDisabledSharedBuild": "无法用共享配置覆盖您当前的个人配置。请使用“单独保存”将其另存为新配置。",
+  "app.saveDisabledSharedBuild": "无法用共享配置覆盖您当前的个人配置。请使用“保存到我的配置”将其保存为新配置。",
   "app.simulation": "模拟",
   "app.skillEditor": "技能编辑器",
   "app.whereWindsMeetDps": "燕云十六声 DPS 计算器",

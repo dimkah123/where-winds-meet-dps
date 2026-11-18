@@ -35,7 +35,7 @@
   "app.gear": "Gear",
   "app.saved": "Saved ✓",
   "app.saved2": "Saved",
-  "app.saveDisabledSharedBuild": "Cannot overwrite your active profile with a shared build. Save it as a separate profile using 'Save separately'.",
+  "app.saveDisabledSharedBuild": "Cannot overwrite your active profile with a shared build. Save it using 'Save to my profiles'.",
   "app.simulation": "Simulation",
   "app.skillEditor": "Skill Editor",
   "app.whereWindsMeetDps": "Where Winds Meet DPS",

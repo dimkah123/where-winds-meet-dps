@@ -35,7 +35,7 @@
   "app.gear": "장비",
   "app.saved": "저장됨 ✓",
   "app.saved2": "저장됨",
-  "app.saveDisabledSharedBuild": "공유된 빌드로 현재 프로필을 덮어쓸 수 없습니다. '별도로 저장'을 사용하여 새 프로필로 저장하세요.",
+  "app.saveDisabledSharedBuild": "공유된 빌드로 현재 프로필을 덮어쓸 수 없습니다. '내 프로필에 저장'을 사용하여 새 프로필로 저장하세요.",
   "app.simulation": "시뮬레이션",
   "app.skillEditor": "스킬 편집",
   "app.whereWindsMeetDps": "연운 DPS 계산기",

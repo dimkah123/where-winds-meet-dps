@@ -638,16 +638,6 @@ function AppInner() {
                 ↷
               </button>
             </div>
-            {sharedBannerInfo && (
-              <button
-                type="button"
-                className="btn primary"
-                onClick={handleSaveSharedToProfiles}
-                title={t("share.bannerSaveToProfiles", "Сохранить в мои профили")}
-              >
-                📥 {t("share.saveAsNewProfile", "Сохранить отдельно")}
-              </button>
-            )}
             <button
               type="button"
               className={"save-btn" + (isDirty && !sharedBannerInfo ? " dirty" : "")}
@@ -658,7 +648,7 @@ function AppInner() {
                 sharedBannerInfo
                   ? t(
                       "app.saveDisabledSharedBuild",
-                      "Нельзя перезаписать свой профиль чужим билдом. Сохраните его отдельным профилем с помощью кнопки «Сохранить отдельно».",
+                      "Нельзя перезаписать свой профиль чужим билдом. Сохраните его в профили с помощью кнопки «Сохранить в мои профили».",
                     )
                   : undefined
               }
