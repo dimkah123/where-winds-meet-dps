@@ -5,6 +5,7 @@
     "Fixed": "Исправлено"
   },
   "headlines": {
+    "1.2.1": "Сохранение сета за слотом и предупреждения о неполных сетах",
     "1.2.0": "Тайминги дистанции заряженных атак Мо (3м / 5м / 2м) и обновление Min Build",
     "1.1.12": "Настройка дистанции каста и радиус заряженных атак Мо",
     "1.1.11": "Исправление коэффициентов Bursting Nine и обновление основной ротации",
@@ -22,6 +23,11 @@
     "1.0.0": "Релиз калькулятора УВС для Расколотого пика (Сила)"
   },
   "items": {
+    "Preserved weapon gear sets per slot on equip: equipping an item into weapon slots (weapons, disc, pendant) automatically retains the slot's set, preventing unintended set bonus drops.": "Сохранение сета за слотом при смене экипировки: экипировка предмета в оружейный слот (оружие, диск, кулон) теперь автоматически сохраняет комплект слота, предотвращая случайную потерю бонуса 4 частей.",
+    "Added visual warning indicators for incomplete sets (e.g. 3/4 or 1/4) and weapon slots without a set directly in the Gear Set strip and slot tiles.": "Добавлены визуальные предупреждающие индикаторы о неполных комплектах (например, 3/4 или 1/4) и слотах оружия без сета в строке комплектов и на плитках снаряжения.",
+    "Added dedicated Gear Set Warnings section in the Alerts tab and corner toast notifications with one-click navigation to the Gear tab.": "Добавлен специальный раздел предупреждений по комплектам снаряжения во вкладке «Алерты» и всплывающих уведомлениях с переходом в «Снаряжение» в один клик.",
+    "Drafting new gear and OCR screenshot importing now automatically inherit the active set of the chosen slot.": "Создание нового снаряжения и распознавание скриншотов теперь автоматически наследуют активный комплект выбранного слота.",
+    "Reverted Min Build heirloom setup to 5 Crit and 1 Precision rolls with native stonesplit attack on armor.": "Откат хейрлума Min Build к оригинальной конфигурации с 5 роллами крита и 1 роллом точности с родной атрибутной атакой на нагруднике.",
     "Accurate staged distance timings for Mo Charged attacks: 1st soldier (MoDown) spawns at 3m (+4% Flute of the Tides bonus), 2nd soldier (MoJump) spawns at 5m (+8% Flute bonus), and the slam lands at 2m (+3% Flute bonus).": "Точные тайминги дистанции заряженных атак Мо: 1-й солдат (MoDown) вылетает на 3 м (+4% от Флейты), 2-й солдат (MoJump) вылетает на 5 м (+8% от Флейты), а приземление удара заряжки происходит на 2 м (+3% от Флейты).",
     "Flute of the Tides damage ticks during Mo Charged attacks now dynamically scale based on the exact distance of each charge phase.": "Тики урона Флейты прилива во время заряженной атаки Мо динамически масштабируются по текущей дистанции каждой фазы заряда.",
     "Updated Stonesplit Strength Min Build graduation preset gear stats and attunements to match the latest in-game heirloom setup.": "Характеристики экипировки и тюнинг пресета Min Build для Раскола скал обновлены под актуальный игровой сетап реликвий.",

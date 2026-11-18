@@ -2,6 +2,12 @@ import type { ChangelogEntry } from "./types"
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: "1.2.1",
+    date: "2026-11-18",
+    headline: "Gear Set Preservation on Equip & Incomplete Set Warnings",
+    loadDetails: () => import("./entries/v1-2-1").then((module) => module.details),
+  },
+  {
     version: "1.2.0",
     date: "2026-11-18",
     headline: "Mo Charged Staged Distance Timings (3m / 5m / 2m) & Min Build Heirloom Update",
