@@ -169,7 +169,8 @@ function AppInner() {
         const author = payload.author || ""
         const title = payload.title || ""
         setWizard(null)
-        setInputs(payload.inputs)
+        resetActiveDraft(payload.inputs)
+        setLastSavedJson(JSON.stringify(payload.inputs))
         setSharedBannerInfo({
           author,
           title,
@@ -205,6 +206,16 @@ function AppInner() {
     resetActiveDraft(activeDraft)
     setLastSavedJson(JSON.stringify(activeDraft))
     setSharedBannerInfo(null)
+  }
+
+  function handleDismissShared() {
+    setSharedBannerInfo(null)
+    const active = committed.profiles.find((profile) => profile.id === committed.activeId)
+    if (active) {
+      resetActiveDraft(active.inputs)
+      setLastSavedJson(JSON.stringify(active.inputs))
+      setSavedAt(null)
+    }
   }
 
   const [wizard, setWizard] = useState<{ mode: SetupMode; defaultName: string } | null>(() =>
@@ -587,7 +598,7 @@ function AppInner() {
                 author={sharedBannerInfo.author}
                 title={sharedBannerInfo.title}
                 onSave={handleSaveSharedToProfiles}
-                onDismiss={() => setSharedBannerInfo(null)}
+                onDismiss={handleDismissShared}
               />
             )}
           </div>

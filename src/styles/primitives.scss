@@ -76,19 +76,24 @@
 }
 
 .save-btn:disabled,
+.save-btn.dirty:disabled,
 .reset-btn:disabled {
-  cursor: default;
-  opacity: 0.55;
+  background: transparent !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text-dim) !important;
+  cursor: not-allowed !important;
+  opacity: 0.45 !important;
+  box-shadow: none !important;
 }
 
-.save-btn.dirty {
+.save-btn.dirty:not(:disabled) {
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: var(--color-bg);
   font-weight: 600;
 }
 
-.save-btn.dirty:hover {
+.save-btn.dirty:not(:disabled):hover {
   background: var(--color-accent-bright);
   border-color: var(--color-accent-bright);
 }
