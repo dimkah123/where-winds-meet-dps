@@ -44,4 +44,56 @@ describe("shareBuild engine", () => {
   it("throws a descriptive error on corrupted base64url data", async () => {
     await expect(decodeSharedBuild("not-a-valid-payload")).rejects.toThrow()
   })
+
+  it("rapidly encodes and decodes heavy builds with many gear pieces without hanging or deadlocking", async () => {
+    const dummyPieces = Array.from({ length: 80 }, (_, i) => ({
+      id: `piece-${i}`,
+      slot: "helm" as const,
+      level: 100 as const,
+      rarity: "legendary" as const,
+      minPhys: 50,
+      maxPhys: 80,
+      hp: 1000,
+      physDef: 200,
+      words: [
+        { word: "crit", value: 0.032, retuned: false },
+        { word: "minPhys", value: 45, retuned: false },
+        { word: "maxPhys", value: 75, retuned: false },
+        { word: "agility", value: 48, retuned: false },
+        { word: "crit", value: 0.032, retuned: true },
+      ] as any,
+      attunement: "phalanxbaneQ",
+      attunementValue: 0.058,
+      relayed: false,
+    }))
+
+    const heavyInputs = {
+      ...defaultInputs,
+      inventory: dummyPieces,
+      equipped: {
+        ...defaultInputs.equipped,
+        helm: "piece-0",
+      },
+    }
+
+    const payload: SharedBuildPayload = {
+      v: 1,
+      author: "HeavyTester",
+      title: "Massive Inventory Build",
+      inputs: heavyInputs,
+    }
+
+    const start = Date.now()
+    const encoded = await encodeSharedBuild(payload)
+    const duration = Date.now() - start
+
+    expect(typeof encoded).toBe("string")
+    expect(duration).toBeLessThan(1000) // Encodes in well under 1 second
+
+    const decoded = await decodeSharedBuild(encoded)
+    expect(decoded.author).toBe("HeavyTester")
+    expect(decoded.inputs.equipped.helm).toBe("piece-0")
+    // Only equipped pieces are retained in shared inventory
+    expect(decoded.inputs.inventory.length).toBe(1)
+  })
 })

@@ -63,23 +63,29 @@ export function ShareBuildDialog({
   useEffect(() => {
     let cancelled = false
     setIsGenerating(true)
-    encodeSharedBuild({
-      v: 1,
-      author: author.trim(),
-      title: title.trim(),
-      inputs,
-    })
-      .then((data) => {
-        if (!cancelled) {
-          setEncodedData(data)
-          setIsGenerating(false)
-        }
+
+    const timer = setTimeout(() => {
+      encodeSharedBuild({
+        v: 1,
+        author: author.trim(),
+        title: title.trim(),
+        inputs,
       })
-      .catch(() => {
-        if (!cancelled) setIsGenerating(false)
-      })
+        .then((data) => {
+          if (!cancelled) {
+            setEncodedData(data)
+            setIsGenerating(false)
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to generate build link:", err)
+          if (!cancelled) setIsGenerating(false)
+        })
+    }, 100)
+
     return () => {
       cancelled = true
+      clearTimeout(timer)
     }
   }, [inputs, author, title])
 

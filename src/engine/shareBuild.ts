@@ -11,9 +11,10 @@ export interface SharedBuildPayload {
 
 export function uint8ArrayToBase64Url(bytes: Uint8Array): string {
   let binary = ""
-  const len = bytes.byteLength
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i])
+  const chunkSize = 8192
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize)
+    binary += String.fromCharCode.apply(null, chunk as unknown as number[])
   }
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
 }
@@ -32,15 +33,24 @@ export function base64UrlToUint8Array(base64url: string): Uint8Array {
 export async function compressBytes(bytes: Uint8Array): Promise<Uint8Array> {
   const cs = new CompressionStream("deflate-raw")
   const writer = cs.writable.getWriter()
-  await writer.write(bytes as unknown as BufferSource)
-  await writer.close()
-  const chunks: Uint8Array[] = []
   const reader = cs.readable.getReader()
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) break
-    if (value) chunks.push(value)
-  }
+
+  const readPromise = (async () => {
+    const chunks: Uint8Array[] = []
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      if (value) chunks.push(value)
+    }
+    return chunks
+  })()
+
+  const writePromise = (async () => {
+    await writer.write(bytes as unknown as BufferSource)
+    await writer.close()
+  })()
+
+  const [chunks] = await Promise.all([readPromise, writePromise])
   const totalLength = chunks.reduce((acc, c) => acc + c.byteLength, 0)
   const result = new Uint8Array(totalLength)
   let offset = 0
@@ -54,15 +64,24 @@ export async function compressBytes(bytes: Uint8Array): Promise<Uint8Array> {
 export async function decompressBytes(bytes: Uint8Array): Promise<Uint8Array> {
   const ds = new DecompressionStream("deflate-raw")
   const writer = ds.writable.getWriter()
-  await writer.write(bytes as unknown as BufferSource)
-  await writer.close()
-  const chunks: Uint8Array[] = []
   const reader = ds.readable.getReader()
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) break
-    if (value) chunks.push(value)
-  }
+
+  const readPromise = (async () => {
+    const chunks: Uint8Array[] = []
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      if (value) chunks.push(value)
+    }
+    return chunks
+  })()
+
+  const writePromise = (async () => {
+    await writer.write(bytes as unknown as BufferSource)
+    await writer.close()
+  })()
+
+  const [chunks] = await Promise.all([readPromise, writePromise])
   const totalLength = chunks.reduce((acc, c) => acc + c.byteLength, 0)
   const result = new Uint8Array(totalLength)
   let offset = 0
@@ -74,11 +93,20 @@ export async function decompressBytes(bytes: Uint8Array): Promise<Uint8Array> {
 }
 
 export async function encodeSharedBuild(payload: SharedBuildPayload): Promise<string> {
+  // Only keep equipped gear pieces in inventory so payload stays super light and link doesn't bloat
+  const equippedIds = new Set(Object.values(payload.inputs.equipped || {}).filter(Boolean))
+  const inventory = (payload.inputs.inventory || []).filter((p) => equippedIds.has(p.id))
+
+  const compactInputs: Inputs = {
+    ...withoutDerivedStats(payload.inputs),
+    inventory,
+  }
+
   const compactPayload = {
     v: payload.v,
     author: payload.author || "",
     title: payload.title || "",
-    inputs: withoutDerivedStats(payload.inputs),
+    inputs: compactInputs,
   }
   const json = JSON.stringify(compactPayload)
   const rawBytes = new TextEncoder().encode(json)
