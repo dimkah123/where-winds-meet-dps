@@ -5,6 +5,7 @@ import { hydrateInputs, newGearPieceId } from "../storage"
 import { GEAR_WORD_IDS } from "../data/stats/statLines"
 import { ATTUNEMENT_OPTIONS } from "./attunements"
 import { gearBaseStatsFor } from "../data/stats/gearBaseStats"
+import { defaultGraduationBuildId } from "./graduation"
 
 export interface SharedBuildPayload {
   v: number
@@ -34,6 +35,7 @@ interface CompactBuildV2 {
   t?: string // title
   c: string // classId
   b: number // breakthrough
+  gb?: string // graduationBuildId
   r?: string // rotation
   d?: string // divinecraft
   dr?: string // divinecraftRefinement
@@ -180,6 +182,7 @@ function encodeToCompactV2(payload: SharedBuildPayload): CompactBuildV2 {
 
   if (author.trim()) v2.a = author.trim()
   if (title.trim()) v2.t = title.trim()
+  if (inputs.graduationBuildId) v2.gb = inputs.graduationBuildId
   if (inputs.rotation) v2.r = inputs.rotation
   if (inputs.divinecraft) v2.d = inputs.divinecraft
   if (inputs.divinecraftRefinement) v2.dr = inputs.divinecraftRefinement
@@ -310,6 +313,7 @@ function decodeFromCompactV2(v2: CompactBuildV2): SharedBuildPayload {
     useGraduationQiBreak: v2.uqb !== 0,
     shareDebuff5HenZhi: v2.sh5 === 1,
     shareEasyHurt: v2.she === 1,
+    graduationBuildId: v2.gb || defaultGraduationBuildId(v2.c) || null,
     bowGear: v2.bg
       ? {
           bow: v2.bg.b

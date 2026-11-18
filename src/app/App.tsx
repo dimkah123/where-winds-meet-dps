@@ -74,15 +74,43 @@ migrateDotStandinOverrides()
 
 const OWN_QI_BAR: EngineRunOptions = { qiBar: "own" }
 
+function extractSharedData(search: string): string | null {
+  if (search) {
+    const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search)
+    const val = params.get("d") || params.get("data")
+    if (val) return val
+  }
+  if (typeof window !== "undefined" && window.location.hash) {
+    const qIdx = window.location.hash.indexOf("?")
+    if (qIdx >= 0) {
+      const params = new URLSearchParams(window.location.hash.slice(qIdx + 1))
+      const val = params.get("d") || params.get("data")
+      if (val) return val
+    }
+  }
+  if (typeof window !== "undefined" && window.location.search) {
+    const params = new URLSearchParams(
+      window.location.search.startsWith("?")
+        ? window.location.search.slice(1)
+        : window.location.search,
+    )
+    const val = params.get("d") || params.get("data")
+    if (val) return val
+  }
+  return null
+}
+
 function AppInner() {
   const simulation = useParseSimulation()
   const [startedRunCount, setStartedRunCount] = useState(0)
   const [acknowledgedRunCount, setAcknowledgedRunCount] = useState(0)
   const isSimulationRunning = simulation.status === "running"
-  const pathname = useLocation().pathname
+  const location = useLocation()
+  const pathname = location.pathname
   const isOnSimulationTab = pathname === SIMULATION_PATH
   const areInputsLocked = isSimulationRunning && !isOnSimulationTab
   const navigate = useNavigate()
+  const lastLoadedDataRef = useRef<string | null>(null)
 
   const startParseSimulation = simulation.start
   const startSimulation = useCallback(
@@ -132,19 +160,15 @@ function AppInner() {
   } | null>(null)
 
   useEffect(() => {
-    const hash = window.location.hash
-    const questionIdx = hash.indexOf("?")
-    const queryString = questionIdx >= 0 ? hash.slice(questionIdx + 1) : window.location.search.slice(1)
-    if (!queryString) return
-
-    const params = new URLSearchParams(queryString)
-    const data = params.get("d") || params.get("data")
-    if (!data) return
+    const data = extractSharedData(location.search)
+    if (!data || data === lastLoadedDataRef.current) return
+    lastLoadedDataRef.current = data
 
     decodeSharedBuild(data)
       .then((payload) => {
-        const author = payload.author || params.get("author") || ""
-        const title = payload.title || params.get("title") || ""
+        const author = payload.author || ""
+        const title = payload.title || ""
+        setWizard(null)
         setInputs(payload.inputs)
         setSharedBannerInfo({
           author,
@@ -156,7 +180,7 @@ function AppInner() {
       .catch((err) => {
         console.error("Failed to load shared build:", err)
       })
-  }, [navigate])
+  }, [location.pathname, location.search, navigate])
 
   function handleSaveSharedToProfiles() {
     if (!sharedBannerInfo) return
@@ -676,6 +700,18 @@ function AppInner() {
         <fieldset className={styles.routeFields} disabled={areInputsLocked}>
           <Routes>
             <Route path="/" element={<Navigate to="/overview" replace />} />
+            <Route
+              path="/build"
+              element={
+                <OverviewTab
+                  inputs={inputs}
+                  configuredInputs={configuredInputs}
+                  engineInputs={engineInputs}
+                  onChange={setInputs}
+                  result={result}
+                />
+              }
+            />
             <Route
               path="/overview"
               element={
