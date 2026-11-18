@@ -1,24 +1,27 @@
 import { useMemo, useState } from "react"
-import type { Result } from "../../../engine/types"
+import type { Inputs, Result } from "../../../engine/types"
 import { useI18n } from "../../../i18n/i18nContext"
-import { getAllAlertKeys } from "../../features/alerts/alertKeys"
+import { getAllAlertKeys, getGearSetAlerts } from "../../features/alerts/alertKeys"
 import { WarningLines } from "../output-panel/OutputPanel"
 import styles from "./WarningsToast.module.scss"
 
-function warningsSignature(result: Result): string {
+function warningsSignature(result: Result, inputs?: Inputs): string {
   const qiEdgeWarnings = result.qiEdgeWarnings ?? []
-  if (!result.warnings.length && !qiEdgeWarnings.length) return ""
-  return JSON.stringify([result.warnings, qiEdgeWarnings])
+  const setAlerts = inputs ? getGearSetAlerts(inputs) : []
+  if (!result.warnings.length && !qiEdgeWarnings.length && !setAlerts.length) return ""
+  return JSON.stringify([result.warnings, qiEdgeWarnings, setAlerts.map((a) => a.key)])
 }
 
 export function WarningsToast({
   result,
+  inputs,
   isDnd = false,
   onToggleDnd,
   acknowledgedAlerts,
   onAcknowledgeAlerts,
 }: {
   result: Result
+  inputs?: Inputs
   isDnd?: boolean
   onToggleDnd?: () => void
   acknowledgedAlerts?: Set<string>
@@ -26,9 +29,9 @@ export function WarningsToast({
 }) {
   const { t } = useI18n()
   const [dismissedSignature, setDismissedSignature] = useState("")
-  const signature = warningsSignature(result)
+  const signature = warningsSignature(result, inputs)
 
-  const activeKeys = useMemo(() => getAllAlertKeys(result), [result])
+  const activeKeys = useMemo(() => getAllAlertKeys(result, inputs), [result, inputs])
   const hasUnacknowledged = useMemo(() => {
     if (!acknowledgedAlerts || acknowledgedAlerts.size === 0) return activeKeys.length > 0
     return activeKeys.some((k) => !acknowledgedAlerts.has(k))
@@ -43,7 +46,7 @@ export function WarningsToast({
     <div className={styles.toast} role="status" aria-live="polite">
       <div className={styles.topRow}>
         <div className={styles.lines}>
-          <WarningLines result={result} />
+          <WarningLines result={result} inputs={inputs} />
         </div>
         <button
           type="button"

@@ -1,8 +1,11 @@
 import { useMemo } from "react"
 import { useNavigate } from "react-router-dom"
-import type { QiEdgeWarning, Result } from "../../../../engine/types"
+import type { Inputs, QiEdgeWarning, Result } from "../../../../engine/types"
 import { useI18n } from "../../../../i18n/i18nContext"
-import { getGeneralWarningKey, getQiEdgeWarningKey } from "../alertKeys"
+import { getGeneralWarningKey, getGearSetAlerts, getQiEdgeWarningKey } from "../alertKeys"
+import { gearSlotLabelKey } from "../../gear/shared/gearSlotKeys"
+import { setKey } from "../../../../i18n/contentKeys"
+import { SET_BY_ID } from "../../../../definitions/sets/registry"
 import styles from "./AlertsTab.module.scss"
 
 const QI_EDGE_WARNING_KEYS = {
@@ -18,6 +21,7 @@ const QI_EDGE_WARNING_KEYS = {
 
 export function AlertsTab({
   result,
+  inputs,
   isDnd,
   onToggleDnd,
   acknowledgedAlerts = new Set(),
@@ -25,6 +29,7 @@ export function AlertsTab({
   onAcknowledgeAll,
 }: {
   result: Result
+  inputs?: Inputs
   isDnd: boolean
   onToggleDnd: () => void
   acknowledgedAlerts?: Set<string>
@@ -36,6 +41,7 @@ export function AlertsTab({
 
   const warnings = result.warnings
   const qiEdgeWarnings = result.qiEdgeWarnings ?? []
+  const gearSetAlerts = useMemo(() => (inputs ? getGearSetAlerts(inputs) : []), [inputs])
   const uniqueWarnings = useMemo(() => {
     const seen = new Set<string>()
     return warnings.filter((w) => {
@@ -47,7 +53,7 @@ export function AlertsTab({
       return true
     })
   }, [warnings])
-  const totalAlerts = uniqueWarnings.length + qiEdgeWarnings.length
+  const totalAlerts = uniqueWarnings.length + qiEdgeWarnings.length + gearSetAlerts.length
   const fallbackCount = result.fallbackStepIds?.length ?? 0
 
   const unacknowledgedCount = useMemo(() => {
@@ -58,8 +64,11 @@ export function AlertsTab({
     for (const q of qiEdgeWarnings) {
       if (!acknowledgedAlerts.has(getQiEdgeWarningKey(q))) count++
     }
+    for (const g of gearSetAlerts) {
+      if (!acknowledgedAlerts.has(g.key)) count++
+    }
     return count
-  }, [uniqueWarnings, qiEdgeWarnings, acknowledgedAlerts])
+  }, [uniqueWarnings, qiEdgeWarnings, gearSetAlerts, acknowledgedAlerts])
 
   return (
     <div className={styles.container}>
@@ -166,6 +175,83 @@ export function AlertsTab({
                         >
                           {t("alerts.openRotationEditor")} →
                         </button>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {gearSetAlerts.length > 0 && (
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>
+                <span>🛡️</span>
+                <span>{t("alerts.gearSetWarningsTitle")}</span>
+              </h3>
+              {gearSetAlerts.map((alert) => {
+                const isAck = acknowledgedAlerts.has(alert.key)
+                const slotLabel = alert.slot
+                  ? t(gearSlotLabelKey(alert.slot, inputs?.classId ?? "stonesplitStrength"))
+                  : ""
+                const setName = alert.setName
+                  ? t(setKey(alert.setName), SET_BY_ID[alert.setName]?.name ?? alert.setName)
+                  : ""
+                return (
+                  <div
+                    key={alert.key}
+                    className={`${styles.alertCard} ${isAck ? styles.alertCardAcknowledged : ""}`}
+                  >
+                    <div className={styles.alertHeader}>
+                      <span className={styles.skillName}>
+                        <span>⚠️</span>
+                        <span>
+                          {alert.kind === "noSet"
+                            ? t("alerts.gearSetNoSetTitle").replace("{slot}", slotLabel)
+                            : t("alerts.gearSetIncompleteTitle")
+                                .replace("{set}", setName)
+                                .replace("{count}", `${alert.count}/4`)}
+                        </span>
+                      </span>
+                      <div className={styles.headerTags}>
+                        {isAck && (
+                          <span className={styles.acknowledgedTag}>
+                            ✓ {t("alerts.acknowledged")}
+                          </span>
+                        )}
+                        <span className={styles.timingTag}>
+                          {alert.kind === "noSet" ? t("common.noSet") : `${alert.count}/4`}
+                        </span>
+                      </div>
+                    </div>
+                    <div className={styles.alertBody}>
+                      {alert.kind === "noSet"
+                        ? t("alerts.gearSetNoSetBody").replace("{slot}", slotLabel)
+                        : t("alerts.gearSetIncompleteBody")
+                            .replace("{set}", setName)
+                            .replace("{count}", `${alert.count}/4`)}
+                    </div>
+                    <div className={styles.alertFooter}>
+                      <span className={styles.recommendation}>
+                        {t("alerts.gearSetRecommendation")}
+                      </span>
+                      <div className={styles.footerActions}>
+                        <button
+                          type="button"
+                          className={styles.rotationButton}
+                          onClick={() => navigate("/gear")}
+                        >
+                          {t("gear.buildSummary.equippedTab")} →
+                        </button>
+                        {onToggleAcknowledge && (
+                          <button
+                            type="button"
+                            className={isAck ? styles.acknowledgedButton : styles.acknowledgeButton}
+                            onClick={() => onToggleAcknowledge(alert.key)}
+                          >
+                            {isAck ? `✓ ${t("alerts.acknowledged")}` : t("alerts.acknowledge")}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

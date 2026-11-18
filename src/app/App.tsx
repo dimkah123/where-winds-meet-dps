@@ -350,7 +350,7 @@ function AppInner() {
     })
   }, [])
 
-  const activeAlertKeys = useMemo(() => getAllAlertKeys(result), [result])
+  const activeAlertKeys = useMemo(() => getAllAlertKeys(result, inputs), [result, inputs])
 
   const acknowledgeAllAlerts = useCallback(() => {
     setAcknowledgedAlerts((prev) => {
@@ -404,6 +404,7 @@ function AppInner() {
       <DpsActivityToast hidden={isSimulationRunning} />
       <CornerToasts
         result={result}
+        inputs={inputs}
         onCheckRotation={goToRotationEditorTab}
         isAlertsDnd={isAlertsDnd}
         onToggleDnd={toggleAlertsDnd}
@@ -609,6 +610,7 @@ function AppInner() {
               element={
                 <AlertsTab
                   result={result}
+                  inputs={inputs}
                   isDnd={isAlertsDnd}
                   onToggleDnd={toggleAlertsDnd}
                   acknowledgedAlerts={acknowledgedAlerts}

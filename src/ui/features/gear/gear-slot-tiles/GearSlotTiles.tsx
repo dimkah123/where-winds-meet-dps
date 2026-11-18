@@ -3,7 +3,7 @@ import { isWeaponSlot } from "../../../../engine/types"
 import { useI18n } from "../../../../i18n/i18nContext"
 import { setKey } from "../../../../i18n/contentKeys"
 import { heirloomMatch, type HeirloomProfile } from "../../../../engine/heirloom"
-import { resolveActiveSets, setPieceCount } from "../../../../engine/setBonuses"
+import { resolveActiveSets, setPieceCount, slotSetFor } from "../../../../engine/setBonuses"
 import { BOW_SET_DEFS } from "../../../../data/sets/bowSets"
 import { GEAR_SET_DEFS, SET_BY_ID } from "../../../../definitions/sets/registry"
 import { HeirloomShine } from "../../../components/heirloom-shine/HeirloomShine"
@@ -93,8 +93,17 @@ export function GearSlotTiles({
       .replace("{total}", String(total))
   }
 
-  function gearSetLabel(piece: GearPiece) {
-    if (!piece.set) return <span className={styles.noSet}>{t("gear.slotTiles.noSet")}</span>
+  function gearSetLabel(piece: GearPiece, slot: GearSlot) {
+    if (!piece.set) {
+      const slotHasExpectedSet = slotSetFor(inputs, slot)
+      const className = slotHasExpectedSet ? styles.noSetWarning : styles.noSet
+      return (
+        <span className={className}>
+          {slotHasExpectedSet ? "⚠️ " : ""}
+          {t("gear.slotTiles.noSet")}
+        </span>
+      )
+    }
     return t(setKey(piece.set), SET_BY_ID[piece.set]?.name ?? piece.set)
   }
 
@@ -142,7 +151,7 @@ export function GearSlotTiles({
           {piece ? (
             <>
               {levelText(piece.level)}
-              {isWeaponSlot(slot) && <> · {gearSetLabel(piece)}</>}
+              {isWeaponSlot(slot) && <> · {gearSetLabel(piece, slot)}</>}
             </>
           ) : (
             t("gear.slotTiles.empty")

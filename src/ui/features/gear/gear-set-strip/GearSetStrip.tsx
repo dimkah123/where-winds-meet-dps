@@ -1,5 +1,6 @@
 import { Fragment } from "react"
 import type { GearLevel, Inputs } from "../../../../engine/types"
+import { WEAPON_SLOTS } from "../../../../engine/types"
 import { resolveActiveSets, setTierLevel } from "../../../../engine/setBonuses"
 import {
   equippedSetBearingPieces,
@@ -35,6 +36,13 @@ export function GearSetStrip({ inputs }: Props) {
   const activeBow = activeSets.bow
   const bowDefinition = activeBow ? BOW_SET_DEFS[activeBow.set] : null
 
+  const equippedWeapons = WEAPON_SLOTS.map((slot) => {
+    const id = inputs.equipped[slot]
+    return id ? inputs.inventory.find((piece) => piece.id === id) : null
+  }).filter((piece): piece is NonNullable<typeof piece> => !!piece)
+
+  const weaponsWithoutSet = equippedWeapons.filter((piece) => !piece.set)
+
   return (
     <div className={styles.setStrip}>
       <div className={styles.group}>
@@ -48,6 +56,7 @@ export function GearSetStrip({ inputs }: Props) {
             (bonus ? setTierLevel(levels, 1, Object.keys(bonus.value).map(Number)) : null)
           const bonusValue =
             bonus && tierLevel !== null ? bonus.value[tierLevel as GearLevel] : undefined
+          const isIncomplete = count > 0 && count < FOUR_PIECE_SIZE && count !== TWO_PIECE_SIZE
           return (
             <Fragment key={definition.id}>
               {index > 0 && <span className={styles.separator} />}
@@ -64,9 +73,25 @@ export function GearSetStrip({ inputs }: Props) {
               <span className={styles.tierChip + (count >= FOUR_PIECE_SIZE ? ` ${styles.on}` : "")}>
                 {t("common.fourPiece")}
               </span>
+              {isIncomplete && (
+                <span
+                  className={styles.warningChip}
+                  title={t("gear.setWarningIncomplete").replace("{count}", `${count}/${FOUR_PIECE_SIZE}`)}
+                >
+                  ⚠️ {t("gear.setWarningIncomplete").replace("{count}", `${count}/${FOUR_PIECE_SIZE}`)}
+                </span>
+              )}
             </Fragment>
           )
         })}
+        {weaponsWithoutSet.length > 0 && equippedSets.length > 0 && (
+          <span
+            className={styles.warningChip}
+            title={t("gear.setWarningNoSet").replace("{count}", String(weaponsWithoutSet.length))}
+          >
+            ⚠️ {t("gear.setWarningNoSet").replace("{count}", String(weaponsWithoutSet.length))}
+          </span>
+        )}
       </div>
       <span className={styles.separator} />
       <div className={styles.group}>

@@ -6,7 +6,9 @@ import {
   setPieceCount,
   setPieceCountWith,
   setTierLevel,
+  slotSetFor,
 } from "../../src/engine/setBonuses"
+import { getGearSetAlerts } from "../../src/ui/features/alerts/alertKeys"
 import {
   GEAR_LEVELS,
   WEAPON_SLOTS,
@@ -213,5 +215,53 @@ describe("bow set", () => {
       inputs.critRate + BOW_SET_DEFS.crit.value[96]!,
       10,
     )
+  })
+})
+
+describe("slotSetFor and getGearSetAlerts", () => {
+  it("resolves the slot's set or falls back to dominant equipped set", () => {
+    const inputs = inputsWith([
+      { set: SET_ID.cleftpeak, level: 100 }, // leftWeapon
+      { set: SET_ID.cleftpeak, level: 100 }, // rightWeapon
+      { level: 100 }, // disc (no set)
+      { set: SET_ID.cleftpeak, level: 100 }, // pendant
+    ])
+
+    // leftWeapon has cleftpeak
+    expect(slotSetFor(inputs, "leftWeapon")).toBe(SET_ID.cleftpeak)
+    // disc has no set, but 3 other weapon slots have cleftpeak -> falls back to cleftpeak
+    expect(slotSetFor(inputs, "disc")).toBe(SET_ID.cleftpeak)
+    // armor slots return undefined
+    expect(slotSetFor(inputs, "armor")).toBeUndefined()
+  })
+
+  it("detects no-set pieces and incomplete sets via getGearSetAlerts", () => {
+    const inputs = inputsWith([
+      { set: SET_ID.cleftpeak, level: 100 }, // leftWeapon
+      { set: SET_ID.cleftpeak, level: 100 }, // rightWeapon
+      { level: 100 }, // disc (no set)
+      { set: SET_ID.cleftpeak, level: 100 }, // pendant
+    ])
+
+    const alerts = getGearSetAlerts(inputs)
+    // Expect warning for disc having no set
+    expect(alerts.some((a) => a.kind === "noSet" && a.slot === "disc")).toBe(true)
+    // Expect warning for cleftpeak being incomplete (3/4)
+    expect(
+      alerts.some(
+        (a) => a.kind === "incomplete" && a.setName === SET_ID.cleftpeak && a.count === 3,
+      ),
+    ).toBe(true)
+  })
+
+  it("produces no alerts when all 4 weapon pieces share a full set", () => {
+    const inputs = inputsWith([
+      { set: SET_ID.cleftpeak, level: 100 },
+      { set: SET_ID.cleftpeak, level: 100 },
+      { set: SET_ID.cleftpeak, level: 100 },
+      { set: SET_ID.cleftpeak, level: 100 },
+    ])
+
+    expect(getGearSetAlerts(inputs)).toEqual([])
   })
 })

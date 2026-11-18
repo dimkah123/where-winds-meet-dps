@@ -11,6 +11,7 @@ import type {
 } from "../../../../engine/types"
 import { BOW_SLOTS, GEAR_SLOTS, isWeaponSlot } from "../../../../engine/types"
 import { gearLevelForBreakthrough } from "../../../../definitions/baseStats/breakthroughs"
+import { slotSetFor } from "../../../../engine/setBonuses"
 import { withSetChoice } from "../../../../engine/setChoice"
 import { useI18n } from "../../../../i18n/i18nContext"
 import { useConfirm } from "../../../components/confirm-dialog/confirmContext"
@@ -173,12 +174,19 @@ export function GearTab({
     setNewPieceOpen(false)
     setSelectedBowSlot(null)
     setSelectedSlot(piece.slot)
+    let pieceToSave = piece
+    if (isWeaponSlot(piece.slot)) {
+      const slotSet = slotSetFor(inputs, piece.slot)
+      if (slotSet && !piece.set) {
+        pieceToSave = { ...piece, set: slotSet }
+      }
+    }
     if (mode === "equip") {
-      commitGearChange([...inventory, piece], { ...equipped, [piece.slot]: piece.id })
-      setSelectedPieceId(piece.id)
+      commitGearChange([...inventory, pieceToSave], { ...equipped, [pieceToSave.slot]: pieceToSave.id })
+      setSelectedPieceId(pieceToSave.id)
       return
     }
-    onChange({ ...inputs, inventory: [...inventory, { ...piece, isNew: true }] })
+    onChange({ ...inputs, inventory: [...inventory, { ...pieceToSave, isNew: true }] })
   }
 
   async function deletePiece(): Promise<void> {
@@ -195,7 +203,17 @@ export function GearTab({
 
   function equipSelected(): void {
     if (!selectedPiece) return
-    commitGearChange(inventory, { ...equipped, [selectedPiece.slot]: selectedPiece.id })
+    const slot = selectedPiece.slot
+    let nextInventory = inventory
+    let pieceToEquip = selectedPiece
+    if (isWeaponSlot(slot)) {
+      const slotSet = slotSetFor(inputs, slot)
+      if (slotSet && selectedPiece.set !== slotSet) {
+        pieceToEquip = { ...selectedPiece, set: slotSet }
+        nextInventory = inventory.map((piece) => (piece.id === pieceToEquip.id ? pieceToEquip : piece))
+      }
+    }
+    commitGearChange(nextInventory, { ...equipped, [slot]: pieceToEquip.id })
   }
 
   function unequipSelected(): void {

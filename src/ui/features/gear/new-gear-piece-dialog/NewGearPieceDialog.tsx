@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react"
 import type { GearLevel, GearPiece, GearRarity, GearSlot, Inputs } from "../../../../engine/types"
 import { emptyGearWords } from "../../../../engine/types"
 import { gearBaseStatsFor } from "../../../../data/stats/gearBaseStats"
+import { slotSetFor } from "../../../../engine/setBonuses"
 import { newGearPieceId } from "../../../../storage"
 import { heirloomMatch, type HeirloomProfile } from "../../../../engine/heirloom"
 import { graduationBuildKey } from "../../../../i18n/contentKeys"
@@ -25,15 +26,17 @@ interface Props {
   onSave(piece: GearPiece, mode: "store" | "equip"): void
 }
 
-function makeDraft(slot: GearSlot): GearPiece {
+function makeDraft(slot: GearSlot, inputs?: Inputs): GearPiece {
   const level: GearLevel = 96
   const rarity: GearRarity = "legendary"
   const base = gearBaseStatsFor({ slot, level, rarity })
+  const set = inputs ? slotSetFor(inputs, slot) : undefined
   return {
     id: newGearPieceId(),
     slot,
     level,
     rarity,
+    ...(set ? { set } : {}),
     minPhys: base.minPhys,
     maxPhys: base.maxPhys,
     hp: base.hp,
@@ -57,12 +60,16 @@ function imageFileFromClipboard(items: DataTransferItemList | null): File | null
 export function NewGearPieceDialog({ initialSlot, inputs, profile, onCancel, onSave }: Props) {
   const { t } = useI18n()
   const titleId = useId()
-  const [draft, setDraft] = useState<GearPiece>(() => makeDraft(initialSlot))
+  const [draft, setDraft] = useState<GearPiece>(() => makeDraft(initialSlot, inputs))
   const [clearedMarks, setClearedMarks] = useState<ScanMarkField[]>([])
   const equipButtonRef = useRef<HTMLButtonElement | null>(null)
 
   const screenshot = useScreenshotImport(inputs, draft.slot, (piece) => {
-    setDraft(piece)
+    const defaultSet = slotSetFor(inputs, draft.slot)
+    setDraft({
+      ...piece,
+      set: piece.set ?? draft.set ?? defaultSet,
+    })
     setClearedMarks([])
   })
   const importImageRef = useRef(screenshot.importImage)

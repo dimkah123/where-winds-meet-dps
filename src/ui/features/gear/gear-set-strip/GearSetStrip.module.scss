@@ -58,3 +58,17 @@
 .dim {
   color: var(--color-text-muted);
 }
+
+.warningChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  background: rgba(220, 53, 69, 0.15);
+  border: 1px solid var(--color-negative);
+  border-radius: 3px;
+  color: #ff6b6b;
+  font-weight: 600;
+  font-size: 0.9em;
+  white-space: nowrap;
+}

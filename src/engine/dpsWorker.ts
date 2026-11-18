@@ -32,7 +32,8 @@ import { ftDpsWhenEquipped, ftDpsWithSlotEmpty, type FullPotentialDps } from "./
 import { withCustomContent } from "./customContent"
 import { withDerivedStats } from "./derivedInputs"
 import { defaultArsenalForClass, swapArsenal } from "./panel"
-import { applySetBonuses } from "./setBonuses"
+import { applySetBonuses, slotSetFor } from "./setBonuses"
+import { isWeaponSlot } from "./types"
 import { NO_SET_CHOICE, withSetChoice, type SetChoiceTarget } from "./setChoice"
 import { GEAR_SET_DEFS } from "../definitions/sets/registry"
 import { BOW_SET_DEFS } from "../data/sets/bowSets"
@@ -152,8 +153,15 @@ function computeDpsDeltas(req: DpsWorkerRequest): DpsWorkerResponse {
   }
 
   for (const id of pieceIds) {
-    const candidate = byId.get(id)
+    let candidate = byId.get(id)
     if (!candidate) continue
+
+    if (isWeaponSlot(candidate.slot)) {
+      const slotSet = slotSetFor(inputs, candidate.slot)
+      if (slotSet && candidate.set !== slotSet) {
+        candidate = { ...candidate, set: slotSet }
+      }
+    }
 
     const equippedId = inputs.equipped[candidate.slot]
     const equipped = equippedId ? (byId.get(equippedId) ?? null) : null

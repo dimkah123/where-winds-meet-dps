@@ -5,7 +5,7 @@ import { GEAR_SET_DEFS, SET_BY_ID } from "../definitions/sets/registry"
 import { BOW_SET_DEFS } from "../data/sets/bowSets"
 import { applyStatOverrides } from "./derivedInputs"
 
-export { setPieceCount, setPieceCountWith } from "./setPieces"
+export { setPieceCount, setPieceCountWith, slotSetFor } from "./setPieces"
 
 export interface ActiveSets {
   twoPiece: readonly { setId: string; level: GearLevel }[]

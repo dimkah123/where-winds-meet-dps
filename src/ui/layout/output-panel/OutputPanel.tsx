@@ -1,6 +1,10 @@
 import type { ReactNode } from "react"
-import type { Result } from "../../../engine/types"
+import type { Inputs, Result } from "../../../engine/types"
 import { useI18n } from "../../../i18n/i18nContext"
+import { getGearSetAlerts } from "../../features/alerts/alertKeys"
+import { gearSlotLabelKey } from "../../features/gear/shared/gearSlotKeys"
+import { setKey } from "../../../i18n/contentKeys"
+import { SET_BY_ID } from "../../../definitions/sets/registry"
 import { groupByBreakdownName } from "../../utils/skillBreakdown"
 import { formatCompactDamage, formatNumber } from "../../utils/numberFormatting"
 import { GraduationFire } from "./graduation-fire/GraduationFire"
@@ -145,12 +149,29 @@ const QI_EDGE_WARNING_KEYS = {
   },
 }
 
-export function WarningLines({ result }: { result: Result }) {
+export function WarningLines({ result, inputs }: { result: Result; inputs?: Inputs }) {
   const { t } = useI18n()
+  const setAlerts = inputs ? getGearSetAlerts(inputs) : []
   return (
     <>
       {result.warnings.map((warning, index) => (
         <div key={index}>⚠ {warning}</div>
+      ))}
+      {setAlerts.map((a) => (
+        <div key={a.key}>
+          ⚠{" "}
+          {a.kind === "noSet"
+            ? t("alerts.gearSetNoSetToast").replace(
+                "{slot}",
+                a.slot ? t(gearSlotLabelKey(a.slot, inputs?.classId ?? "stonesplitStrength")) : "",
+              )
+            : t("alerts.gearSetIncompleteToast")
+                .replace(
+                  "{set}",
+                  a.setName ? t(setKey(a.setName), SET_BY_ID[a.setName]?.name ?? a.setName) : "",
+                )
+                .replace("{count}", `${a.count}/4`)}
+        </div>
       ))}
       {(result.qiEdgeWarnings ?? []).map((warning) => (
         <div key={`${warning.skillName}-${warning.edge}-${warning.edgeSec}`}>
