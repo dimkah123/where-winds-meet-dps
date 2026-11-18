@@ -1,11 +1,17 @@
 import { describe, expect, it } from "vitest"
-import { decodeSharedBuild, encodeSharedBuild, type SharedBuildPayload } from "../../src/engine/shareBuild"
+import {
+  compressBytes,
+  decodeSharedBuild,
+  encodeSharedBuild,
+  uint8ArrayToBase64Url,
+  type SharedBuildPayload,
+} from "../../src/engine/shareBuild"
 import { defaultInputs } from "../../src/engine/defaults"
 
 describe("shareBuild engine", () => {
-  it("encodes and decodes a shared build payload accurately", async () => {
+  it("encodes and decodes a shared build payload accurately with compact v2 format", async () => {
     const payload: SharedBuildPayload = {
-      v: 1,
+      v: 2,
       author: "Dimka",
       title: "Stonesplit 85k DPS",
       inputs: {
@@ -17,19 +23,45 @@ describe("shareBuild engine", () => {
 
     const encoded = await encodeSharedBuild(payload)
     expect(typeof encoded).toBe("string")
-    expect(encoded.length).toBeGreaterThan(10)
+    // Extremely compact: default build is around ~200-300 characters
+    expect(encoded.length).toBeLessThan(400)
 
     const decoded = await decodeSharedBuild(encoded)
-    expect(decoded.v).toBe(1)
+    expect(decoded.v).toBe(2)
     expect(decoded.author).toBe("Dimka")
     expect(decoded.title).toBe("Stonesplit 85k DPS")
     expect(decoded.inputs.classId).toBe("stonesplitStrength")
     expect(decoded.inputs.breakthrough).toBe(18)
   })
 
+  it("decodes legacy v1 payloads for backward compatibility", async () => {
+    const legacyPayload = {
+      v: 1,
+      author: "LegacyAuthor",
+      title: "LegacyBuild",
+      inputs: {
+        ...defaultInputs,
+        classId: "stonesplitStrength",
+        breakthrough: 16,
+      },
+    }
+
+    const json = JSON.stringify(legacyPayload)
+    const rawBytes = new TextEncoder().encode(json)
+    const compressed = await compressBytes(rawBytes)
+    const encodedV1 = uint8ArrayToBase64Url(compressed)
+
+    const decoded = await decodeSharedBuild(encodedV1)
+    expect(decoded.v).toBe(1)
+    expect(decoded.author).toBe("LegacyAuthor")
+    expect(decoded.title).toBe("LegacyBuild")
+    expect(decoded.inputs.classId).toBe("stonesplitStrength")
+    expect(decoded.inputs.breakthrough).toBe(16)
+  })
+
   it("handles Cyrillic player names and build titles without corruption", async () => {
     const payload: SharedBuildPayload = {
-      v: 1,
+      v: 2,
       author: "Димка",
       title: "Сборка Расколотый пик (Мо + Хэн) 85к УВС",
       inputs: defaultInputs,
@@ -77,7 +109,7 @@ describe("shareBuild engine", () => {
     }
 
     const payload: SharedBuildPayload = {
-      v: 1,
+      v: 2,
       author: "HeavyTester",
       title: "Massive Inventory Build",
       inputs: heavyInputs,
@@ -92,8 +124,10 @@ describe("shareBuild engine", () => {
 
     const decoded = await decodeSharedBuild(encoded)
     expect(decoded.author).toBe("HeavyTester")
-    expect(decoded.inputs.equipped.helm).toBe("piece-0")
-    // Only equipped pieces are retained in shared inventory
+    // Only equipped pieces are retained in shared inventory and assigned generated IDs
     expect(decoded.inputs.inventory.length).toBe(1)
+    expect(decoded.inputs.equipped.helm).toBe(decoded.inputs.inventory[0].id)
+    expect(decoded.inputs.inventory[0].words[0].word).toBe("crit")
+    expect(decoded.inputs.inventory[0].words[4].retuned).toBe(true)
   })
 })

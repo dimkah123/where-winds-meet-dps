@@ -138,7 +138,7 @@ function AppInner() {
     if (!queryString) return
 
     const params = new URLSearchParams(queryString)
-    const data = params.get("data")
+    const data = params.get("d") || params.get("data")
     if (!data) return
 
     decodeSharedBuild(data)

@@ -1,12 +1,53 @@
-import type { Inputs } from "./types"
-import { withoutDerivedStats } from "./derivedInputs"
-import { hydrateInputs } from "../storage"
+import type { GearLevel, GearPiece, GearWordEntry, Inputs } from "./types"
+import { GEAR_SLOTS } from "./types"
+import { defaultInputs, emptyMindMethod } from "./defaults"
+import { hydrateInputs, newGearPieceId } from "../storage"
+import { GEAR_WORD_IDS } from "../data/stats/statLines"
+import { ATTUNEMENT_OPTIONS } from "./attunements"
+import { gearBaseStatsFor } from "../data/stats/gearBaseStats"
 
 export interface SharedBuildPayload {
   v: number
   author: string
   title: string
   inputs: Inputs
+}
+
+interface CompactWordEntry {
+  0: number | string // wordIndex or wordId
+  1: number // value
+  2?: 1 // retuned
+}
+
+interface CompactGearPiece {
+  l: number // level
+  s?: string // set (if set)
+  r?: 1 // relayed (1 if true)
+  w: CompactWordEntry[]
+  a?: number | string // attunement index or id
+  av?: number // attunement value
+}
+
+interface CompactBuildV2 {
+  v: 2
+  a?: string // author
+  t?: string // title
+  c: string // classId
+  b: number // breakthrough
+  r?: string // rotation
+  d?: string // divinecraft
+  dr?: string // divinecraftRefinement
+  f?: string // food
+  hpf?: string // hpFood
+  bg?: { b?: [string, number]; t?: [string, number] } // bowGear: bow, thumbRing
+  mm?: [string, string][] // mindMethods
+  dm?: 1 // dummyMode
+  uqb?: 0 // useGraduationQiBreak (0 if false)
+  sh5?: 1 // shareDebuff5HenZhi
+  she?: 1 // shareEasyHurt
+  g: Record<number, CompactGearPiece> // slotIndex -> piece
+  st?: Record<string, number> // statOverrides
+  cr?: any // activeCustomRotation
 }
 
 export function uint8ArrayToBase64Url(bytes: Uint8Array): string {
@@ -92,23 +133,217 @@ export async function decompressBytes(bytes: Uint8Array): Promise<Uint8Array> {
   return result
 }
 
-export async function encodeSharedBuild(payload: SharedBuildPayload): Promise<string> {
-  // Only keep equipped gear pieces in inventory so payload stays super light and link doesn't bloat
-  const equippedIds = new Set(Object.values(payload.inputs.equipped || {}).filter(Boolean))
-  const inventory = (payload.inputs.inventory || []).filter((p) => equippedIds.has(p.id))
+function encodeToCompactV2(payload: SharedBuildPayload): CompactBuildV2 {
+  const { author, title, inputs } = payload
+  const inventoryById = new Map((inputs.inventory || []).map((p) => [p.id, p]))
 
-  const compactInputs: Inputs = {
-    ...withoutDerivedStats(payload.inputs),
+  const g: Record<number, CompactGearPiece> = {}
+  GEAR_SLOTS.forEach((slot, slotIdx) => {
+    const id = inputs.equipped?.[slot]
+    if (!id) return
+    const piece = inventoryById.get(id)
+    if (!piece) return
+
+    const w: CompactWordEntry[] = (piece.words || []).map((wordEntry) => {
+      const wordIdx = (GEAR_WORD_IDS as readonly string[]).indexOf(wordEntry.word)
+      const res: CompactWordEntry = [
+        wordIdx >= 0 ? wordIdx : wordEntry.word,
+        wordEntry.value,
+      ]
+      if (wordEntry.retuned) res[2] = 1
+      return res
+    })
+
+    const attunementIdx = piece.attunement
+      ? ATTUNEMENT_OPTIONS.findIndex((opt) => opt.id === piece.attunement)
+      : -1
+
+    const compactPiece: CompactGearPiece = {
+      l: piece.level,
+      w,
+    }
+    if (piece.set) compactPiece.s = piece.set
+    if (piece.relayed) compactPiece.r = 1
+    if (piece.attunement) {
+      compactPiece.a = attunementIdx >= 0 ? attunementIdx : piece.attunement
+      compactPiece.av = piece.attunementValue
+    }
+    g[slotIdx] = compactPiece
+  })
+
+  const v2: CompactBuildV2 = {
+    v: 2,
+    c: inputs.classId,
+    b: inputs.breakthrough,
+    g,
+  }
+
+  if (author.trim()) v2.a = author.trim()
+  if (title.trim()) v2.t = title.trim()
+  if (inputs.rotation) v2.r = inputs.rotation
+  if (inputs.divinecraft) v2.d = inputs.divinecraft
+  if (inputs.divinecraftRefinement) v2.dr = inputs.divinecraftRefinement
+  if (inputs.food) v2.f = inputs.food
+  if (inputs.hpFood) v2.hpf = inputs.hpFood
+  if (inputs.dummyMode) v2.dm = 1
+  if (inputs.useGraduationQiBreak === false) v2.uqb = 0
+  if (inputs.shareDebuff5HenZhi) v2.sh5 = 1
+  if (inputs.shareEasyHurt) v2.she = 1
+
+  if (inputs.bowGear) {
+    const bg: NonNullable<CompactBuildV2["bg"]> = {}
+    if (inputs.bowGear.bow?.set) {
+      bg.b = [inputs.bowGear.bow.set, inputs.bowGear.bow.level]
+    }
+    if (inputs.bowGear.thumbRing?.set) {
+      bg.t = [inputs.bowGear.thumbRing.set, inputs.bowGear.thumbRing.level]
+    }
+    if (bg.b || bg.t) {
+      v2.bg = bg
+    }
+  }
+
+  const mm = (inputs.mindMethods || [])
+    .filter((m) => m && m.name)
+    .map((m) => [m.name, m.stacks] as [string, string])
+  if (mm.length > 0) v2.mm = mm
+
+  if (inputs.statOverrides && Object.keys(inputs.statOverrides).length > 0) {
+    v2.st = inputs.statOverrides
+  }
+  if (inputs.activeCustomRotation) {
+    v2.cr = inputs.activeCustomRotation
+  }
+
+  return v2
+}
+
+function decodeFromCompactV2(v2: CompactBuildV2): SharedBuildPayload {
+  const base = { ...defaultInputs, classId: v2.c, breakthrough: v2.b }
+  const inventory: GearPiece[] = []
+  const equipped = { ...base.equipped }
+
+  if (v2.g) {
+    for (const [slotIdxStr, cp] of Object.entries(v2.g)) {
+      const slotIdx = Number(slotIdxStr)
+      const slot = GEAR_SLOTS[slotIdx]
+      if (!slot) continue
+
+      const id = newGearPieceId()
+      const level = (cp.l || 100) as GearLevel
+      const rarity = "legendary"
+      const baseStats = gearBaseStatsFor({ slot, level, rarity })
+
+      const words: [GearWordEntry, GearWordEntry, GearWordEntry, GearWordEntry, GearWordEntry] = [
+        { word: "", value: 0, retuned: false },
+        { word: "", value: 0, retuned: false },
+        { word: "", value: 0, retuned: false },
+        { word: "", value: 0, retuned: false },
+        { word: "", value: 0, retuned: false },
+      ]
+
+      if (Array.isArray(cp.w)) {
+        cp.w.forEach((cw, idx) => {
+          if (idx < 5 && cw) {
+            const wordId =
+              typeof cw[0] === "number" ? GEAR_WORD_IDS[cw[0]] || "" : String(cw[0])
+            words[idx] = {
+              word: (wordId as any) || "",
+              value: cw[1] || 0,
+              retuned: cw[2] === 1,
+            }
+          }
+        })
+      }
+
+      let attunement = ""
+      if (cp.a !== undefined) {
+        attunement =
+          typeof cp.a === "number" ? ATTUNEMENT_OPTIONS[cp.a]?.id || "" : String(cp.a)
+      }
+
+      const piece: GearPiece = {
+        id,
+        slot,
+        level,
+        rarity,
+        minPhys: baseStats.minPhys,
+        maxPhys: baseStats.maxPhys,
+        hp: baseStats.hp,
+        physDef: baseStats.physDef,
+        words,
+        attunement,
+        attunementValue: cp.av || 0,
+        relayed: cp.r === 1,
+        set: cp.s,
+      }
+
+      inventory.push(piece)
+      equipped[slot] = id
+    }
+  }
+
+  const mindMethods: Inputs["mindMethods"] = [
+    { ...emptyMindMethod },
+    { ...emptyMindMethod },
+    { ...emptyMindMethod },
+    { ...emptyMindMethod },
+  ]
+  if (Array.isArray(v2.mm)) {
+    v2.mm.forEach((m, idx) => {
+      if (idx < 4 && m) {
+        mindMethods[idx] = { name: m[0] || "", stacks: m[1] || "" }
+      }
+    })
+  }
+
+  const inputs: Inputs = hydrateInputs({
+    ...base,
     inventory,
-  }
+    equipped,
+    rotation: v2.r ?? base.rotation,
+    divinecraft: v2.d ? (v2.d as any) : base.divinecraft,
+    divinecraftRefinement: v2.dr ? (v2.dr as any) : base.divinecraftRefinement,
+    food: v2.f ? (v2.f as any) : base.food,
+    hpFood: v2.hpf ? (v2.hpf as any) : base.hpFood,
+    dummyMode: v2.dm === 1,
+    useGraduationQiBreak: v2.uqb !== 0,
+    shareDebuff5HenZhi: v2.sh5 === 1,
+    shareEasyHurt: v2.she === 1,
+    bowGear: v2.bg
+      ? {
+          bow: v2.bg.b
+            ? {
+                set: v2.bg.b[0] as any,
+                level: (v2.bg.b[1] as any) || 100,
+                rarity: "legendary" as const,
+              }
+            : null,
+          thumbRing: v2.bg.t
+            ? {
+                set: v2.bg.t[0] as any,
+                level: (v2.bg.t[1] as any) || 100,
+                rarity: "legendary" as const,
+              }
+            : null,
+        }
+      : base.bowGear,
+    mindMethods,
+    statOverrides: v2.st,
+    activeCustomRotation: v2.cr,
+  })
 
-  const compactPayload = {
-    v: payload.v,
-    author: payload.author || "",
-    title: payload.title || "",
-    inputs: compactInputs,
+  return {
+    v: 2,
+    author: v2.a || "",
+    title: v2.t || "",
+    inputs,
   }
-  const json = JSON.stringify(compactPayload)
+}
+
+export async function encodeSharedBuild(payload: SharedBuildPayload): Promise<string> {
+  const compactV2 = encodeToCompactV2(payload)
+  const json = JSON.stringify(compactV2)
   const rawBytes = new TextEncoder().encode(json)
   const compressed = await compressBytes(rawBytes)
   return uint8ArrayToBase64Url(compressed)
@@ -118,13 +353,19 @@ export async function decodeSharedBuild(encoded: string): Promise<SharedBuildPay
   const bytes = base64UrlToUint8Array(encoded.trim())
   const decompressed = await decompressBytes(bytes)
   const json = new TextDecoder().decode(decompressed)
-  const parsed = JSON.parse(json) as {
-    v?: number
-    author?: string
-    title?: string
-    inputs?: unknown
+  const parsed = JSON.parse(json) as any
+
+  if (!parsed || typeof parsed !== "object") {
+    throw new Error("Invalid shared build payload")
   }
-  if (!parsed || typeof parsed !== "object" || !parsed.inputs) {
+
+  // Compact v2 format (uses short IDs)
+  if (parsed.v === 2 || (parsed.c && parsed.g)) {
+    return decodeFromCompactV2(parsed as CompactBuildV2)
+  }
+
+  // Legacy v1 format fallback
+  if (!parsed.inputs) {
     throw new Error("Invalid shared build payload")
   }
   const inputs = hydrateInputs(parsed.inputs as unknown as Inputs)

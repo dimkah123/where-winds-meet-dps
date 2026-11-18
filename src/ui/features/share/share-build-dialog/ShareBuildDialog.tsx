@@ -92,7 +92,7 @@ export function ShareBuildDialog({
   // Build URL string
   const currentOrigin =
     typeof window !== "undefined" ? window.location.origin + window.location.pathname : ""
-  const shareUrl = `${currentOrigin}#/build?author=${encodeURIComponent(author.trim())}&title=${encodeURIComponent(title.trim())}&data=${encodedData}`
+  const shareUrl = `${currentOrigin}#/build?d=${encodedData}`
 
   // Render canvas card
   useEffect(() => {
