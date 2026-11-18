@@ -17,10 +17,6 @@ export const details: ChangelogEntryDetails = {
           text: "Added dedicated Gear Set Warnings section in the Alerts tab and corner toast notifications with one-click navigation to the Gear tab.",
           authors: ["dimkah123"],
         },
-        {
-          text: "Drafting new gear and OCR screenshot importing now automatically inherit the active set of the chosen slot.",
-          authors: ["dimkah123"],
-        },
       ],
     },
     {
