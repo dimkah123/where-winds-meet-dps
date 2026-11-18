@@ -194,7 +194,7 @@ function AppInner() {
     const newProf: StoredProfile = {
       id: newId,
       name,
-      inputs: sharedBannerInfo.inputs,
+      inputs: activeDraft,
     }
     const nextProfiles = [...committed.profiles, newProf]
     const nextState: ProfilesState = {
@@ -202,8 +202,8 @@ function AppInner() {
       activeId: newId,
     }
     persist(nextState)
-    resetActiveDraft(sharedBannerInfo.inputs)
-    setLastSavedJson(JSON.stringify(sharedBannerInfo.inputs))
+    resetActiveDraft(activeDraft)
+    setLastSavedJson(JSON.stringify(activeDraft))
     setSharedBannerInfo(null)
   }
 
@@ -281,6 +281,7 @@ function AppInner() {
   }
 
   function handleSave() {
+    if (sharedBannerInfo) return
     const next: ProfilesState = {
       ...committed,
       profiles: committed.profiles.map((profile) =>
@@ -301,11 +302,12 @@ function AppInner() {
     resetActiveDraft(restored)
     setLastSavedJson(JSON.stringify(restored))
     setSavedAt(null)
+    setSharedBannerInfo(null)
   }
 
   async function selectProfile(id: string) {
     if (isSimulationRunning) return
-    if (id === committed.activeId) return
+    if (id === committed.activeId && !sharedBannerInfo) return
     if (isDirty && !(await confirm(t("app.youHaveUnsavedChangesSwitch")))) return
     const target = committed.profiles.find((profile) => profile.id === id)
     if (!target) return
@@ -314,6 +316,7 @@ function AppInner() {
     resetActiveDraft(target.inputs)
     setLastSavedJson(JSON.stringify(target.inputs))
     setSavedAt(null)
+    setSharedBannerInfo(null)
   }
 
   async function createProfile() {
@@ -624,12 +627,30 @@ function AppInner() {
                 ↷
               </button>
             </div>
+            {sharedBannerInfo && (
+              <button
+                type="button"
+                className="btn primary"
+                onClick={handleSaveSharedToProfiles}
+                title={t("share.bannerSaveToProfiles", "Сохранить в мои профили")}
+              >
+                📥 {t("share.saveAsNewProfile", "Сохранить отдельно")}
+              </button>
+            )}
             <button
               type="button"
-              className={"save-btn" + (isDirty ? " dirty" : "")}
+              className={"save-btn" + (isDirty && !sharedBannerInfo ? " dirty" : "")}
               onClick={handleSave}
-              disabled={!isDirty}
+              disabled={!isDirty || !!sharedBannerInfo}
               aria-label={t("common.save")}
+              title={
+                sharedBannerInfo
+                  ? t(
+                      "app.saveDisabledSharedBuild",
+                      "Нельзя перезаписать свой профиль чужим билдом. Сохраните его отдельным профилем с помощью кнопки «Сохранить отдельно».",
+                    )
+                  : undefined
+              }
             >
               {saveLabel}
             </button>
