@@ -5,11 +5,11 @@ import { drawBuildCard, type BuildCardLabels } from "../build-showcase/drawBuild
 import { encodeSharedBuild } from "../../../../engine/shareBuild"
 import type { Inputs, Result } from "../../../../engine/types"
 import { useI18n } from "../../../../i18n/i18nContext"
-import { classKey, setKey } from "../../../../i18n/contentKeys"
+import { attunementKey, classKey, innerWayKey, setKey } from "../../../../i18n/contentKeys"
 import { classDefinition } from "../../../../definitions/classes/registry"
-import { withDerivedStats } from "../../../../engine/derivedInputs"
-import { applySetBonuses, resolveActiveSets } from "../../../../engine/setBonuses"
-import { effectiveRates } from "../../../../engine/panel"
+import { equippedPiecesFor, withDerivedStats } from "../../../../engine/derivedInputs"
+import { applySetBonuses, resolveActiveSets, setPhysDefBonus } from "../../../../engine/setBonuses"
+import { effectiveRates, getSchool } from "../../../../engine/panel"
 import { finalHitOutcomeRates } from "../../../components/stats-overview-panel/finalHitOutcomeRates"
 import { activeRotationName } from "../../rotation/rotationOptions"
 import { SET_BY_ID } from "../../../../definitions/sets/registry"
@@ -17,6 +17,23 @@ import { BOW_SET_NAME_KEYS } from "../../gear/shared/buildSetKeys"
 import { BOW_SET_DEFS } from "../../../../data/sets/bowSets"
 import { formatSetBonusValue, setBonusStatKey } from "../../gear/shared/setBonusText"
 import { gearLevelForBreakthrough } from "../../../../definitions/baseStats/breakthroughs"
+import {
+  effectiveEnhancementLevels,
+  effectiveMaxHp,
+  enhancedSlotsOf,
+  totalMaxHp,
+  totalPhysDef,
+  totalPlayerAttributes,
+} from "../../../../definitions/baseStats"
+import { getAttunement } from "../../../../engine/attunements"
+import { SCRIPT_LABEL_KEYS } from "../../../../data/skills/buffs/scriptOptions"
+import { OPTION_LABEL_KEYS } from "../../overview/encounter-settings-dialog/encounterOptionText"
+import {
+  attackFoodOptionId,
+  divinecraftOptionId,
+  refinementOptionId,
+} from "../../../../engine/encounterOptions"
+import { innerWayName, slotInnerWayId } from "../../../../definitions/innerWays/registry"
 import { readPath } from "../../../utils/statFormatting"
 import styles from "./ShareBuildDialog.module.scss"
 
@@ -129,6 +146,106 @@ export function ShareBuildDialog({
         ? `${formatSetBonusValue(bowDef.stat, bowDef.value[activeBow.level] ?? 0)} ${t(setBonusStatKey(bowDef.stat))}`
         : null
 
+    const school = getSchool(inputs.classId)
+    const primaryAttrKey = school.primaryAttribute.toLowerCase()
+    const primaryAttributeName = t(`share.card.attrName.${school.primaryAttribute}`, school.primaryAttribute)
+    const primaryAttributeMin = readPath(withSets, `${primaryAttrKey}.min`)
+    const primaryAttributeMax = readPath(withSets, `${primaryAttrKey}.max`)
+    const primaryAttributePenetration = readPath(withSets, `${primaryAttrKey}.penetration`)
+    const physPenetration = readPath(withSets, "phys.penetration")
+
+    const equippedPieces = equippedPiecesFor(inputs)
+    const enhancedSlots = enhancedSlotsOf(inputs)
+    const enhancements = effectiveEnhancementLevels(inputs.enhancements, inputs.breakthrough)
+    const baseAttrs = totalPlayerAttributes(
+      inputs.breakthrough,
+      equippedPieces,
+      inputs.disabledTalentNodes,
+    )
+    const power = inputs.statOverrides?.power ?? baseAttrs.power
+    const agility = inputs.statOverrides?.agility ?? baseAttrs.agility
+    const physDefense =
+      inputs.statOverrides?.physDef ??
+      totalPhysDef(
+        inputs.breakthrough,
+        equippedPieces,
+        inputs.disabledTalentNodes,
+        enhancements,
+        inputs.unclaimedOddityNodes,
+        setPhysDefBonus(inputs),
+        enhancedSlots,
+      )
+    const effHp = effectiveMaxHp(
+      inputs.breakthrough,
+      equippedPieces,
+      inputs.disabledTalentNodes,
+      enhancements,
+      inputs.unclaimedOddityNodes,
+      inputs.arsenalScores,
+      enhancedSlots,
+    )
+    const baseHp = totalMaxHp(
+      inputs.breakthrough,
+      equippedPieces,
+      inputs.disabledTalentNodes,
+      enhancements,
+      inputs.unclaimedOddityNodes,
+      inputs.arsenalScores,
+      enhancedSlots,
+    )
+    const maxHp = Math.round(inputs.statOverrides?.maxHp ?? effHp ?? baseHp)
+
+    const allMartialBoost = readPath(withSets, "allMartialBoost")
+    const attributeDamageBoost = readPath(withSets, "attributeDamageBoost")
+    const bossBoost = readPath(withSets, "bossBoost")
+
+    let topClassBoost: { label: string; value: number } | undefined
+    let maxClassVal = 0
+    for (const attId of school.classSpecificAttunements) {
+      const val = withSets.classSpecificAttunement[attId] ?? 0
+      if (val > maxClassVal) {
+        maxClassVal = val
+        const option = getAttunement(attId)
+        topClassBoost = {
+          label: option ? t(attunementKey(option.id), option.label) : attId,
+          value: val,
+        }
+      }
+    }
+
+    const encounter = inputs.combatSettings
+    const scriptName =
+      encounter?.script && SCRIPT_LABEL_KEYS[encounter.script]
+        ? t(SCRIPT_LABEL_KEYS[encounter.script])
+        : null
+
+    let divinecraftName: string | null = null
+    if (inputs.divinecraft) {
+      const dcKey = OPTION_LABEL_KEYS[divinecraftOptionId(inputs.divinecraft)]
+      const refKey = inputs.divinecraftRefinement
+        ? OPTION_LABEL_KEYS[refinementOptionId(inputs.divinecraftRefinement)]
+        : null
+      const baseDc = dcKey ? t(dcKey) : ""
+      const ref = refKey ? ` (${t(refKey)})` : ""
+      divinecraftName = baseDc ? `${baseDc}${ref}` : null
+    }
+
+    let foodName: string | null = null
+    if (inputs.food) {
+      const foodKey = OPTION_LABEL_KEYS[attackFoodOptionId(inputs.food)]
+      if (foodKey) {
+        foodName = t(foodKey)
+      }
+    }
+
+    const innerWays: string[] = (inputs.mindMethods ?? [])
+      .map((slot) => {
+        const id = slotInnerWayId(slot)
+        if (!id) return ""
+        return t(innerWayKey(id), innerWayName(id))
+      })
+      .filter(Boolean)
+
     const labels: BuildCardLabels = {
       playerBuildPrefix: t("share.card.playerBuildPrefix", "Сборка игрока:"),
       defaultPlayer: t("share.defaultPlayerName", "Игрок"),
@@ -136,16 +253,37 @@ export function ShareBuildDialog({
       totalDamage: t("share.card.totalDamage", "Всего урона"),
       duration: t("share.card.duration", "Длительность"),
       rotation: t("share.card.rotation", "Ротация"),
-      characterStatsTitle: t("share.card.characterStatsTitle", "ХАРАКТЕРИСТИКИ ПЕРСОНАЖА"),
+
+      attackTitle: t("share.card.attackTitle", "АТАКА И ХАРАКТЕРИСТИКИ"),
+      ratesTitle: t("share.card.ratesTitle", "ТОЧНОСТЬ И УСИЛЕНИЯ УРОНА"),
+      gearTitle: t("share.card.gearTitle", "КОМПЛЕКТЫ И СТОЛКНОВЕНИЕ"),
+
       physAttackLabel: t("share.card.physAttackLabel", "Физ. атака (Мин – Макс)"),
-      critLabel: t("share.card.critLabel", "Крит. шанс / Крит. урон"),
-      precisionLabel: t("share.card.precisionLabel", "Точность"),
-      affinityLabel: t("share.card.affinityLabel", "Сокрушение"),
-      gearSetsTitle: t("share.card.gearSetsTitle", "КОМПЛЕКТЫ И СНАРЯЖЕНИЕ"),
+      physPenLabel: t("share.card.physPenLabel", "Физ. пробитие"),
+      attrAttackLabel: t("share.card.attrAttackLabel", "Атака: {attr}"),
+      attrPenLabel: t("share.card.attrPenLabel", "Пробитие: {attr}"),
+      agilityLabel: t("share.card.agilityLabel", "Ловкость (Agility)"),
+      powerLabel: t("share.card.powerLabel", "Сила (Power)"),
+      physDefenseLabel: t("share.card.physDefenseLabel", "Физ. защита"),
+      maxHpLabel: t("share.card.maxHpLabel", "Макс. здоровье (HP)"),
+
+      critLabel: t("share.card.critLabel", "Крит. шанс"),
+      critDmgLabel: t("share.card.critDmgLabel", "Крит. урон"),
+      precisionLabel: t("share.card.precisionLabel", "Точность (Precision)"),
+      affinityLabel: t("share.card.affinityLabel", "Сокрушение (Affinity)"),
+      allMartialArtsLabel: t("share.card.allMartialArtsLabel", "Все боевые искусства"),
+      attributeDmgLabel: t("share.card.attributeDmgLabel", "Урон атрибута"),
+      bossBoostLabel: t("share.card.bossBoostLabel", "Урон против боссов"),
+      classSkillBoostLabel: t("share.card.classSkillBoostLabel", "Навык класса"),
+
       armorSetLabel: t("share.card.armorSetLabel", "Комплект брони (4/4):"),
       bowSetLabel: t("share.card.bowSetLabel", "Комплект лука (2/2):"),
+      scriptLabel: t("share.card.scriptLabel", "Крафтовый свиток:"),
+      noScript: t("share.card.noScript", "Без свитка"),
+      encounterLabel: t("share.card.encounterLabel", "Ремесло и Еда:"),
+      innerWaysLabel: t("share.card.innerWaysLabel", "Внутренние пути (4/4):"),
       notEquipped: t("share.card.notEquipped", "Не надет"),
-      readyHint: t("share.card.readyHint", "Готово к проверке и тестированию в калькуляторе."),
+
       generated: t("share.card.generated", "Сгенерировано:"),
       locale,
     }
@@ -161,15 +299,37 @@ export function ShareBuildDialog({
         totalDamage: result.totalDamage,
         rotationDuration: result.rotationDuration,
         rotationName: activeRotationName(inputs) || "",
+
         minPhys: readPath(withSets, "phys.min"),
         maxPhys: readPath(withSets, "phys.max"),
+        physPenetration,
+        primaryAttributeName,
+        primaryAttributeMin,
+        primaryAttributeMax,
+        primaryAttributePenetration,
+
         critRate: finalRates.critRate,
         critDamageBoost: readPath(withSets, "critDamageBoost"),
         precisionRate: eff.precision,
         affinityRate: finalRates.affinityRate,
+
+        allMartialBoost,
+        attributeDamageBoost,
+        bossBoost,
+        topClassBoost,
+
+        agility,
+        power,
+        physDefense,
+        maxHp,
+
         armorSetName,
         bowSetName,
         bowSetBonus,
+        scriptName,
+        divinecraftName,
+        foodName,
+        innerWays,
       },
       labels,
     )
