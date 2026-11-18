@@ -2179,6 +2179,7 @@
   "gear.setDialog.subtitle": "Для {slot} · {level}. Значения для уровня этого предмета.",
   "gear.setDialog.unpaired": "без пары",
   "gear.setStrip.bowUnpaired": "Лук и Кольцо лучника отличаются — бонуса нет",
+  "gear.quickSelectBowSet": "Быстрый выбор комплекта лука",
   "gear.slot.armor": "Доспех",
   "gear.slot.bow": "Лук",
   "gear.slot.bracer": "Наручи",

@@ -3,6 +3,7 @@ import type {
   BowGear,
   BowGearLevel,
   BowPiece,
+  BowSet,
   BowSlot,
   EquippedSlots,
   GearPiece,
@@ -136,16 +137,40 @@ export function GearTab({
 
   function addBowPiece(slot: BowSlot): void {
     const gearLevel = gearLevelForBreakthrough(inputs.breakthrough)
+    const partnerSlot: BowSlot = slot === "bow" ? "thumbRing" : "bow"
+    const partnerSet = inputs.bowGear[partnerSlot]?.set ?? null
     updateBowPiece(slot, {
       level: Math.max(gearLevel, 91) as BowGearLevel,
       rarity: "legendary",
-      set: null,
+      set: partnerSet,
     })
   }
 
   async function deleteBowPiece(slot: BowSlot): Promise<void> {
     if (!(await confirm(t("gear.deleteThisGearPiece")))) return
     updateBowPiece(slot, null)
+  }
+
+  function handleUpdateBowSet(newSet: BowSet | null): void {
+    const gearLevel = gearLevelForBreakthrough(inputs.breakthrough)
+    const fallbackLevel = Math.max(gearLevel, 91) as BowGearLevel
+    const currentLevel = (inputs.bowGear.bow?.level ??
+      inputs.bowGear.thumbRing?.level ??
+      fallbackLevel) as BowGearLevel
+
+    const nextBowGear: BowGear = {
+      bow: inputs.bowGear.bow
+        ? { ...inputs.bowGear.bow, set: newSet }
+        : newSet !== null
+          ? { level: currentLevel, rarity: "legendary", set: newSet }
+          : null,
+      thumbRing: inputs.bowGear.thumbRing
+        ? { ...inputs.bowGear.thumbRing, set: newSet }
+        : newSet !== null
+          ? { level: currentLevel, rarity: "legendary", set: newSet }
+          : null,
+    }
+    onChange({ ...inputs, bowGear: nextBowGear })
   }
 
   let setDialogTarget: GearSetDialogTarget | null = null
@@ -158,7 +183,7 @@ export function GearTab({
   function applySetChoice(setId: string | null, applyToGroup: boolean): void {
     setSetDialogOpen(false)
     if (selectedBowSlot) {
-      onChange(withSetChoice(inputs, { kind: "bow", slot: selectedBowSlot }, false, setId))
+      onChange(withSetChoice(inputs, { kind: "bow", slot: selectedBowSlot }, applyToGroup, setId))
     } else if (selectedPiece) {
       onChange(
         withSetChoice(inputs, { kind: "piece", pieceId: selectedPiece.id }, applyToGroup, setId),
@@ -323,7 +348,7 @@ export function GearTab({
           dpsDeltas={equippedDeltas.deltas}
           dpsDeltasPending={equippedDeltas.isPending}
         />
-        <GearSetStrip inputs={inputs} />
+        <GearSetStrip inputs={inputs} onChangeBowSet={handleUpdateBowSet} />
       </div>
 
       <div className={styles.gearSplit}>

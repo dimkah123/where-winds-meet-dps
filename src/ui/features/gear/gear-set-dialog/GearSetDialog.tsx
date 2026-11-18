@@ -113,7 +113,8 @@ export function GearSetDialog({ inputs, target, onApply, onClose }: Props) {
   function countText(card: SetCard): { text: string; isHit: boolean } {
     if (target.kind === "bow") {
       const partnerSlot: BowSlot = target.slot === "bow" ? "thumbRing" : "bow"
-      const isMatch = inputs.bowGear[partnerSlot]?.set === card.id
+      const partnerSet = inputs.bowGear[partnerSlot]?.set
+      const isMatch = partnerSet === card.id || (partnerSet === null && card.id !== null)
       return {
         text: isMatch
           ? t("gear.setDialog.pairsWith").replace("{slot}", t(bowSlotLabelKey(partnerSlot)))
@@ -149,7 +150,9 @@ export function GearSetDialog({ inputs, target, onApply, onClose }: Props) {
     if (pendingSetId === null) return t("gear.setDialog.noSetOnPiece")
     if (target.kind === "bow") {
       const partnerSlot: BowSlot = target.slot === "bow" ? "thumbRing" : "bow"
-      const isPaired = inputs.bowGear[partnerSlot]?.set === pendingSetId
+      const partnerSet = inputs.bowGear[partnerSlot]?.set
+      const isPaired =
+        partnerSet === pendingSetId || (partnerSet === null && pendingSetId !== null)
       return `${isPaired ? BOW_SET_PIECES : 1}/${BOW_SET_PIECES} · ${
         isPaired ? t("gear.setDialog.reachPair") : t("gear.setDialog.reachNone")
       }`

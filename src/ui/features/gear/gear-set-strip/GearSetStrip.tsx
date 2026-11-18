@@ -1,5 +1,5 @@
-import { Fragment } from "react"
-import type { GearLevel, Inputs } from "../../../../engine/types"
+import { Fragment, useRef, useState } from "react"
+import type { BowGearLevel, BowSet, GearLevel, Inputs } from "../../../../engine/types"
 import { WEAPON_SLOTS } from "../../../../engine/types"
 import { resolveActiveSets, setTierLevel } from "../../../../engine/setBonuses"
 import {
@@ -13,14 +13,22 @@ import { setKey } from "../../../../i18n/contentKeys"
 import { useI18n } from "../../../../i18n/i18nContext"
 import { BOW_SET_NAME_KEYS } from "../shared/buildSetKeys"
 import { formatSetBonusValue, setBonusStatKey } from "../shared/setBonusText"
+import { DropdownList, DropdownOption } from "../../../components/dropdown-list/DropdownList"
 import styles from "./GearSetStrip.module.scss"
+
+const BOW_SET_OPTIONS: readonly Exclude<BowSet, null>[] = ["crit", "precision", "affinity"]
 
 interface Props {
   inputs: Inputs
+  onChangeBowSet?: (nextSet: BowSet | null) => void
 }
 
-export function GearSetStrip({ inputs }: Props) {
+export function GearSetStrip({ inputs, onChangeBowSet }: Props) {
   const { t } = useI18n()
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(0)
+  const triggerRef = useRef<HTMLButtonElement | null>(null)
+
   const activeSets = resolveActiveSets(inputs)
   const equippedPieces = equippedSetBearingPieces(inputs)
 
@@ -42,6 +50,73 @@ export function GearSetStrip({ inputs }: Props) {
   }).filter((piece): piece is NonNullable<typeof piece> => !!piece)
 
   const weaponsWithoutSet = equippedWeapons.filter((piece) => !piece.set)
+
+  const currentBowLevel = (
+    activeBow?.level ??
+    inputs.bowGear.bow?.level ??
+    inputs.bowGear.thumbRing?.level ??
+    100
+  ) as BowGearLevel
+  const levelForBonus = (
+    currentBowLevel in BOW_SET_DEFS.crit.value ? currentBowLevel : 100
+  ) as BowGearLevel
+
+  const bowOptions: { id: BowSet; label: string; meta?: string }[] = [
+    ...BOW_SET_OPTIONS.map((id) => {
+      const def = BOW_SET_DEFS[id]
+      const bonusVal = def.value[levelForBonus] ?? 0
+      return {
+        id,
+        label: t(BOW_SET_NAME_KEYS[id]),
+        meta: `${formatSetBonusValue(def.stat, bonusVal)} ${t(setBonusStatKey(def.stat))}`,
+      }
+    }),
+    {
+      id: null,
+      label: t("gear.noneShort"),
+      meta: t("gear.setStrip.bowUnpaired"),
+    },
+  ]
+
+  function handleOpenDropdown() {
+    const curIdx = bowOptions.findIndex((opt) => opt.id === (activeBow?.set ?? null))
+    setHighlightedIndex(curIdx >= 0 ? curIdx : 0)
+    setDropdownOpen(true)
+  }
+
+  function handleSelectOption(setId: BowSet | null) {
+    setDropdownOpen(false)
+    onChangeBowSet?.(setId)
+    triggerRef.current?.focus()
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent) {
+    if (!dropdownOpen) {
+      if (
+        event.key === "ArrowDown" ||
+        event.key === "ArrowUp" ||
+        event.key === "Enter" ||
+        event.key === " "
+      ) {
+        event.preventDefault()
+        handleOpenDropdown()
+      }
+      return
+    }
+    if (event.key === "ArrowDown") {
+      event.preventDefault()
+      setHighlightedIndex((prev) => (prev + 1) % bowOptions.length)
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault()
+      setHighlightedIndex((prev) => (prev - 1 + bowOptions.length) % bowOptions.length)
+    } else if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault()
+      const chosen = bowOptions[highlightedIndex]
+      if (chosen) handleSelectOption(chosen.id)
+    } else if (event.key === "Tab") {
+      setDropdownOpen(false)
+    }
+  }
 
   return (
     <div className={styles.setStrip}>
@@ -109,6 +184,45 @@ export function GearSetStrip({ inputs }: Props) {
           </>
         ) : (
           <span className={styles.dim}>{t("gear.setStrip.bowUnpaired")}</span>
+        )}
+        {onChangeBowSet && (
+          <>
+            <button
+              ref={triggerRef}
+              type="button"
+              className={styles.bowDropdownButton}
+              onClick={() => (dropdownOpen ? setDropdownOpen(false) : handleOpenDropdown())}
+              onKeyDown={handleKeyDown}
+              aria-haspopup="listbox"
+              aria-expanded={dropdownOpen}
+              aria-label={t("gear.quickSelectBowSet")}
+              title={t("gear.quickSelectBowSet")}
+            >
+              <span className={styles.bowChevron} aria-hidden="true">
+                ▾
+              </span>
+            </button>
+            <DropdownList
+              open={dropdownOpen}
+              anchorRef={triggerRef}
+              onClose={() => setDropdownOpen(false)}
+              ariaLabel={t("gear.quickSelectBowSet")}
+            >
+              {bowOptions.map((opt, idx) => (
+                <DropdownOption
+                  key={opt.id ?? "none"}
+                  value={opt.id ?? "none"}
+                  label={opt.label}
+                  meta={opt.meta}
+                  selected={opt.id === (activeBow?.set ?? null)}
+                  highlighted={idx === highlightedIndex}
+                  showCheck
+                  onSelect={() => handleSelectOption(opt.id)}
+                  onHover={() => setHighlightedIndex(idx)}
+                />
+              ))}
+            </DropdownList>
+          </>
         )}
       </div>
     </div>

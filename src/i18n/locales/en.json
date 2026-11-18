@@ -2179,6 +2179,7 @@
   "gear.setDialog.subtitle": "For {slot} · {level}. Values at this piece's level.",
   "gear.setDialog.unpaired": "unpaired",
   "gear.setStrip.bowUnpaired": "Bow and Thumb Ring differ — no bonus",
+  "gear.quickSelectBowSet": "Quick select bow set",
   "gear.slot.armor": "Armor",
   "gear.slot.bow": "Bow",
   "gear.slot.bracer": "Bracer",

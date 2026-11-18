@@ -2179,6 +2179,7 @@
   "gear.setDialog.subtitle": "用于{slot} · {level}。数值按这件装备的等级计算。",
   "gear.setDialog.unpaired": "未配对",
   "gear.setStrip.bowUnpaired": "弓与射决不同 — 无加成",
+  "gear.quickSelectBowSet": "快捷选择弓箭套装",
   "gear.slot.armor": "护甲",
   "gear.slot.bow": "弓",
   "gear.slot.bracer": "腕甲",

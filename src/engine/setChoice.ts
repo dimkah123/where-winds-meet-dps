@@ -28,9 +28,21 @@ export function withSetChoice(
   if (target.kind === "bow") {
     const bowPiece = inputs.bowGear[target.slot]
     if (!bowPiece) return inputs
+    const partnerSlot: BowSlot = target.slot === "bow" ? "thumbRing" : "bow"
+    const partnerPiece = inputs.bowGear[partnerSlot]
+
+    const shouldPairPartner =
+      applyToGroup || (partnerPiece && partnerPiece.set === null && setId !== null)
+
     return {
       ...inputs,
-      bowGear: { ...inputs.bowGear, [target.slot]: { ...bowPiece, set: setId as BowSet } },
+      bowGear: {
+        ...inputs.bowGear,
+        [target.slot]: { ...bowPiece, set: setId as BowSet },
+        ...(shouldPairPartner && partnerPiece
+          ? { [partnerSlot]: { ...partnerPiece, set: setId as BowSet } }
+          : {}),
+      },
     }
   }
   const affected = new Set([
