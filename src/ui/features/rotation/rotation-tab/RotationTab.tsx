@@ -33,7 +33,6 @@ export function RotationTab({
       </div>
       <div className={styles.outputGrid}>
         <div className="panel">
-          <h2>{t("rotation.dpsBreakdown")}</h2>
           <RotationBreakdownPanel result={result} />
         </div>
         <div className="panel">

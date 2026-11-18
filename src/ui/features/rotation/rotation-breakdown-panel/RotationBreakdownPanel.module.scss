@@ -1,0 +1,111 @@
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+}
+
+.viewToggle {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  background: var(--color-surface-inset, #18191c);
+  border: 1px solid var(--color-border, #333);
+  border-radius: 4px;
+  gap: 2px;
+}
+
+.toggleBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: transparent;
+  color: var(--color-text-muted, #888);
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: var(--color-text, #fff);
+  }
+
+  &.active {
+    background: var(--color-surface-alt, #282a2e);
+    color: var(--color-accent, #c0a060);
+    font-weight: 600;
+  }
+}
+
+.categoryRow {
+  transition: background-color 0.1s ease;
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      background: var(--color-surface-hover, rgba(255, 255, 255, 0.04));
+    }
+  }
+}
+
+.categoryNameCell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.expandChevron {
+  display: inline-block;
+  font-size: 0.65em;
+  color: var(--color-text-muted);
+  transition: transform 0.15s ease;
+  user-select: none;
+
+  &.open {
+    transform: rotate(90deg);
+  }
+}
+
+.subSkillCountBadge {
+  display: inline-block;
+  padding: 0 4px;
+  font-size: 0.72em;
+  background: var(--color-surface-inset, rgba(0, 0, 0, 0.3));
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  color: var(--color-text-muted);
+}
+
+.subSkillRow {
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 0.9em;
+
+  td {
+    color: var(--color-text-muted);
+    border-top: 1px dashed rgba(255, 255, 255, 0.05);
+  }
+}
+
+.subSkillName {
+  padding-left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &::before {
+    content: "↳";
+    color: var(--color-text-faint);
+  }
+}
