@@ -135,4 +135,68 @@ describe("Russian OCR gear screenshot parsing", () => {
     expect(parsed.piece.attunement).toBe("phalanxbaneQ")
     expect(parsed.piece.attunementValue).toBe(0.058)
   })
+
+  it("parses user screenshot 1 (Mirage Vodorez weapon with maxFormless, retuned agility, and relayed header)", () => {
+    const text = `
+| Мираж Водорез
+Передача · Уровень 100
+Мин. физ. атака +85.2
+Шанс критического удара +9.8%
+Максимальная Атака Безформенного +48.3
+[Повернуть]Ловкость +54.0
+Мин. физ. атака +85.2
+`
+    const parsed = parseGearScreenshot(text, inputs, "leftWeapon")
+
+    expect(parsed.error).toBeNull()
+    expect(parsed.piece.slot).toBe("leftWeapon")
+    expect(parsed.piece.level).toBe(100)
+    expect(parsed.piece.relayed).toBe(true)
+
+    const words = parsed.piece.words
+    expect(words[0]).toEqual({ word: "minPhys", value: 85.2, retuned: false })
+    expect(words[1]).toEqual({ word: "crit", value: 0.098, retuned: false })
+    expect(words[2]).toEqual({ word: "maxFormless", value: 48.3, retuned: false })
+    expect(words[3]).toEqual({ word: "agility", value: 54, retuned: true })
+    expect(words[4]).toEqual({ word: "minPhys", value: 85.2, retuned: false })
+
+    // Diagnostics should not falsely flag max relayed rolls as exceeding cap
+    expect(parsed.diagnostics.rows[0].exceededCap).toBe(false)
+    expect(parsed.diagnostics.rows[1].exceededCap).toBe(false)
+    expect(parsed.diagnostics.rows[2].exceededCap).toBe(false)
+    expect(parsed.diagnostics.rows[3].exceededCap).toBe(false)
+    expect(parsed.diagnostics.rows[4].exceededCap).toBe(false)
+  })
+
+  it("parses user screenshot 2 (Helm with pipe prefix, level 100, silkbind and bamboocut)", () => {
+    const text = `
+| Шлем Туманистого хребта
+Передача · Уровень 100
+Шанс критического удара +9.8%
+[Повернуть]Мин. физ. атака +85.2
+Мин. Атака шелковыми путями +48.3
+Мин. Атака бамбуковым клинком +48.3
+Ловкость +54.0
+`
+    const parsed = parseGearScreenshot(text, inputs, "leftWeapon")
+
+    expect(parsed.error).toBeNull()
+    expect(parsed.piece.slot).toBe("helm")
+    expect(parsed.piece.level).toBe(100)
+    expect(parsed.piece.relayed).toBe(true)
+
+    const words = parsed.piece.words
+    expect(words[0]).toEqual({ word: "crit", value: 0.098, retuned: false })
+    expect(words[1]).toEqual({ word: "minPhys", value: 85.2, retuned: true })
+    expect(words[2]).toEqual({ word: "minSilkbind", value: 48.3, retuned: false })
+    expect(words[3]).toEqual({ word: "minBamboocut", value: 48.3, retuned: false })
+    expect(words[4]).toEqual({ word: "agility", value: 54, retuned: false })
+
+    // Diagnostics
+    expect(parsed.diagnostics.rows[0].exceededCap).toBe(false)
+    expect(parsed.diagnostics.rows[1].exceededCap).toBe(false)
+    expect(parsed.diagnostics.rows[2].exceededCap).toBe(false)
+    expect(parsed.diagnostics.rows[3].exceededCap).toBe(false)
+    expect(parsed.diagnostics.rows[4].exceededCap).toBe(false)
+  })
 })

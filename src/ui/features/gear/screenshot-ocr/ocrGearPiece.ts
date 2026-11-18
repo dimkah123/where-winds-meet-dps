@@ -122,6 +122,10 @@ const RETUNE_BRACKET_WORDS: ReadonlySet<string> = new Set([
   "перековка",
   "закалка",
   "перекованный",
+  "повернуть",
+  "повернуто",
+  "повернутый",
+  "поворот",
 ])
 
 const NAME_DISTANCE_MIN = 2
@@ -140,17 +144,86 @@ interface NormalizedNameEntry<T> {
 }
 
 const RUSSIAN_STAT_ALIASES: readonly [string, GearWordId][] = [
+  // Crit
   ["крит", "crit"],
   ["шанс крита", "crit"],
   ["критический удар", "crit"],
+  ["шанс критического удара", "crit"],
+
+  // Phys
   ["мин физ атака", "minPhys"],
-  ["мин атака", "minPhys"],
+  ["мин физ. атака", "minPhys"],
+  ["минимальная физ атака", "minPhys"],
+  ["минимальная физическая атака", "minPhys"],
+  ["мин физическая атака", "minPhys"],
   ["макс физ атака", "maxPhys"],
-  ["макс атака", "maxPhys"],
+  ["макс физ. атака", "maxPhys"],
+  ["максимальная физ атака", "maxPhys"],
+  ["максимальная физическая атака", "maxPhys"],
+  ["макс физическая атака", "maxPhys"],
+
+  // Formless (both "безформенного" and "бесформенного")
+  ["максимальная атака безформенного", "maxFormless"],
+  ["максимальная атака бесформенного", "maxFormless"],
+  ["макс атака безформенного", "maxFormless"],
+  ["макс атака бесформенного", "maxFormless"],
+  ["макс безформенная атака", "maxFormless"],
+  ["макс бесформенная атака", "maxFormless"],
+  ["атака безформенного", "maxFormless"],
+  ["атака бесформенного", "maxFormless"],
+  ["минимальная атака безформенного", "minFormless"],
+  ["минимальная атака бесформенного", "minFormless"],
+  ["мин атака безформенного", "minFormless"],
+  ["мин атака бесформенного", "minFormless"],
+  ["мин безформенная атака", "minFormless"],
+  ["мин бесформенная атака", "minFormless"],
+
+  // Silkbind (both "путями" and "путами")
+  ["мин атака шелковыми путями", "minSilkbind"],
+  ["мин атака шелковыми путами", "minSilkbind"],
+  ["минимальная атака шелковыми путями", "minSilkbind"],
+  ["минимальная атака шелковыми путами", "minSilkbind"],
+  ["макс атака шелковыми путями", "maxSilkbind"],
+  ["макс атака шелковыми путами", "maxSilkbind"],
+  ["максимальная атака шелковыми путями", "maxSilkbind"],
+  ["максимальная атака шелковыми путами", "maxSilkbind"],
+  ["атака шелковыми путями", "minSilkbind"],
+  ["атака шелковыми путами", "minSilkbind"],
+
+  // Bamboocut
+  ["мин атака бамбуковым клинком", "minBamboocut"],
+  ["минимальная атака бамбуковым клинком", "minBamboocut"],
+  ["макс атака бамбуковым клинком", "maxBamboocut"],
+  ["максимальная атака бамбуковым клинком", "maxBamboocut"],
+  ["атака бамбуковым клинком", "minBamboocut"],
+
+  // Bellstrike
+  ["мин атака колокольного звона", "minBellstrike"],
+  ["минимальная атака колокольного звона", "minBellstrike"],
+  ["макс атака колокольного звона", "maxBellstrike"],
+  ["максимальная атака колокольного звона", "maxBellstrike"],
+  ["атака колокольного звона", "minBellstrike"],
+
+  // Stonesplit
+  ["мин атака камнелома", "minStonesplit"],
+  ["минимальная атака камнелома", "minStonesplit"],
+  ["макс атака камнелома", "maxStonesplit"],
+  ["максимальная атака камнелома", "maxStonesplit"],
+  ["атака камнелома", "minStonesplit"],
+
+  // Defense / HP
   ["физ защита", "physDef"],
+  ["физическая защита", "physDef"],
   ["защита", "physDef"],
+  ["макс hp", "maxHp"],
+  ["хп", "maxHp"],
+  ["здоровье", "maxHp"],
+
+  // Penetration
   ["физ проникновение", "physicalPenetration"],
   ["проникновение", "physicalPenetration"],
+
+  // Affinity & Attributes
   ["сродство", "affinity"],
   ["шанс сродства", "affinity"],
   ["точность", "precision"],
@@ -158,10 +231,6 @@ const RUSSIAN_STAT_ALIASES: readonly [string, GearWordId][] = [
   ["ловкость", "agility"],
   ["импульс", "momentum"],
   ["телосложение", "body"],
-  ["макс hp", "maxHp"],
-  ["хп", "maxHp"],
-  ["мин атака камнелома", "minStonesplit"],
-  ["макс атака камнелома", "maxStonesplit"],
 ]
 
 const RUSSIAN_ATTUNEMENT_ALIASES: readonly [string, string][] = [
@@ -277,7 +346,7 @@ interface NumberToken {
   percent: boolean
 }
 
-const NUMBER_TOKEN_PATTERN = /([+-]?)(\d+(?:\.\d+)?)(%)?/g
+const NUMBER_TOKEN_PATTERN = /([+-]?)(\d+(?:[.,]\d+)?)(%)?/g
 
 function findNumberTokens(text: string): NumberToken[] {
   const tokens: NumberToken[] = []
@@ -294,14 +363,20 @@ function findNumberTokens(text: string): NumberToken[] {
 }
 
 function isSplitPair(first: NumberToken, second: NumberToken, text: string): boolean {
-  return (
-    !!first.sign &&
-    !first.digits.includes(".") &&
-    first.digits.length <= 2 &&
-    !second.sign &&
-    second.digits.includes(".") &&
-    /^\s*$/.test(text.slice(first.end, second.start))
-  )
+  if (!first.sign || second.sign) return false
+  const between = text.slice(first.end, second.start)
+  const firstHasSep = first.digits.includes(".") || first.digits.includes(",")
+  const secondHasSep = second.digits.includes(".") || second.digits.includes(",")
+
+  // Case 1: "+7 3.1" — first is integer, second has decimal point, whitespace between
+  if (!firstHasSep && secondHasSep && /^\s*$/.test(between)) {
+    return true
+  }
+  // Case 2: "+48 . 3" or "+48 , 3" — dot or comma between tokens
+  if (!firstHasSep && !secondHasSep && /^\s*[.,]\s*$/.test(between)) {
+    return true
+  }
+  return false
 }
 
 // A bare unsigned number (e.g. the "44" inside "rowerr44o") never carries a
@@ -316,9 +391,16 @@ function matchStatRow(text: string): { name: string; value: StatRowValue | null 
 
     const next = tokens[index + 1]
     const paired = next && isSplitPair(token, next, text)
-    const magnitude = paired
-      ? Number(`${token.sign}${token.digits}${next!.digits}`)
-      : Number(`${token.sign}${token.digits}`)
+    let magStr = token.digits.replace(",", ".")
+    if (paired) {
+      const nextDigits = next!.digits.replace(",", ".")
+      if (nextDigits.includes(".")) {
+        magStr = magStr + nextDigits
+      } else {
+        magStr = magStr + "." + nextDigits
+      }
+    }
+    const magnitude = Number(`${token.sign}${magStr}`)
     const percent = paired ? next!.percent : token.percent
 
     return { name: text.slice(0, token.start).trim(), value: { magnitude, isPercent: percent } }
@@ -404,7 +486,7 @@ function guessSlot(titleLine: string, fallbackSlot: GearSlot): { slot: GearSlot;
 
 function parseLevel(headerLine: string): { level: GearLevel; read: boolean } {
   const match =
-    /(?:tier|уровень|ранг|тир|ур\.?|lvl|level|lv)\s*(\d+)/i.exec(headerLine) ||
+    /(?:tier|уровень|ранг|тир|ур\.?|lvl|level|lv)\s*[:.·-]?\s*(\d+)/i.exec(headerLine) ||
     /\b(86|91|96|100|105)\b/.exec(headerLine)
   const candidate = match ? Number(match[1]) : null
   const isValidLevel = candidate !== null && VALID_LEVELS.includes(candidate as GearLevel)
@@ -530,9 +612,11 @@ function parseWordCandidate(
 
   let provesNotRelayed = false
   if (wordId) {
+    const unit = GEAR_WORD_UNIT[wordId]
     const cap = gearWordMaxRoll(wordId, level)
-    const relayedCeiling = relayedCapValue(cap, GEAR_WORD_UNIT[wordId])
-    provesNotRelayed = magnitude > relayedCeiling && magnitude <= cap
+    const relayedCeiling = relayedCapValue(cap, unit)
+    const tolerance = unit === "percent" ? 0.0005 : 0.1
+    provesNotRelayed = magnitude > relayedCeiling + tolerance && magnitude <= cap
   }
 
   return {
@@ -600,8 +684,9 @@ function finalizeWordRow(
   const cap = gearWordMaxRoll(candidate.wordId, level)
   const unit = GEAR_WORD_UNIT[candidate.wordId]
   const ceiling = relayed ? relayedCapValue(cap, unit) : cap
+  const tolerance = unit === "percent" ? 0.0005 : 0.1
 
-  const withinCeiling = candidate.magnitude <= ceiling
+  const withinCeiling = candidate.magnitude <= ceiling + tolerance
   const value = roundGearWordValue(Math.max(candidate.magnitude, 0), unit === "percent")
 
   // A value above its ceiling is never clamped into legality: the read digits
@@ -756,15 +841,22 @@ export function parseGearScreenshot(
   fallbackSlot: GearSlot,
   headerBarText = "",
 ): GearScreenshotParse {
-  const lines = text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0)
+  const rawLines = text.split(/\r?\n/)
+  const lines: string[] = []
+  for (const raw of rawLines) {
+    const cleaned = raw.trim().replace(/^[|!·•\s_-]+/u, "").trim()
+    if (cleaned.length > 0 && /[a-zA-Zа-яА-ЯёЁ0-9]/.test(cleaned)) {
+      lines.push(cleaned)
+    }
+  }
   if (lines.length === 0) return emptyParse(fallbackSlot, "empty")
 
-  const [titleLine, ...rest] = lines
+  const titleIndex = lines.findIndex((line) => /[a-zA-Zа-яА-ЯёЁ]/.test(line))
+  if (titleIndex < 0) return emptyParse(fallbackSlot, "empty")
+  const titleLine = lines[titleIndex]!
+  const rest = [...lines.slice(0, titleIndex), ...lines.slice(titleIndex + 1)]
   const headerIndex = rest.findIndex((line) =>
-    /relaying|tier\s*\d|ранг|тир|уровень|ур\.?\s*\d|наследован/i.test(line),
+    /relaying|tier\s*\d|ранг|тир|уровень|ур\.?\s*\d|наследован|передач/i.test(line),
   )
   const headerLine = headerIndex >= 0 ? rest[headerIndex] : undefined
   const bodyLines =
@@ -784,8 +876,8 @@ export function parseGearScreenshot(
   const headerBarLevel = parseLevel(headerBarText)
   const headerLevelGuess = headerBarLevel.read ? headerBarLevel : parseLevel(headerLine ?? "")
   const headerRelayedGuess =
-    /relaying|наследован/i.test(headerBarText) ||
-    (headerLine ? /relaying|наследован/i.test(headerLine) : false)
+    /relaying|наследован|передач/i.test(headerBarText) ||
+    (headerLine ? /relaying|наследован|передач/i.test(headerLine) : false)
 
   // A gear piece always has exactly five word slots: an unread row is an
   // empty, editable slot, never a shorter array — so each index is looked up
