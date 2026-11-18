@@ -119,6 +119,16 @@ const CATEGORY_RULES: CategoryRule[] = [
       /разрывающий/i.test(bd),
   },
   {
+    id: "fireSolidFoundation",
+    nameKey: "rotation.breakdown.cat.fireSolidFoundation",
+    fallbackName: "Fire - Solid Foundation",
+    match: (name, bd) =>
+      /fire\s*explosion/i.test(name) ||
+      /solid\s*foundation/i.test(name) ||
+      /divinecraft.*взрыв/i.test(bd) ||
+      /solid\s*foundation/i.test(bd),
+  },
+  {
     id: "divinecraftFire",
     nameKey: "rotation.breakdown.cat.divinecraftFire",
     fallbackName: "Divinecraft - Fire",
@@ -170,8 +180,12 @@ const CATEGORY_RULES: CategoryRule[] = [
     fallbackName: "Morale Chant",
     match: (name, bd) =>
       /morale/i.test(name) ||
+      /yi\s*river/i.test(name) ||
+      /morale/i.test(bd) ||
+      /yi\s*river/i.test(bd) ||
       /песнь боевого духа/i.test(bd) ||
-      /боевой клич/i.test(bd),
+      /боевой клич/i.test(bd) ||
+      /боевой напев/i.test(bd),
   },
   {
     id: "slide",
@@ -241,12 +255,8 @@ export function groupIntoInGameCategories(
     const percentOfTotal = items.reduce((sum, i) => sum + i.percentOfTotal, 0)
     const dps = rotationDuration > 0 ? expectedDamage / rotationDuration : 0
 
-    // Compute Attempt count:
-    // If items have explicit castCount, sum them.
-    // For soldier summons where sub-skills have castCount 0, attempt is the wave count (max count among soldier hits).
-    const totalCastCount = items.reduce((sum, i) => sum + (i.castCount ?? 0), 0)
-    const maxItemCount = Math.max(...items.map((i) => i.count), 0)
-    const attempt = totalCastCount > 0 ? totalCastCount : maxItemCount
+    // In-game "Attempt" column represents the total hit count of the skill / category:
+    const attempt = items.reduce((sum, i) => sum + i.count, 0)
 
     const subSkills: CompactSubSkill[] = items
       .map((i) => ({
@@ -277,9 +287,7 @@ export function groupIntoInGameCategories(
     const percentOfTotal = items.reduce((sum, i) => sum + i.percentOfTotal, 0)
     const dps = rotationDuration > 0 ? expectedDamage / rotationDuration : 0
 
-    const totalCastCount = items.reduce((sum, i) => sum + (i.castCount ?? 0), 0)
-    const maxItemCount = Math.max(...items.map((i) => i.count), 0)
-    const attempt = totalCastCount > 0 ? totalCastCount : maxItemCount
+    const attempt = items.reduce((sum, i) => sum + i.count, 0)
 
     const subSkills: CompactSubSkill[] = items
       .map((i) => ({

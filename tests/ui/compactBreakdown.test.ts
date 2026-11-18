@@ -17,7 +17,7 @@ function makeRow(patch: Partial<SkillTickResult>): SkillTickResult {
 }
 
 describe("groupIntoInGameCategories", () => {
-  it("groups Burning Heart hits into a single category with sum of damages and attempts", () => {
+  it("groups Burning Heart hits into a single category with sum of damages and hit count attempts", () => {
     const rows: SkillTickResult[] = [
       makeRow({
         name: "PhalanxCharged-S1",
@@ -53,7 +53,7 @@ describe("groupIntoInGameCategories", () => {
     expect(bh.expectedDamage).toBe(3_500_000)
     expect(bh.percentOfTotal).toBeCloseTo(0.7)
     expect(bh.dps).toBeCloseTo(3_500_000 / 60)
-    expect(bh.attempt).toBe(20) // sum of castCounts
+    expect(bh.attempt).toBe(30) // sum of hit counts, exactly as in-game Attempt column
     expect(bh.subSkills).toHaveLength(3)
     // Sorted by damage descending
     expect(bh.subSkills[0].name).toBe("PhalanxCharged-S3[InnerPassion]")
@@ -61,7 +61,7 @@ describe("groupIntoInGameCategories", () => {
     expect(bh.subSkills[2].name).toBe("PhalanxCharged-S1")
   })
 
-  it("calculates soldiers' attempts from max wave count when castCount is zero", () => {
+  it("calculates soldiers' attempts as total hits matching in-game combat log", () => {
     const rows: SkillTickResult[] = [
       makeRow({
         name: "AnxiSoldierMoDown",
@@ -94,37 +94,59 @@ describe("groupIntoInGameCategories", () => {
     const mo = grouped[0]
     expect(mo.categoryId).toBe("moSoldier")
     expect(mo.name).toBe("Mo Blade Anxi Soldier")
-    expect(mo.attempt).toBe(16)
+    expect(mo.attempt).toBe(40) // 16 + 16 + 8 hits
     expect(mo.expectedDamage).toBe(187_000 + 338_000 + 111_000)
     expect(mo.subSkills).toHaveLength(3)
   })
 
-  it("categorizes Flute and Snowbreak Spring accurately", () => {
+  it("groups Yi River ticks into Morale Chant category", () => {
     const rows: SkillTickResult[] = [
       makeRow({
-        name: "Flute Chanting a Thousand Waves",
-        breakdownName: "Flute Chanting a Thousand Waves",
-        count: 11,
-        castCount: 6,
-        expectedDamage: 235_000,
-        percentOfTotal: 0.046,
+        name: "Yi River",
+        breakdownName: "Morale Chant",
+        count: 5,
+        castCount: 0,
+        expectedDamage: 60_593,
+        percentOfTotal: 0.012,
+      }),
+    ]
+
+    const grouped = groupIntoInGameCategories(rows, 60)
+    expect(grouped).toHaveLength(1)
+    expect(grouped[0].categoryId).toBe("moraleChant")
+    expect(grouped[0].name).toBe("Morale Chant")
+    expect(grouped[0].attempt).toBe(5)
+    expect(grouped[0].expectedDamage).toBe(60_593)
+  })
+
+  it("separates Fire - Solid Foundation from Divinecraft - Fire", () => {
+    const rows: SkillTickResult[] = [
+      makeRow({
+        name: "Divinecraft - Fire",
+        breakdownName: "Divinecraft - Fire",
+        count: 60,
+        castCount: 0,
+        expectedDamage: 79_124,
+        percentOfTotal: 0.015,
       }),
       makeRow({
-        name: "SnowpartingVC",
-        breakdownName: "SnowpartingVC",
-        count: 4,
-        castCount: 2,
-        expectedDamage: 192_000,
-        percentOfTotal: 0.037,
+        name: "Divinecraft - Fire Explosion",
+        breakdownName: "Divinecraft - Fire Explosion",
+        count: 6,
+        castCount: 0,
+        expectedDamage: 12_014,
+        percentOfTotal: 0.002,
       }),
     ]
 
     const grouped = groupIntoInGameCategories(rows, 60)
     expect(grouped).toHaveLength(2)
-    expect(grouped[0].categoryId).toBe("flute")
-    expect(grouped[0].attempt).toBe(6)
-    expect(grouped[1].categoryId).toBe("snowbreakSpring")
-    expect(grouped[1].attempt).toBe(2)
+    expect(grouped[0].categoryId).toBe("divinecraftFire")
+    expect(grouped[0].name).toBe("Divinecraft - Fire")
+    expect(grouped[0].attempt).toBe(60)
+    expect(grouped[1].categoryId).toBe("fireSolidFoundation")
+    expect(grouped[1].name).toBe("Fire - Solid Foundation")
+    expect(grouped[1].attempt).toBe(6)
   })
 
   it("handles uncategorized skills gracefully by stripping modifiers and keeping them cleanly grouped", () => {
@@ -151,7 +173,7 @@ describe("groupIntoInGameCategories", () => {
     expect(grouped).toHaveLength(1)
     expect(grouped[0].name).toBe("CustomSkill")
     expect(grouped[0].expectedDamage).toBe(100_000)
-    expect(grouped[0].attempt).toBe(1)
+    expect(grouped[0].attempt).toBe(6) // 3 + 3 hits
     expect(grouped[0].subSkills).toHaveLength(2)
   })
 })
