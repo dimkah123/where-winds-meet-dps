@@ -177,52 +177,78 @@ export function GearSetStrip({ inputs, onChangeBowSet }: Props) {
             <span className={styles.count}>
               {t("common.levelShort").replace("{n}", String(activeBow.level))}
             </span>
-            <span className={`${styles.tierChip} ${styles.on}`}>
-              {formatSetBonusValue(bowDefinition.stat, bowDefinition.value[activeBow.level] ?? 0)}{" "}
-              {t(setBonusStatKey(bowDefinition.stat))}
-            </span>
+            {onChangeBowSet ? (
+              <button
+                ref={triggerRef}
+                type="button"
+                className={`${styles.tierChip} ${styles.on} ${styles.bowTierButton}`}
+                onClick={() => (dropdownOpen ? setDropdownOpen(false) : handleOpenDropdown())}
+                onKeyDown={handleKeyDown}
+                aria-haspopup="listbox"
+                aria-expanded={dropdownOpen}
+                aria-label={t("gear.quickSelectBowSet")}
+                title={t("gear.quickSelectBowSet")}
+              >
+                <span>
+                  {formatSetBonusValue(bowDefinition.stat, bowDefinition.value[activeBow.level] ?? 0)}{" "}
+                  {t(setBonusStatKey(bowDefinition.stat))}
+                </span>
+                <span className={styles.bowChevron} aria-hidden="true">
+                  ▾
+                </span>
+              </button>
+            ) : (
+              <span className={`${styles.tierChip} ${styles.on}`}>
+                {formatSetBonusValue(bowDefinition.stat, bowDefinition.value[activeBow.level] ?? 0)}{" "}
+                {t(setBonusStatKey(bowDefinition.stat))}
+              </span>
+            )}
           </>
         ) : (
-          <span className={styles.dim}>{t("gear.setStrip.bowUnpaired")}</span>
+          <>
+            {onChangeBowSet ? (
+              <button
+                ref={triggerRef}
+                type="button"
+                className={`${styles.tierChip} ${styles.bowTierButton}`}
+                onClick={() => (dropdownOpen ? setDropdownOpen(false) : handleOpenDropdown())}
+                onKeyDown={handleKeyDown}
+                aria-haspopup="listbox"
+                aria-expanded={dropdownOpen}
+                aria-label={t("gear.quickSelectBowSet")}
+                title={t("gear.quickSelectBowSet")}
+              >
+                <span className={styles.dim}>{t("gear.setStrip.bowUnpaired")}</span>
+                <span className={styles.bowChevron} aria-hidden="true">
+                  ▾
+                </span>
+              </button>
+            ) : (
+              <span className={styles.dim}>{t("gear.setStrip.bowUnpaired")}</span>
+            )}
+          </>
         )}
         {onChangeBowSet && (
-          <>
-            <button
-              ref={triggerRef}
-              type="button"
-              className={styles.bowDropdownButton}
-              onClick={() => (dropdownOpen ? setDropdownOpen(false) : handleOpenDropdown())}
-              onKeyDown={handleKeyDown}
-              aria-haspopup="listbox"
-              aria-expanded={dropdownOpen}
-              aria-label={t("gear.quickSelectBowSet")}
-              title={t("gear.quickSelectBowSet")}
-            >
-              <span className={styles.bowChevron} aria-hidden="true">
-                ▾
-              </span>
-            </button>
-            <DropdownList
-              open={dropdownOpen}
-              anchorRef={triggerRef}
-              onClose={() => setDropdownOpen(false)}
-              ariaLabel={t("gear.quickSelectBowSet")}
-            >
-              {bowOptions.map((opt, idx) => (
-                <DropdownOption
-                  key={opt.id ?? "none"}
-                  value={opt.id ?? "none"}
-                  label={opt.label}
-                  meta={opt.meta}
-                  selected={opt.id === (activeBow?.set ?? null)}
-                  highlighted={idx === highlightedIndex}
-                  showCheck
-                  onSelect={() => handleSelectOption(opt.id)}
-                  onHover={() => setHighlightedIndex(idx)}
-                />
-              ))}
-            </DropdownList>
-          </>
+          <DropdownList
+            open={dropdownOpen}
+            anchorRef={triggerRef}
+            onClose={() => setDropdownOpen(false)}
+            ariaLabel={t("gear.quickSelectBowSet")}
+          >
+            {bowOptions.map((opt, idx) => (
+              <DropdownOption
+                key={opt.id ?? "none"}
+                value={opt.id ?? "none"}
+                label={opt.label}
+                meta={opt.meta}
+                selected={opt.id === (activeBow?.set ?? null)}
+                highlighted={idx === highlightedIndex}
+                showCheck
+                onSelect={() => handleSelectOption(opt.id)}
+                onHover={() => setHighlightedIndex(idx)}
+              />
+            ))}
+          </DropdownList>
         )}
       </div>
     </div>
