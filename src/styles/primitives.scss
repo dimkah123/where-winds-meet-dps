@@ -53,7 +53,8 @@
 }
 
 .save-btn,
-.reset-btn {
+.reset-btn,
+.share-btn {
   background: transparent;
   border: 1px solid var(--color-border-strong);
   color: var(--color-text-dim);
@@ -68,7 +69,8 @@
 }
 
 .save-btn:hover:not(:disabled),
-.reset-btn:hover:not(:disabled) {
+.reset-btn:hover:not(:disabled),
+.share-btn:hover:not(:disabled) {
   color: var(--color-text);
   border-color: var(--color-border-hover);
 }

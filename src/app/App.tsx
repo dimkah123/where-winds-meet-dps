@@ -40,6 +40,9 @@ import { SetupWizard, type SetupMode } from "../ui/features/setup/setup-wizard/S
 import { BreakthroughDataDialog } from "../ui/layout/breakthrough-data-dialog/BreakthroughDataDialog"
 import { breakthroughDataRequestFor } from "../ui/layout/breakthrough-data-dialog/breakthroughDataRequest"
 import { activeRotationName } from "../ui/features/rotation/rotationOptions"
+import { ShareBuildDialog } from "../ui/features/share/share-build-dialog/ShareBuildDialog"
+import { SharedBuildBanner } from "../ui/layout/shared-build-banner/SharedBuildBanner"
+import { decodeSharedBuild } from "../engine/shareBuild"
 import { followedGraduationBuild } from "../engine/graduation"
 import { graduationBuildKey } from "../i18n/contentKeys"
 import { useI18n } from "../i18n/i18nContext"
@@ -111,6 +114,62 @@ function AppInner() {
   const [graduationDialogOpen, setGraduationDialogOpen] = useState(false)
   const [encounterDialogOpen, setEncounterDialogOpen] = useState(false)
   const [encounterCategory, setEncounterCategory] = useState<EncounterCategory>("food")
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const [shareTargetProfile, setShareTargetProfile] = useState<StoredProfile | null>(null)
+  const [sharedBannerInfo, setSharedBannerInfo] = useState<{
+    author: string
+    title: string
+    inputs: Inputs
+  } | null>(null)
+
+  useEffect(() => {
+    const hash = window.location.hash
+    const questionIdx = hash.indexOf("?")
+    const queryString = questionIdx >= 0 ? hash.slice(questionIdx + 1) : window.location.search.slice(1)
+    if (!queryString) return
+
+    const params = new URLSearchParams(queryString)
+    const data = params.get("data")
+    if (!data) return
+
+    decodeSharedBuild(data)
+      .then((payload) => {
+        const author = payload.author || params.get("author") || ""
+        const title = payload.title || params.get("title") || ""
+        setInputs(payload.inputs)
+        setSharedBannerInfo({
+          author,
+          title,
+          inputs: payload.inputs,
+        })
+        navigate("/overview", { replace: true })
+      })
+      .catch((err) => {
+        console.error("Failed to load shared build:", err)
+      })
+  }, [navigate])
+
+  function handleSaveSharedToProfiles() {
+    if (!sharedBannerInfo) return
+    const authorName = sharedBannerInfo.author.trim() || "Игрок"
+    const buildTitle = sharedBannerInfo.title.trim()
+    const name = buildTitle ? `Сборка игрока ${authorName}: ${buildTitle}` : `Сборка игрока ${authorName}`
+    const newId = newProfileId()
+    const newProf: StoredProfile = {
+      id: newId,
+      name,
+      inputs: sharedBannerInfo.inputs,
+    }
+    const nextProfiles = [...committed.profiles, newProf]
+    const nextState: ProfilesState = {
+      profiles: nextProfiles,
+      activeId: newId,
+    }
+    persist(nextState)
+    setActiveDraft(sharedBannerInfo.inputs)
+    setLastSavedJson(JSON.stringify(sharedBannerInfo.inputs))
+    setSharedBannerInfo(null)
+  }
 
   const [wizard, setWizard] = useState<{ mode: SetupMode; defaultName: string } | null>(() =>
     initial.firstRun ? { mode: "first-run", defaultName: "" } : null,
@@ -457,6 +516,36 @@ function AppInner() {
           onClose={mustChooseGraduationBuild ? undefined : () => setGraduationDialogOpen(false)}
         />
       )}
+      {shareDialogOpen && (
+        <ShareBuildDialog
+          inputs={shareTargetProfile ? shareTargetProfile.inputs : inputs}
+          result={
+            shareTargetProfile
+              ? runEngine(applySetBonuses(withDerivedStats(shareTargetProfile.inputs)))
+              : headerResult
+          }
+          defaultAuthor={
+            shareTargetProfile
+              ? shareTargetProfile.name.split(":")[0]?.replace(/^Сборка игрока\s*/, "")
+              : undefined
+          }
+          defaultTitle={
+            shareTargetProfile ? shareTargetProfile.name : activeRotationName(inputs) || ""
+          }
+          onClose={() => {
+            setShareDialogOpen(false)
+            setShareTargetProfile(null)
+          }}
+        />
+      )}
+      {sharedBannerInfo && (
+        <SharedBuildBanner
+          author={sharedBannerInfo.author}
+          title={sharedBannerInfo.title}
+          onSave={handleSaveSharedToProfiles}
+          onDismiss={() => setSharedBannerInfo(null)}
+        />
+      )}
       <div className={styles.appHeader}>
         <header className={styles.appTitlebar}>
           <div className={styles.appTitle}>
@@ -465,6 +554,18 @@ function AppInner() {
           </div>
           <div className={styles.appTitlebarActions}>
             <LanguageSelect />
+            <button
+              type="button"
+              className="share-btn"
+              onClick={() => {
+                setShareTargetProfile(null)
+                setShareDialogOpen(true)
+              }}
+              title={t("common.shareBuild")}
+              aria-label={t("common.shareBuild")}
+            >
+              🔗 {t("common.shareBuild")}
+            </button>
             <button
               type="button"
               className={"save-btn" + (isDirty ? " dirty" : "")}
@@ -642,6 +743,10 @@ function AppInner() {
                     onDuplicate={duplicateProfile}
                     onDelete={deleteProfile}
                     onImport={handleImportProfile}
+                    onShare={(prof) => {
+                      setShareTargetProfile(prof)
+                      setShareDialogOpen(true)
+                    }}
                   />
                 </div>
               }

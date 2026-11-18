@@ -25,6 +25,7 @@ interface Props {
   onDuplicate: (id: string) => void
   onDelete: (id: string) => void
   onImport: (profile: StoredProfile) => void
+  onShare?: (profile: StoredProfile) => void
 }
 
 export function ProfilePanel({
@@ -39,6 +40,7 @@ export function ProfilePanel({
   onDuplicate,
   onDelete,
   onImport,
+  onShare,
 }: Props) {
   const { t } = useI18n()
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -218,6 +220,11 @@ export function ProfilePanel({
                 <button type="button" className="btn" onClick={() => onDuplicate(profile.id)}>
                   {t("profile.duplicate")}
                 </button>
+                {onShare && (
+                  <button type="button" className="btn" onClick={() => onShare(profile)}>
+                    {t("common.shareBuild")}
+                  </button>
+                )}
                 <button type="button" className="btn" onClick={() => handleExport(profile)}>
                   {t("common.export")}
                 </button>

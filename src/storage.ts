@@ -409,7 +409,7 @@ function healBlossomGainDefaults(
 }
 
 // additive — see CLAUDE.md → "localStorage migrations"
-function hydrateInputs(inputs: Inputs): Inputs {
+export function hydrateInputs(inputs: Inputs): Inputs {
   const { resistance: _legacyResistance, ...rest } = inputs as Inputs & { resistance?: number }
   void _legacyResistance
   const next: Inputs = movePreferredDistanceOntoRotation(
