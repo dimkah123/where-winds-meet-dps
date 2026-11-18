@@ -9,7 +9,7 @@ import { defaultInputs } from "../../src/engine/defaults"
 import { builtinSkillsForClass, builtinRotationsForClass } from "../../src/engine/builtinLibrary"
 
 describe("readableRotation", () => {
-  it("formats mixed dummy 1 min to human-readable rotation string", () => {
+  it("formats mixed 1 min to human-readable rotation string", () => {
     const inputs = {
       ...defaultInputs,
       classId: "stonesplitStrength",

@@ -19,7 +19,7 @@ describe("ReadableRotationDialog", () => {
     render(
       <I18nProvider>
         <ReadableRotationDialog
-          title="Mixed Dummy 1 Min"
+          title="Mixed 1 Min"
           readableText="Mo Special > Heng Special > Mo Charged x3"
           classId="stonesplitStrength"
           skillsById={skillsById}
@@ -30,7 +30,7 @@ describe("ReadableRotationDialog", () => {
     )
 
     expect(screen.getByText("READABLE FORMAT")).toBeInTheDocument()
-    expect(screen.getByText("Mixed Dummy 1 Min")).toBeInTheDocument()
+    expect(screen.getByText("Mixed 1 Min")).toBeInTheDocument()
     expect(
       screen.getByText(
         "(start) marks fight start, (break) marks Qi break. Consecutive skills are grouped with xN.",
@@ -159,7 +159,7 @@ describe("ReadableRotationDialog", () => {
     fireEvent.click(btn)
 
     expect(screen.getByText("READABLE FORMAT")).toBeInTheDocument()
-    expect(screen.getByText("Mixed Dummy 1 Min")).toBeInTheDocument()
+    expect(screen.getByText("Mixed 1 Min")).toBeInTheDocument()
     expect(screen.getByLabelText("Readable format")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Apply to Rotation" })).toBeInTheDocument()
   })

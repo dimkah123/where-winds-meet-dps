@@ -1,8 +1,8 @@
 import { defineRotation } from "../../../../definitions/rotations/rotationDef"
 
 export default defineRotation({
-  id: "builtin-stonesplitStrength-mixed-dummy-1-min",
-  name: "Mixed Dummy 1 Min",
+  id: "builtin-stonesplitStrength-3-heng-bow",
+  name: "3 Heng + Bow",
   classId: "stonesplitStrength",
   category: "Mo - Rotation",
   steps: [
@@ -23,6 +23,8 @@ export default defineRotation({
     { skillId: "stonesplitStrength-snowpartingvc" },
     { skillId: "mystic-bursting-nine-7-hits" },
     { skillId: "stonesplitStrength-phalanxq-soul" },
+    { skillId: "stonesplitStrength-snowpartingdual" },
+    { skillId: "stonesplitStrength-snowpartingvc" },
     { skillId: "stonesplitStrength-snowpartingslide" },
     { skillId: "stonesplitStrength-snowpartingspecial" },
     { skillId: "stonesplitStrength-snowpartingq-stab" },
@@ -54,6 +56,6 @@ export default defineRotation({
   preferredDistanceMeters: 2,
   permanentBuffIds: [],
   fixedWindowSec: 60,
-  createdAt: "2026-11-16T13:30:39.283Z",
-  updatedAt: "2026-11-16T17:50:00.000Z",
+  createdAt: "2026-11-18T18:41:21.064Z",
+  updatedAt: "2026-11-18T18:45:40.625Z",
 })

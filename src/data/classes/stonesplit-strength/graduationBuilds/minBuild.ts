@@ -1,7 +1,7 @@
 import { defineGraduationBuild } from "../../../../definitions/graduationBuilds/graduationBuildDef"
 import { SET_ID } from "../../../sets/ids"
 import { createGraduationGearPiece } from "../../graduationGear"
-import graduationRotation from "../rotations/mixedDummy1Min"
+import graduationRotation from "../rotations/mixed1Min"
 
 const idPrefix = "graduation-stonesplit-strength"
 
