@@ -88,6 +88,12 @@
   color: var(--color-text-muted);
 }
 
+.percentCell {
+  white-space: nowrap !important;
+  font-variant-numeric: tabular-nums;
+  min-width: 54px;
+}
+
 .subSkillRow {
   background: rgba(0, 0, 0, 0.2);
   font-size: 0.9em;

@@ -45,6 +45,7 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
+  white-space: nowrap;
   transition: all 0.15s ease;
 
   &:hover {
@@ -52,13 +53,6 @@
     border-color: #c0a060;
     color: #e8c772;
   }
-}
-
-.googleIcon {
-  width: 15px;
-  height: 15px;
-  display: inline-block;
-  flex-shrink: 0;
 }
 
 .userBtn {
@@ -73,11 +67,21 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
+  white-space: nowrap;
   transition: all 0.15s ease;
+}
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: #c0a060;
+@media (max-width: 600px) {
+  .loginBtnText,
+  .userName {
+    display: none;
+  }
+
+  .authContainer.inline {
+    .loginBtn,
+    .userBtn {
+      padding: 0 7px;
+    }
   }
 }
 

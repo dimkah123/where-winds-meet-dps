@@ -180,7 +180,9 @@ export function SimulationRunDetailPanel({
                     <td>{t(row.nameKey, row.name)}</td>
                     <td className={styles.numeric}>{fullNumber(row.count)}</td>
                     <td className={styles.numeric}>{fullNumber(row.expectedDamage)}</td>
-                    <td className={styles.numeric}>{fixed(row.percentOfTotal * 100, 1)} %</td>
+                    <td className={styles.numeric} style={{ whiteSpace: "nowrap" }}>
+                      {fixed(row.percentOfTotal * 100, 1)}%
+                    </td>
                     <td className="bar-col">
                       <div className="skill-bar-track">
                         <div

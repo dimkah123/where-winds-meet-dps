@@ -159,7 +159,7 @@ export function RotationBreakdownPanel({
                     </div>
                   </td>
                   <td>{row.count}</td>
-                  <td>{(row.percentOfTotal * 100).toFixed(1)} %</td>
+                  <td className={styles.percentCell}>{(row.percentOfTotal * 100).toFixed(1)}%</td>
                   <td>{fmt(dpsOverRotation(row.expectedDamage), 1)}</td>
                   <td>{fmt(row.expectedDamage, 0)}</td>
                 </tr>
@@ -249,7 +249,7 @@ function CompactRowGroup({
           </div>
         </td>
         <td>{row.attempt}</td>
-        <td>{(row.percentOfTotal * 100).toFixed(1)} %</td>
+        <td className={styles.percentCell}>{(row.percentOfTotal * 100).toFixed(1)}%</td>
         <td>{fmt(row.dps, 1)}</td>
         <td>{fmt(row.expectedDamage, 0)}</td>
       </tr>
@@ -267,7 +267,7 @@ function CompactRowGroup({
             <td>
               {sub.count} {sub.count === 1 ? "hit" : "hits"}
             </td>
-            <td>{(sub.percentOfTotal * 100).toFixed(1)} %</td>
+            <td className={styles.percentCell}>{(sub.percentOfTotal * 100).toFixed(1)}%</td>
             <td>{fmt(sub.dps, 1)}</td>
             <td>{fmt(sub.expectedDamage, 0)}</td>
           </tr>

@@ -32,6 +32,148 @@
     color: var(--color-accent, #c0a060);
     background: var(--color-surface-hover);
   }
+
+  &.hasAlerts {
+    border: 1px solid #e53935;
+    border-radius: 5px;
+    animation: alertRedPulse 1.8s ease-in-out infinite;
+    color: #ff6b6b;
+
+    .gearIcon {
+      color: #ff5252;
+    }
+  }
+}
+
+@keyframes alertRedPulse {
+  0% {
+    box-shadow: 0 0 0 1px #e53935, 0 0 4px rgba(229, 57, 53, 0.4);
+    border-color: #e53935;
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px #ff4d4f,
+      0 0 12px rgba(255, 77, 79, 0.85),
+      inset 0 0 6px rgba(229, 57, 53, 0.35);
+    border-color: #ff4d4f;
+  }
+  100% {
+    box-shadow: 0 0 0 1px #e53935, 0 0 4px rgba(229, 57, 53, 0.4);
+    border-color: #e53935;
+  }
+}
+
+.gearIconWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alertBadgeDot {
+  position: absolute;
+  top: -7px;
+  right: -9px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: #e53935;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 15px;
+  text-align: center;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+.alertsBlock {
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-border-strong, #3d3931);
+}
+
+.alertsRowBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border-strong, #3a3834);
+  border-radius: 6px;
+  color: var(--color-text, #f0f0f0);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--color-accent);
+  }
+
+  &.alertsActive {
+    background: rgba(229, 57, 53, 0.12);
+    border-color: rgba(229, 57, 53, 0.6);
+    box-shadow: 0 0 8px rgba(229, 57, 53, 0.2);
+
+    &:hover {
+      background: rgba(229, 57, 53, 0.18);
+      border-color: #ff4d4f;
+    }
+
+    .alertsTitle {
+      color: #ff6b6b;
+    }
+  }
+}
+
+.alertsRowLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alertsIcon {
+  font-size: 1.15em;
+  line-height: 1;
+}
+
+.alertsTextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.alertsTitle {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.alertsSubtitle {
+  font-size: 11px;
+  color: var(--color-text-dim, #999);
+}
+
+.alertsBadgeCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #e53935;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0 6px;
+  height: 18px;
+  min-width: 18px;
+  box-shadow: 0 0 6px rgba(229, 57, 53, 0.5);
+}
+
+.alertsArrow {
+  font-size: 13px;
+  color: var(--color-text-dim, #888);
 }
 
 .gearIcon {

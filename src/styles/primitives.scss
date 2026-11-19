@@ -234,6 +234,12 @@
   border-bottom: 1px solid var(--color-surface-raised);
 }
 
+.ranking-table th:not(:first-child),
+.ranking-table td:not(:first-child) {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
 .ranking-table th {
   text-align: left;
   color: var(--color-text-muted);

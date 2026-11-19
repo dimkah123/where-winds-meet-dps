@@ -637,11 +637,11 @@ function AppInner() {
   }, [activeAlertKeys, acknowledgedAlerts])
 
   const hasUnacknowledgedAlerts = unacknowledgedAlertsCount > 0
-  const shouldPulseAlertsTab = hasUnacknowledgedAlerts && !isAlertsDnd && pathname !== "/alerts"
 
   const TABS: {
     path: string
     label: string
+    shortLabel?: string
     align?: "right"
     gapBefore?: true
     badge?: number
@@ -654,12 +654,11 @@ function AppInner() {
     { path: "/simulation", label: t("app.simulation") },
     { path: "/skills", label: t("app.skillEditor") },
     {
-      path: "/alerts",
-      label: t("app.alerts"),
-      pulsing: shouldPulseAlertsTab,
-      badge: unacknowledgedAlertsCount > 0 ? unacknowledgedAlertsCount : undefined,
+      path: "/talents",
+      label: t("common.enhancementOdditiesTalents"),
+      shortLabel: t("common.talentsShort", "Таланты"),
+      align: "right",
     },
-    { path: "/talents", label: t("common.enhancementOdditiesTalents"), align: "right" },
     { path: "/profile", label: t("common.profiles"), gapBefore: true },
   ]
 
@@ -973,6 +972,9 @@ function AppInner() {
                 onResetSettings={resetHeaderSettings}
                 user={currentUser}
                 onOpenMyBuilds={() => setMyBuildsDialogOpen(true)}
+                alertCount={unacknowledgedAlertsCount}
+                hasAlerts={hasUnacknowledgedAlerts && !isAlertsDnd}
+                onOpenAlerts={() => navigate("/alerts")}
               />
             </div>
           </div>
@@ -1022,12 +1024,19 @@ function AppInner() {
                   (tab.pulsing ? ` ${styles.tabPulsing}` : "")
                 }
               >
-                {tab.label}
+                {tab.shortLabel ? (
+                  <>
+                    <span className={styles.tabFullLabel}>{tab.label}</span>
+                    <span className={styles.tabShortLabel}>{tab.shortLabel}</span>
+                  </>
+                ) : (
+                  tab.label
+                )}
                 {typeof tab.badge === "number" && tab.badge > 0 && (
                   <span className={styles.alertBadge}>{tab.badge}</span>
                 )}
               </NavLink>
-              {tab.path === "/alerts" && headerSettings.collapseHeader && (
+              {tab.path === "/skills" && headerSettings.collapseHeader && (
                 <div
                   className={styles.compactDpsWidget}
                   title={`${t("common.totalDamage")}: ${formatCompactDamage(headerResult.totalDamage)} · ${formatNumber(headerResult.rotationDuration, 2)}s ${rotationName ? `· ${rotationName}` : ""}`}

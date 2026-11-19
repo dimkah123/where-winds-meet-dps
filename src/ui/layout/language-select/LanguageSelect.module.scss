@@ -45,3 +45,15 @@
     }
   }
 }
+
+@media (max-width: 600px) {
+  .languageSelect.inline {
+    min-width: auto;
+    width: auto;
+
+    button {
+      padding: 0 6px !important;
+      font-size: 12px !important;
+    }
+  }
+}

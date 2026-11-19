@@ -91,6 +91,26 @@
 }
 
 @include breakpoints.below(breakpoints.$bp-560) {
+  .card {
+    padding: 5px 8px;
+    gap: 7px;
+  }
+
+  .iconTile {
+    width: 26px;
+    height: 26px;
+    font-size: 0.95em;
+  }
+
+  .title {
+    font-size: 0.84em;
+  }
+
+  .pill {
+    padding: 2px 7px;
+    font-size: 0.72em;
+  }
+
   .subtitle,
   .open {
     display: none;

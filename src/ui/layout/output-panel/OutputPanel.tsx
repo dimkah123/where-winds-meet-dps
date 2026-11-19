@@ -213,7 +213,7 @@ export function PerSkillTable({ result }: { result: Result }) {
               <td>{t(row.nameKey, row.name)}</td>
               <td>{row.count}</td>
               <td>{formatNumber(row.expectedDamage, 0)}</td>
-              <td>{(row.percentOfTotal * 100).toFixed(1)} %</td>
+              <td style={{ whiteSpace: "nowrap" }}>{(row.percentOfTotal * 100).toFixed(1)}%</td>
               <td className="bar-col">
                 <div className="skill-bar-track">
                   <div

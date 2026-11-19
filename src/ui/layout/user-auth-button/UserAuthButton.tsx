@@ -190,7 +190,9 @@ export function UserAuthButton({ onOpenMyBuilds, onUserChanged, inline }: Props)
               d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.57 1.26 6.59l4.02 3.09c.95-2.83 3.6-4.93 6.72-4.93z"
             />
           </svg>
-          <span>{isLoading ? "..." : t("share.cloud.login", "Войти")}</span>
+          <span className={styles.loginBtnText}>
+            {isLoading ? "..." : t("share.cloud.login", "Войти")}
+          </span>
         </button>
       )}
     </div>

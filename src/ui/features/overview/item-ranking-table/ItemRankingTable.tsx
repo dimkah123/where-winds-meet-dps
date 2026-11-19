@@ -41,7 +41,7 @@ export function ItemRankingTable({ rows }: Props) {
           <th>{t("common.amount")}</th>
           <th>{t("common.dpsDelta")}</th>
           <th>{t("overview.itemRankingTable.lift")}</th>
-          <th>{t("overview.itemRankingTable.lead")}</th>
+          <th className={styles.leadCol}>{t("overview.itemRankingTable.lead")}</th>
         </tr>
       </thead>
       <tbody>
@@ -63,15 +63,18 @@ export function ItemRankingTable({ rows }: Props) {
               </span>
               {t(row.labelKey, row.label)}
             </td>
-            <td>{row.unit === "percent" ? fmt(row.amount * 100, 2) + " %" : fmt(row.amount, 2)}</td>
+            <td>{row.unit === "percent" ? fmt(row.amount * 100, 2) + "%" : fmt(row.amount, 2)}</td>
             <td
               className={`${styles.dpsDelta} ${deltaSignClass(row.dpsDelta)}`}
               title={`${t("overview.itemRankingTable.expectedDps")}: ${fmt(row.expectedDps, 2)}`}
             >
               {fmtDpsDelta(row.dpsDelta)}
             </td>
-            <td>{(row.liftPercent * 100).toFixed(2) + " %"}</td>
-            <td style={{ color: row.leadVsMin === "(none)" ? "#666" : "#d8b070" }}>
+            <td>{(row.liftPercent * 100).toFixed(2) + "%"}</td>
+            <td
+              className={styles.leadCol}
+              style={{ color: row.leadVsMin === "(none)" ? "#666" : "#d8b070" }}
+            >
               {typeof row.leadVsMin === "number" ? row.leadVsMin.toFixed(2) : t("common.none")}
             </td>
           </tr>
