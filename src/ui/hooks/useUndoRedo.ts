@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useReducer, useRef } from "react"
 
 const MAX_HISTORY_STEPS = 50
 
@@ -14,6 +14,80 @@ export interface UndoRedo<T> {
   futureLength: number
 }
 
+interface HistoryState<T> {
+  past: T[]
+  present: T
+  future: T[]
+}
+
+type HistoryAction<T> =
+  | { type: "SET"; next: T; isEqual?: (a: T, b: T) => boolean }
+  | { type: "RESET"; initial: T }
+  | { type: "UNDO" }
+  | { type: "REDO" }
+
+function defaultIsEqual<T>(a: T, b: T): boolean {
+  if (a === b) return true
+  try {
+    return JSON.stringify(a) === JSON.stringify(b)
+  } catch {
+    return false
+  }
+}
+
+function historyReducer<T>(state: HistoryState<T>, action: HistoryAction<T>): HistoryState<T> {
+  switch (action.type) {
+    case "SET": {
+      const eq = action.isEqual ?? defaultIsEqual
+      if (eq(state.present, action.next)) return state
+      const updatedPast = [...state.past, state.present]
+      const trimmedPast =
+        updatedPast.length > MAX_HISTORY_STEPS
+          ? updatedPast.slice(updatedPast.length - MAX_HISTORY_STEPS)
+          : updatedPast
+      return {
+        past: trimmedPast,
+        present: action.next,
+        future: [],
+      }
+    }
+    case "RESET": {
+      return {
+        past: [],
+        present: action.initial,
+        future: [],
+      }
+    }
+    case "UNDO": {
+      if (state.past.length === 0) return state
+      const previous = state.past[state.past.length - 1]
+      const nextPast = state.past.slice(0, state.past.length - 1)
+      return {
+        past: nextPast,
+        present: previous,
+        future: [state.present, ...state.future],
+      }
+    }
+    case "REDO": {
+      if (state.future.length === 0) return state
+      const next = state.future[0]
+      const nextFuture = state.future.slice(1)
+      const updatedPast = [...state.past, state.present]
+      const trimmedPast =
+        updatedPast.length > MAX_HISTORY_STEPS
+          ? updatedPast.slice(updatedPast.length - MAX_HISTORY_STEPS)
+          : updatedPast
+      return {
+        past: trimmedPast,
+        present: next,
+        future: nextFuture,
+      }
+    }
+    default:
+      return state
+  }
+}
+
 export function useUndoRedo<T>(
   initialState: T,
   options?: {
@@ -21,86 +95,39 @@ export function useUndoRedo<T>(
     enableKeyboardShortcuts?: boolean
   },
 ): UndoRedo<T> {
-  const isEqual =
-    options?.isEqual ??
-    ((a: T, b: T) => {
-      if (a === b) return true
-      try {
-        return JSON.stringify(a) === JSON.stringify(b)
-      } catch {
-        return false
-      }
-    })
+  const [history, dispatch] = useReducer(historyReducer<T>, {
+    past: [],
+    present: initialState,
+    future: [],
+  })
 
-  const [past, setPast] = useState<T[]>([])
-  const [present, setPresent] = useState<T>(initialState)
-  const [future, setFuture] = useState<T[]>([])
+  const historyRef = useRef(history)
+  useEffect(() => {
+    historyRef.current = history
+  })
 
-  const presentRef = useRef(present)
-  presentRef.current = present
-
-  const pastRef = useRef(past)
-  pastRef.current = past
-
-  const futureRef = useRef(future)
-  futureRef.current = future
-
+  const customIsEqual = options?.isEqual
   const set = useCallback(
     (next: T) => {
-      const current = presentRef.current
-      if (isEqual(current, next)) return
-
-      setPast((prev) => {
-        const updated = [...prev, current]
-        if (updated.length > MAX_HISTORY_STEPS) {
-          return updated.slice(updated.length - MAX_HISTORY_STEPS)
-        }
-        return updated
-      })
-      setPresent(next)
-      setFuture([])
+      dispatch({ type: "SET", next, isEqual: customIsEqual })
     },
-    [isEqual],
+    [customIsEqual],
   )
 
-  const undo = useCallback(() => {
-    setPast((prevPast) => {
-      if (prevPast.length === 0) return prevPast
-      const previous = prevPast[prevPast.length - 1]
-      const nextPast = prevPast.slice(0, prevPast.length - 1)
+  const reset = useCallback((initial: T) => {
+    dispatch({ type: "RESET", initial })
+  }, [])
 
-      setFuture((prevFuture) => [presentRef.current, ...prevFuture])
-      setPresent(previous)
-      return nextPast
-    })
+  const undo = useCallback(() => {
+    dispatch({ type: "UNDO" })
   }, [])
 
   const redo = useCallback(() => {
-    setFuture((prevFuture) => {
-      if (prevFuture.length === 0) return prevFuture
-      const next = prevFuture[0]
-      const nextFuture = prevFuture.slice(1)
-
-      setPast((prevPast) => {
-        const updated = [...prevPast, presentRef.current]
-        if (updated.length > MAX_HISTORY_STEPS) {
-          return updated.slice(updated.length - MAX_HISTORY_STEPS)
-        }
-        return updated
-      })
-      setPresent(next)
-      return nextFuture
-    })
+    dispatch({ type: "REDO" })
   }, [])
 
-  const reset = useCallback((initial: T) => {
-    setPast([])
-    setFuture([])
-    setPresent(initial)
-  }, [])
-
-  const canUndo = past.length > 0
-  const canRedo = future.length > 0
+  const canUndo = history.past.length > 0
+  const canRedo = history.future.length > 0
 
   const enableShortcuts = options?.enableKeyboardShortcuts ?? true
 
@@ -108,50 +135,63 @@ export function useUndoRedo<T>(
     if (!enableShortcuts) return
 
     function onKeyDown(e: KeyboardEvent) {
-      const target = e.target as HTMLElement | null
-      if (
-        target &&
-        (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)
-      ) {
-        return
-      }
-
       const isCtrlOrCmd = e.ctrlKey || e.metaKey
       if (!isCtrlOrCmd) return
 
-      if (e.key === "z" || e.key === "Z") {
+      const isZ = e.code === "KeyZ" || e.key.toLowerCase() === "z" || e.key.toLowerCase() === "я"
+      const isY = e.code === "KeyY" || e.key.toLowerCase() === "y" || e.key.toLowerCase() === "н"
+
+      if (!isZ && !isY) return
+
+      const target = e.target as HTMLElement | null
+      const isTextEntry =
+        target &&
+        ((target.tagName === "INPUT" &&
+          (target as HTMLInputElement).type !== "checkbox" &&
+          (target as HTMLInputElement).type !== "radio" &&
+          (target as HTMLInputElement).type !== "range" &&
+          (target as HTMLInputElement).type !== "button" &&
+          (target as HTMLInputElement).type !== "submit") ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+
+      if (isTextEntry) {
+        return
+      }
+
+      if (isZ) {
         if (e.shiftKey) {
-          if (futureRef.current.length > 0) {
+          if (historyRef.current.future.length > 0) {
             e.preventDefault()
-            redo()
+            dispatch({ type: "REDO" })
           }
         } else {
-          if (pastRef.current.length > 0) {
+          if (historyRef.current.past.length > 0) {
             e.preventDefault()
-            undo()
+            dispatch({ type: "UNDO" })
           }
         }
-      } else if (e.key === "y" || e.key === "Y") {
-        if (futureRef.current.length > 0) {
+      } else if (isY) {
+        if (historyRef.current.future.length > 0) {
           e.preventDefault()
-          redo()
+          dispatch({ type: "REDO" })
         }
       }
     }
 
     window.addEventListener("keydown", onKeyDown)
     return () => window.removeEventListener("keydown", onKeyDown)
-  }, [enableShortcuts, undo, redo])
+  }, [enableShortcuts])
 
   return {
-    state: present,
+    state: history.present,
     set,
     reset,
     undo,
     redo,
     canUndo,
     canRedo,
-    pastLength: past.length,
-    futureLength: future.length,
+    pastLength: history.past.length,
+    futureLength: history.future.length,
   }
 }

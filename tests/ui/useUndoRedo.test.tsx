@@ -101,4 +101,29 @@ describe("useUndoRedo hook", () => {
     })
     expect(result.current.state.val).toBe("changed")
   })
+
+  it("handles keyboard events with Russian layout (Ctrl+Я and Ctrl+Н)", () => {
+    const { result } = renderHook(() => useUndoRedo({ val: "initial" }))
+
+    act(() => {
+      result.current.set({ val: "changed" })
+    })
+    expect(result.current.state.val).toBe("changed")
+
+    // Dispatch Ctrl+Я (Russian layout for Ctrl+Z)
+    act(() => {
+      window.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "я", code: "KeyZ", ctrlKey: true, bubbles: true }),
+      )
+    })
+    expect(result.current.state.val).toBe("initial")
+
+    // Dispatch Ctrl+Н (Russian layout for Ctrl+Y)
+    act(() => {
+      window.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "н", code: "KeyY", ctrlKey: true, bubbles: true }),
+      )
+    })
+    expect(result.current.state.val).toBe("changed")
+  })
 })

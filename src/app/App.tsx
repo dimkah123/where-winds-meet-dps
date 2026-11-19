@@ -373,7 +373,7 @@ function AppInner() {
     saveProfiles(next)
   }
 
-  function handleSave() {
+  const handleSave = useCallback(() => {
     if (sharedBannerInfo) return
     const next: ProfilesState = {
       ...committed,
@@ -383,6 +383,7 @@ function AppInner() {
     }
     persist(next)
     setLastSavedJson(draftJson)
+    // eslint-disable-next-line react-hooks/purity
     setSavedAt(Date.now())
 
     if (currentCloudId) {
@@ -404,7 +405,7 @@ function AppInner() {
         })
         .catch(() => {})
     }
-  }
+  }, [activeDraft, committed, currentCloudId, draftJson, headerResult.dps, sharedBannerInfo])
   async function handleReset() {
     if (isSimulationRunning) return
     if (!isDirty) return
@@ -736,7 +737,11 @@ function AppInner() {
                 className={styles.historyBtn}
                 onClick={handleUndo}
                 disabled={!canUndo || isSimulationRunning}
-                title="Отменить последнее действие (Ctrl+Z)"
+                title={
+                  canUndo
+                    ? "Отменить последнее действие (Ctrl+Z)"
+                    : "История изменений пуста (Ctrl+Z)"
+                }
                 aria-label="Отменить (Ctrl+Z)"
               >
                 ↶
@@ -746,7 +751,11 @@ function AppInner() {
                 className={styles.historyBtn}
                 onClick={handleRedo}
                 disabled={!canRedo || isSimulationRunning}
-                title="Повторить отменённое действие (Ctrl+Y или Ctrl+Shift+Z)"
+                title={
+                  canRedo
+                    ? "Повторить отменённое действие (Ctrl+Y или Ctrl+Shift+Z)"
+                    : "Нет действий для повтора"
+                }
                 aria-label="Повторить (Ctrl+Y)"
               >
                 ↷
