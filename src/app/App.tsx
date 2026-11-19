@@ -812,12 +812,8 @@ function AppInner() {
                       className={styles.toolbarBtn}
                       onClick={handleUndo}
                       disabled={!canUndo || isSimulationRunning}
-                      title={
-                        canUndo
-                          ? "Отменить последнее действие (Ctrl+Z)"
-                          : "История изменений пуста (Ctrl+Z)"
-                      }
-                      aria-label="Отменить (Ctrl+Z)"
+                      title={canUndo ? t("app.undoTooltip") : t("app.undoEmptyTooltip")}
+                      aria-label={t("app.undo")}
                     >
                       <svg
                         className={styles.toolbarIcon}
@@ -838,12 +834,8 @@ function AppInner() {
                       className={styles.toolbarBtn}
                       onClick={handleRedo}
                       disabled={!canRedo || isSimulationRunning}
-                      title={
-                        canRedo
-                          ? "Повторить отменённое действие (Ctrl+Y или Ctrl+Shift+Z)"
-                          : "Нет действий для повтора"
-                      }
-                      aria-label="Повторить (Ctrl+Y)"
+                      title={canRedo ? t("app.redoTooltip") : t("app.redoEmptyTooltip")}
+                      aria-label={t("app.redo")}
                     >
                       <svg
                         className={styles.toolbarIcon}
@@ -882,15 +874,12 @@ function AppInner() {
                       aria-label={t("common.save")}
                       title={
                         sharedBannerInfo
-                          ? t(
-                              "app.saveDisabledSharedBuild",
-                              "Нельзя перезаписать свой профиль чужим билдом. Сохраните его в профили с помощью кнопки «Сохранить в мои профили».",
-                            )
+                          ? t("app.saveDisabledSharedBuild")
                           : isDirty
-                            ? `${t("common.save")} (Ctrl+S)`
+                            ? t("app.saveChangesTooltip")
                             : isJustSaved
-                              ? t("app.saved")
-                              : t("app.saved2")
+                              ? t("app.saveJustSavedTooltip")
+                              : t("app.saveCleanTooltip")
                       }
                     >
                       <svg
@@ -916,8 +905,8 @@ function AppInner() {
                       aria-label={t("app.discardChanges")}
                       title={
                         isDirty
-                          ? t("app.discardEditsSinceTheLast")
-                          : t("app.noChangesToDiscard", "Нет несохранённых изменений")
+                          ? t("app.discardEditsTooltip")
+                          : t("app.noChangesToDiscardTooltip")
                       }
                     >
                       <svg
@@ -948,7 +937,7 @@ function AppInner() {
                   setShareTargetProfile(null)
                   setShareDialogOpen(true)
                 }}
-                title={t("common.shareBuild")}
+                title={t("app.shareTooltip")}
                 aria-label={t("common.shareBuild")}
               >
                 <svg
