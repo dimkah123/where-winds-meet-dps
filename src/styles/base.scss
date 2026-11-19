@@ -39,7 +39,8 @@ body {
   height: 100dvh;
   box-sizing: border-box;
   overflow: hidden;
-  background: var(--color-bg);
+  background: radial-gradient(ellipse 130% 90% at 50% -15%, #242018 0%, #171618 60%, #0d0d0f 100%);
+  background-attachment: fixed;
 }
 
 @include breakpoints.below(breakpoints.$bp-700) {

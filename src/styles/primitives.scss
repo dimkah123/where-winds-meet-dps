@@ -1,6 +1,9 @@
 .panel {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: linear-gradient(180deg, rgba(36, 36, 36, 0.95) 0%, rgba(27, 27, 28, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
   border-radius: 6px;
   padding: 10px 14px;
   margin-bottom: 10px;

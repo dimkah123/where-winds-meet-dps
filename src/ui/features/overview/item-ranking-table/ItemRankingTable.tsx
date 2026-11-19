@@ -47,7 +47,22 @@ export function ItemRankingTable({ rows }: Props) {
       <tbody>
         {sorted.map((row, index) => (
           <tr key={row.statLineId + index}>
-            <td>{t(row.labelKey, row.label)}</td>
+            <td>
+              <span
+                className={`${styles.rankBadge} ${
+                  index === 0
+                    ? styles.rankBadge1
+                    : index === 1
+                      ? styles.rankBadge2
+                      : index === 2
+                        ? styles.rankBadge3
+                        : styles.rankBadgeDim
+                }`}
+              >
+                {index + 1}
+              </span>
+              {t(row.labelKey, row.label)}
+            </td>
             <td>{row.unit === "percent" ? fmt(row.amount * 100, 2) + " %" : fmt(row.amount, 2)}</td>
             <td
               className={`${styles.dpsDelta} ${deltaSignClass(row.dpsDelta)}`}

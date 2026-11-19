@@ -6,8 +6,11 @@
   flex-wrap: nowrap;
   gap: 28px;
   align-items: center;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: linear-gradient(180deg, rgba(37, 36, 35, 0.95) 0%, rgba(27, 26, 26, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
   border-radius: 6px;
   padding: 12px 18px;
   margin-bottom: 10px;
@@ -31,9 +34,13 @@
 
 .dps .value {
   font-size: 1.9em;
-  color: var(--color-accent);
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
+  font-weight: 700;
+  background: linear-gradient(135deg, #fae2a6 0%, #e5a93b 50%, #c48b28 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 10px rgba(229, 169, 59, 0.28));
 }
 
 .subline {

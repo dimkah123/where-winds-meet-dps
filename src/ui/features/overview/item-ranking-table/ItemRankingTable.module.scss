@@ -29,3 +29,45 @@
 .dpsDelta:global(.is-zero) {
   color: var(--color-text-muted);
 }
+
+.rankBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 3px;
+  font-size: 0.8em;
+  font-weight: 700;
+  margin-right: 6px;
+  line-height: 1;
+  vertical-align: middle;
+  font-variant-numeric: tabular-nums;
+  box-sizing: border-box;
+}
+
+.rankBadge1 {
+  background: linear-gradient(135deg, #fae2a6, #c48b28);
+  color: #12100a;
+  box-shadow: 0 0 8px rgba(229, 169, 59, 0.4);
+}
+
+.rankBadge2 {
+  background: linear-gradient(135deg, #e4e7ec, #98a2b3);
+  color: #101216;
+  box-shadow: 0 0 6px rgba(200, 205, 215, 0.25);
+}
+
+.rankBadge3 {
+  background: linear-gradient(135deg, #e8a673, #9e5b2e);
+  color: #150d06;
+  box-shadow: 0 0 6px rgba(217, 142, 84, 0.25);
+}
+
+.rankBadgeDim {
+  color: var(--color-text-faint);
+  font-size: 0.78em;
+  font-weight: 500;
+  opacity: 0.7;
+}
