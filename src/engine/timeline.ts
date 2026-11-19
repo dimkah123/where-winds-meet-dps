@@ -117,11 +117,7 @@ import {
   type DeferredBuffGrant,
 } from "./buffs/buffEngine"
 import { AFTER_HIT_SEC, SAME_FRAME_STEP_SEC } from "./buffs/frameOrder"
-import {
-  distanceAfterApproach,
-  applyDisplacement,
-  type Displacement,
-} from "./distance"
+import { distanceAfterApproach, applyDisplacement, type Displacement } from "./distance"
 import { IN_COMBAT_STATUS } from "./combatState"
 import type { ConditionalFinalCrit } from "./buffs/buffModule"
 import { PROP_TO_PROPERTY, type SkillProperties } from "./effects/context"
@@ -1971,7 +1967,9 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
     const isPhalanxCharged = castResolution.skill.tags?.includes(ROLE.phalanxCharged)
     const downSoldierHit = isPhalanxCharged
       ? occurringHits.find((h) =>
-          h.triggers?.some((t) => t.kind === "castSkill" && t.targetId.includes("anxisoldiermodown")),
+          h.triggers?.some(
+            (t) => t.kind === "castSkill" && t.targetId.includes("anxisoldiermodown"),
+          ),
         )
       : undefined
     const downOffsetFrames = downSoldierHit
@@ -1981,7 +1979,9 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
 
     const jumpSoldierHit = isPhalanxCharged
       ? occurringHits.find((h) =>
-          h.triggers?.some((t) => t.kind === "castSkill" && t.targetId.includes("anxisoldiermojump")),
+          h.triggers?.some(
+            (t) => t.kind === "castSkill" && t.targetId.includes("anxisoldiermojump"),
+          ),
         )
       : undefined
     const jumpOffsetFrames = jumpSoldierHit
@@ -2002,7 +2002,11 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
         cast.writtenDistance = landingDistance
         currentDistanceMeters = landingDistance
       } else {
-        ledger.recordStack(TARGET_DISTANCE_STATUS, Math.max(landingFrame, loopFrame), landingDistance)
+        ledger.recordStack(
+          TARGET_DISTANCE_STATUS,
+          Math.max(landingFrame, loopFrame),
+          landingDistance,
+        )
         currentDistanceMeters = landingDistance
       }
     }

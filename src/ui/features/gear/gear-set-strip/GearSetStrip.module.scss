@@ -84,7 +84,10 @@
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
-  transition: background-color 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+  transition:
+    background-color 0.12s ease,
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
 
   &.on {
     border-color: var(--color-positive);

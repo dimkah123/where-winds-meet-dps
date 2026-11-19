@@ -51,12 +51,10 @@ export function GearSetStrip({ inputs, onChangeBowSet }: Props) {
 
   const weaponsWithoutSet = equippedWeapons.filter((piece) => !piece.set)
 
-  const currentBowLevel = (
-    activeBow?.level ??
+  const currentBowLevel = (activeBow?.level ??
     inputs.bowGear.bow?.level ??
     inputs.bowGear.thumbRing?.level ??
-    100
-  ) as BowGearLevel
+    100) as BowGearLevel
   const levelForBonus = (
     currentBowLevel in BOW_SET_DEFS.crit.value ? currentBowLevel : 100
   ) as BowGearLevel
@@ -151,9 +149,13 @@ export function GearSetStrip({ inputs, onChangeBowSet }: Props) {
               {isIncomplete && (
                 <span
                   className={styles.warningChip}
-                  title={t("gear.setWarningIncomplete").replace("{count}", `${count}/${FOUR_PIECE_SIZE}`)}
+                  title={t("gear.setWarningIncomplete").replace(
+                    "{count}",
+                    `${count}/${FOUR_PIECE_SIZE}`,
+                  )}
                 >
-                  ⚠️ {t("gear.setWarningIncomplete").replace("{count}", `${count}/${FOUR_PIECE_SIZE}`)}
+                  ⚠️{" "}
+                  {t("gear.setWarningIncomplete").replace("{count}", `${count}/${FOUR_PIECE_SIZE}`)}
                 </span>
               )}
             </Fragment>
@@ -190,7 +192,10 @@ export function GearSetStrip({ inputs, onChangeBowSet }: Props) {
                 title={t("gear.quickSelectBowSet")}
               >
                 <span>
-                  {formatSetBonusValue(bowDefinition.stat, bowDefinition.value[activeBow.level] ?? 0)}{" "}
+                  {formatSetBonusValue(
+                    bowDefinition.stat,
+                    bowDefinition.value[activeBow.level] ?? 0,
+                  )}{" "}
                   {t(setBonusStatKey(bowDefinition.stat))}
                 </span>
                 <span className={styles.bowChevron} aria-hidden="true">

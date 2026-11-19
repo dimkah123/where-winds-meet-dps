@@ -91,17 +91,13 @@ describe("useUndoRedo hook", () => {
 
     // Dispatch Ctrl+Z
     act(() => {
-      window.dispatchEvent(
-        new KeyboardEvent("keydown", { key: "z", ctrlKey: true, bubbles: true }),
-      )
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "z", ctrlKey: true, bubbles: true }))
     })
     expect(result.current.state.val).toBe("initial")
 
     // Dispatch Ctrl+Y
     act(() => {
-      window.dispatchEvent(
-        new KeyboardEvent("keydown", { key: "y", ctrlKey: true, bubbles: true }),
-      )
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "y", ctrlKey: true, bubbles: true }))
     })
     expect(result.current.state.val).toBe("changed")
   })

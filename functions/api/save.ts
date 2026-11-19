@@ -1,10 +1,4 @@
-import {
-  generateShortId,
-  generateToken,
-  jsonResponse,
-  type EventContext,
-  type Env,
-} from "../types"
+import { generateShortId, generateToken, jsonResponse, type EventContext, type Env } from "../types"
 import { resolveUserId } from "../auth"
 
 interface SaveBody {

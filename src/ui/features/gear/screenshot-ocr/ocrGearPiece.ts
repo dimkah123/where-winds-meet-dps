@@ -844,7 +844,10 @@ export function parseGearScreenshot(
   const rawLines = text.split(/\r?\n/)
   const lines: string[] = []
   for (const raw of rawLines) {
-    const cleaned = raw.trim().replace(/^[|!·•\s_-]+/u, "").trim()
+    const cleaned = raw
+      .trim()
+      .replace(/^[|!·•\s_-]+/u, "")
+      .trim()
     if (cleaned.length > 0 && /[a-zA-Zа-яА-ЯёЁ0-9]/.test(cleaned)) {
       lines.push(cleaned)
     }

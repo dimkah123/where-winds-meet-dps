@@ -10,7 +10,8 @@ import { defaultInputs } from "../../src/engine/defaults"
 
 describe("shareBuild engine", () => {
   it("decodes user payload from production and restores graduation build", async () => {
-    const userPayload = "vZNNbtswEIWvIrz1RCAli6K4TZGdkwLpTuCCtmlbqCwFFOG2CLTsAbruJXqU5EYFJcdQ_BN01Q1BzBDve_NIPmMPlRCWUOh829juqa78o3e22fgtCAsoLgkbqGewsNRQnDHCN6iyTATJLOaahl0RF5pKnhKLmZCaylTSTMYiFCnL4xlxrQkdFJa1Xfsna76CYKAYweyhWMwT2RP4NZA4iqaJpjILJClnB344QMEMF4OFQlzCOSh-Cs17QvIRdBAscjkhaSplqKapHAdM40JcnvASMsyZ_n_k7Aw54RwUA5ERiznLk9Noj5HrCYPnbxAWksz-kTHVTZPjrabZYXsFIYqeIK4w-PSxjbL5-CzH5N7iTGIZ9M_N5x-aH0WyPKgU547fDXU1oX4o4eX366_Xny9_QPBQmFff7Sri0bxqQFhBYV05C8J6uFrz42Fvm7va-IWzZhWO7Ab1xfA3F1Allq7yIM6YHiSnhZ6w24VpcOfazt_c1mYV3VebrQ_4yrpIQFOJeetMbaPbrWlOOo_emtXadD76ZPetr9rmff_L1rXG33yurFvaSUv3fwE"
+    const userPayload =
+      "vZNNbtswEIWvIrz1RCAli6K4TZGdkwLpTuCCtmlbqCwFFOG2CLTsAbruJXqU5EYFJcdQ_BN01Q1BzBDve_NIPmMPlRCWUOh829juqa78o3e22fgtCAsoLgkbqGewsNRQnDHCN6iyTATJLOaahl0RF5pKnhKLmZCaylTSTMYiFCnL4xlxrQkdFJa1Xfsna76CYKAYweyhWMwT2RP4NZA4iqaJpjILJClnB344QMEMF4OFQlzCOSh-Cs17QvIRdBAscjkhaSplqKapHAdM40JcnvASMsyZ_n_k7Aw54RwUA5ERiznLk9Noj5HrCYPnbxAWksz-kTHVTZPjrabZYXsFIYqeIK4w-PSxjbL5-CzH5N7iTGIZ9M_N5x-aH0WyPKgU547fDXU1oX4o4eX366_Xny9_QPBQmFff7Sri0bxqQFhBYV05C8J6uFrz42Fvm7va-IWzZhWO7Ab1xfA3F1Allq7yIM6YHiSnhZ6w24VpcOfazt_c1mYV3VebrQ_4yrpIQFOJeetMbaPbrWlOOo_emtXadD76ZPetr9rmff_L1rXG33yurFvaSUv3fwE"
     const decoded = await decodeSharedBuild(userPayload)
     expect(decoded.author).toBe("Лёха")
     expect(decoded.title).toBe("Mixed 1 Min")
@@ -42,7 +43,12 @@ describe("shareBuild engine", () => {
     const { runEngine } = await import("../../src/engine/dps")
     const readyInputs = applySetBonuses(withDerivedStats(decoded.inputs))
     const dps = runEngine(readyInputs)
-    console.log("Calculated DPS for Witness 3 Heng + Bow:", dps.dps, "totalDamage:", dps.totalDamage)
+    console.log(
+      "Calculated DPS for Witness 3 Heng + Bow:",
+      dps.dps,
+      "totalDamage:",
+      dps.totalDamage,
+    )
     expect(dps.dps).toBeGreaterThan(60000)
   })
 

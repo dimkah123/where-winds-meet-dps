@@ -45,27 +45,20 @@ const CATEGORY_RULES: CategoryRule[] = [
     nameKey: "rotation.breakdown.cat.moSoldier",
     fallbackName: "Mo Blade Anxi Soldier",
     match: (name, bd) =>
-      /anxisoldiermo/i.test(name) ||
-      /солдат.*мо/i.test(bd) ||
-      /mo.*anxi/i.test(bd),
+      /anxisoldiermo/i.test(name) || /солдат.*мо/i.test(bd) || /mo.*anxi/i.test(bd),
   },
   {
     id: "hengSoldier",
     nameKey: "rotation.breakdown.cat.hengSoldier",
     fallbackName: "Heng Blade Anxi Soldier",
     match: (name, bd) =>
-      /anxisoldierheng/i.test(name) ||
-      /солдат.*хэн/i.test(bd) ||
-      /heng.*anxi/i.test(bd),
+      /anxisoldierheng/i.test(name) || /солдат.*хэн/i.test(bd) || /heng.*anxi/i.test(bd),
   },
   {
     id: "flute",
     nameKey: "rotation.breakdown.cat.flute",
     fallbackName: "Flute Chanting a Thousand Waves",
-    match: (name, bd) =>
-      /flute/i.test(name) ||
-      /flute/i.test(bd) ||
-      /флейта/i.test(bd),
+    match: (name, bd) => /flute/i.test(name) || /flute/i.test(bd) || /флейта/i.test(bd),
   },
   {
     id: "snowbreakSpring",
@@ -114,9 +107,7 @@ const CATEGORY_RULES: CategoryRule[] = [
     id: "burstingNine",
     nameKey: "rotation.breakdown.cat.burstingNine",
     fallbackName: "Bursting Nine",
-    match: (name, bd) =>
-      /bursting/i.test(name) ||
-      /разрывающий/i.test(bd),
+    match: (name, bd) => /bursting/i.test(name) || /разрывающий/i.test(bd),
   },
   {
     id: "fireSolidFoundation",
@@ -152,9 +143,7 @@ const CATEGORY_RULES: CategoryRule[] = [
     nameKey: "rotation.breakdown.cat.totalAnnihilationSoul",
     fallbackName: "Total Annihilation - Soul",
     match: (name, bd) =>
-      /phalanxq.*soul/i.test(name) ||
-      /total.*soul/i.test(name) ||
-      /уничтожение.*душа/i.test(bd),
+      /phalanxq.*soul/i.test(name) || /total.*soul/i.test(name) || /уничтожение.*душа/i.test(bd),
   },
   {
     id: "totalAnnihilationSupreme",
@@ -170,9 +159,7 @@ const CATEGORY_RULES: CategoryRule[] = [
     nameKey: "rotation.breakdown.cat.totalAnnihilation",
     fallbackName: "Total Annihilation",
     match: (name, bd) =>
-      /phalanxq/i.test(name) ||
-      /total.*annihilation/i.test(name) ||
-      /полное уничтожение/i.test(bd),
+      /phalanxq/i.test(name) || /total.*annihilation/i.test(name) || /полное уничтожение/i.test(bd),
   },
   {
     id: "moraleChant",
@@ -191,18 +178,14 @@ const CATEGORY_RULES: CategoryRule[] = [
     id: "slide",
     nameKey: "rotation.breakdown.cat.slide",
     fallbackName: "Slide",
-    match: (name, bd) =>
-      /slide/i.test(name) ||
-      /скольжение/i.test(bd),
+    match: (name, bd) => /slide/i.test(name) || /скольжение/i.test(bd),
   },
   {
     id: "dualWeapon",
     nameKey: "rotation.breakdown.cat.dualWeapon",
     fallbackName: "Dual-Weapon Skill",
     match: (name, bd) =>
-      /dual/i.test(name) ||
-      /парное оружие/i.test(bd) ||
-      /двойное оружие/i.test(bd),
+      /dual/i.test(name) || /парное оружие/i.test(bd) || /двойное оружие/i.test(bd),
   },
   {
     id: "legionSummoner",

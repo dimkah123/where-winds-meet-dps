@@ -171,10 +171,7 @@ function encodeToCompactV2(payload: SharedBuildPayload): CompactBuildV2 {
 
     const w: CompactWordEntry[] = (piece.words || []).map((wordEntry) => {
       const wordIdx = (GEAR_WORD_IDS as readonly string[]).indexOf(wordEntry.word)
-      const res: CompactWordEntry = [
-        wordIdx >= 0 ? wordIdx : wordEntry.word,
-        wordEntry.value,
-      ]
+      const res: CompactWordEntry = [wordIdx >= 0 ? wordIdx : wordEntry.word, wordEntry.value]
       if (wordEntry.retuned) res[2] = 1
       return res
     })
@@ -290,8 +287,7 @@ function decodeFromCompactV2(v2: CompactBuildV2): SharedBuildPayload {
       if (Array.isArray(cp.w)) {
         cp.w.forEach((cw, idx) => {
           if (idx < 5 && cw) {
-            const wordId =
-              typeof cw[0] === "number" ? GEAR_WORD_IDS[cw[0]] || "" : String(cw[0])
+            const wordId = typeof cw[0] === "number" ? GEAR_WORD_IDS[cw[0]] || "" : String(cw[0])
             words[idx] = {
               word: (wordId as any) || "",
               value: cw[1] || 0,
@@ -303,8 +299,7 @@ function decodeFromCompactV2(v2: CompactBuildV2): SharedBuildPayload {
 
       let attunement = ""
       if (cp.a !== undefined) {
-        attunement =
-          typeof cp.a === "number" ? ATTUNEMENT_OPTIONS[cp.a]?.id || "" : String(cp.a)
+        attunement = typeof cp.a === "number" ? ATTUNEMENT_OPTIONS[cp.a]?.id || "" : String(cp.a)
       }
 
       const piece: GearPiece = {

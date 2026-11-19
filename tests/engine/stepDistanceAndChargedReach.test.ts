@@ -4,7 +4,10 @@ import { defaultInputs } from "../../src/engine/defaults"
 import { makeRotation, makeStep } from "../../src/engine/rotation"
 import { SKILL as STONESPLIT_SKILL } from "../../src/data/skills/stonesplit-strength/ids"
 import { SKILL as MYSTIC_SKILL } from "../../src/data/skills/mystic/ids"
-import { parseReadableRotation, readableRotationFromSteps } from "../../src/ui/features/rotation/readableRotation"
+import {
+  parseReadableRotation,
+  readableRotationFromSteps,
+} from "../../src/ui/features/rotation/readableRotation"
 import { classDefinition } from "../../src/definitions/classes/registry"
 
 describe("Mo Charged attack distance and step distance overrides", () => {

@@ -151,8 +151,7 @@ export function GearSetDialog({ inputs, target, onApply, onClose }: Props) {
     if (target.kind === "bow") {
       const partnerSlot: BowSlot = target.slot === "bow" ? "thumbRing" : "bow"
       const partnerSet = inputs.bowGear[partnerSlot]?.set
-      const isPaired =
-        partnerSet === pendingSetId || (partnerSet === null && pendingSetId !== null)
+      const isPaired = partnerSet === pendingSetId || (partnerSet === null && pendingSetId !== null)
       return `${isPaired ? BOW_SET_PIECES : 1}/${BOW_SET_PIECES} · ${
         isPaired ? t("gear.setDialog.reachPair") : t("gear.setDialog.reachNone")
       }`

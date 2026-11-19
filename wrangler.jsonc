@@ -1,11 +1,4 @@
 {
   "name": "where-winds-meet-dps",
-  "pages_build_output_dir": "dist",
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "wwm-dps-db",
-      "database_id": "wwm-dps-db"
-    }
-  ]
+  "pages_build_output_dir": "dist"
 }

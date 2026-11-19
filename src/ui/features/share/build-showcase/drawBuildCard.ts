@@ -424,35 +424,82 @@ export function drawBuildCard(
 
   // Row 1: Power | Agility
   currentY += 21
-  drawStatPair(ctx, subCol1X, currentY, subColW, labels?.powerLabel || "Power", fmtAtk(data.power ?? 0), {
-    valColor: "#f0f0f0",
-  })
-  drawStatPair(ctx, subCol2X, currentY, subColW, labels?.agilityLabel || "Agility", fmtAtk(data.agility ?? 0), {
-    valColor: "#e8c772",
-  })
+  drawStatPair(
+    ctx,
+    subCol1X,
+    currentY,
+    subColW,
+    labels?.powerLabel || "Power",
+    fmtAtk(data.power ?? 0),
+    {
+      valColor: "#f0f0f0",
+    },
+  )
+  drawStatPair(
+    ctx,
+    subCol2X,
+    currentY,
+    subColW,
+    labels?.agilityLabel || "Agility",
+    fmtAtk(data.agility ?? 0),
+    {
+      valColor: "#e8c772",
+    },
+  )
 
   // Row 2: Momentum | Constitution
   currentY += 20
-  drawStatPair(ctx, subCol1X, currentY, subColW, labels?.momentumLabel || "Momentum", fmtAtk(data.momentum ?? 0), {
-    valColor: "#f0f0f0",
-  })
-  drawStatPair(ctx, subCol2X, currentY, subColW, labels?.constitutionLabel || "Constitution", fmtAtk(data.body ?? 0), {
-    valColor: "#f0f0f0",
-  })
+  drawStatPair(
+    ctx,
+    subCol1X,
+    currentY,
+    subColW,
+    labels?.momentumLabel || "Momentum",
+    fmtAtk(data.momentum ?? 0),
+    {
+      valColor: "#f0f0f0",
+    },
+  )
+  drawStatPair(
+    ctx,
+    subCol2X,
+    currentY,
+    subColW,
+    labels?.constitutionLabel || "Constitution",
+    fmtAtk(data.body ?? 0),
+    {
+      valColor: "#f0f0f0",
+    },
+  )
 
   // Section 2: THREE RATES
   currentY += 25
-  drawSectionHeading(ctx, subCol1X, currentY, panel1W - 32, labels?.threeRatesTitle || "THREE RATES")
+  drawSectionHeading(
+    ctx,
+    subCol1X,
+    currentY,
+    panel1W - 32,
+    labels?.threeRatesTitle || "THREE RATES",
+  )
 
   // Row 1: Precision Rate | Critical Rate
   currentY += 21
   const precText =
-    data.effPrecisionRate !== undefined && Math.abs(data.precisionRate - data.effPrecisionRate) > 0.0001
+    data.effPrecisionRate !== undefined &&
+    Math.abs(data.precisionRate - data.effPrecisionRate) > 0.0001
       ? `${fmtRate(data.precisionRate)} → ${fmtRate(data.effPrecisionRate)}`
       : fmtRate(data.precisionRate)
-  drawStatPair(ctx, subCol1X, currentY, subColW, labels?.precisionLabel || "Precision Rate", precText, {
-    valColor: "#f0f0f0",
-  })
+  drawStatPair(
+    ctx,
+    subCol1X,
+    currentY,
+    subColW,
+    labels?.precisionLabel || "Precision Rate",
+    precText,
+    {
+      valColor: "#f0f0f0",
+    },
+  )
 
   const critText =
     data.effCritRate !== undefined && Math.abs(data.critRate - data.effCritRate) > 0.0001
@@ -465,12 +512,21 @@ export function drawBuildCard(
   // Row 2: Affinity Rate | Direct Crit
   currentY += 20
   const affText =
-    data.effAffinityRate !== undefined && Math.abs(data.affinityRate - data.effAffinityRate) > 0.0001
+    data.effAffinityRate !== undefined &&
+    Math.abs(data.affinityRate - data.effAffinityRate) > 0.0001
       ? `${fmtRate(data.affinityRate)} → ${fmtRate(data.effAffinityRate)}`
       : fmtRate(data.affinityRate)
-  drawStatPair(ctx, subCol1X, currentY, subColW, labels?.affinityLabel || "Affinity Rate", affText, {
-    valColor: "#f0f0f0",
-  })
+  drawStatPair(
+    ctx,
+    subCol1X,
+    currentY,
+    subColW,
+    labels?.affinityLabel || "Affinity Rate",
+    affText,
+    {
+      valColor: "#f0f0f0",
+    },
+  )
 
   drawStatPair(
     ctx,
@@ -520,7 +576,7 @@ export function drawBuildCard(
     currentY,
     subColW,
     labels?.finalCritAffinityLabel || "Final Crit & Affinity",
-    fmtRate(data.finalCritAffinity ?? (data.critRate + data.affinityRate)),
+    fmtRate(data.finalCritAffinity ?? data.critRate + data.affinityRate),
     { valColor: "#e8c772" },
   )
 
@@ -547,7 +603,13 @@ export function drawBuildCard(
 
   // Section 3: ATTACK & PENETRATION
   currentY += 25
-  drawSectionHeading(ctx, subCol1X, currentY, panel1W - 32, labels?.attackTitle || "ATTACK & PENETRATION")
+  drawSectionHeading(
+    ctx,
+    subCol1X,
+    currentY,
+    panel1W - 32,
+    labels?.attackTitle || "ATTACK & PENETRATION",
+  )
 
   // Row 1: Min Physical Attack | Max Physical Attack
   currentY += 21
@@ -555,17 +617,33 @@ export function drawBuildCard(
     data.minPhysEff && Math.abs(data.minPhys - data.minPhysEff) > 0.1
       ? `${fmtAtk(data.minPhys)} → ${fmtAtk(data.minPhysEff)}`
       : fmtAtk(data.minPhys)
-  drawStatPair(ctx, subCol1X, currentY, subColW, labels?.minPhysAttackLabel || "Min Physical Attack", minPhysText, {
-    valColor: "#f0f0f0",
-  })
+  drawStatPair(
+    ctx,
+    subCol1X,
+    currentY,
+    subColW,
+    labels?.minPhysAttackLabel || "Min Physical Attack",
+    minPhysText,
+    {
+      valColor: "#f0f0f0",
+    },
+  )
 
   const maxPhysText =
     data.maxPhysEff && Math.abs(data.maxPhys - data.maxPhysEff) > 0.1
       ? `${fmtAtk(data.maxPhys)} → ${fmtAtk(data.maxPhysEff)}`
       : fmtAtk(data.maxPhys)
-  drawStatPair(ctx, subCol2X, currentY, subColW, labels?.maxPhysAttackLabel || "Max Physical Attack", maxPhysText, {
-    valColor: "#f0f0f0",
-  })
+  drawStatPair(
+    ctx,
+    subCol2X,
+    currentY,
+    subColW,
+    labels?.maxPhysAttackLabel || "Max Physical Attack",
+    maxPhysText,
+    {
+      valColor: "#f0f0f0",
+    },
+  )
 
   // Primary element & Foreign elements
   const primaryElem = data.elements.find((e) => e.isPrimary) || data.elements[0]
@@ -603,14 +681,30 @@ export function drawBuildCard(
   currentY += 20
   const formlessMin = data.formlessMin ?? 0
   const formlessMax = data.formlessMax ?? 0
-  drawStatPair(ctx, subCol1X, currentY, subColW, labels?.minFormlessLabel || "Min Formless Attack", fmtAtk(formlessMin), {
-    valColor: formlessMin > 0 ? "#f0f0f0" : "#555555",
-    dimmed: formlessMin <= 0,
-  })
-  drawStatPair(ctx, subCol2X, currentY, subColW, labels?.maxFormlessLabel || "Max Formless Attack", fmtAtk(formlessMax), {
-    valColor: formlessMax > 0 ? "#f0f0f0" : "#555555",
-    dimmed: formlessMax <= 0,
-  })
+  drawStatPair(
+    ctx,
+    subCol1X,
+    currentY,
+    subColW,
+    labels?.minFormlessLabel || "Min Formless Attack",
+    fmtAtk(formlessMin),
+    {
+      valColor: formlessMin > 0 ? "#f0f0f0" : "#555555",
+      dimmed: formlessMin <= 0,
+    },
+  )
+  drawStatPair(
+    ctx,
+    subCol2X,
+    currentY,
+    subColW,
+    labels?.maxFormlessLabel || "Max Formless Attack",
+    fmtAtk(formlessMax),
+    {
+      valColor: formlessMax > 0 ? "#f0f0f0" : "#555555",
+      dimmed: formlessMax <= 0,
+    },
+  )
 
   // Row 7: Physical Penetration | Primary Penetration
   currentY += 20
@@ -624,9 +718,17 @@ export function drawBuildCard(
     { valColor: "#f0f0f0" },
   )
   const penLbl = primaryElem?.penLabel || `${primaryElem?.name || "Attr"} Penetration`
-  drawStatPair(ctx, subCol2X, currentY, subColW, penLbl, fmtPenetration(primaryElem?.penetration ?? 0), {
-    valColor: "#e8c772",
-  })
+  drawStatPair(
+    ctx,
+    subCol2X,
+    currentY,
+    subColW,
+    penLbl,
+    fmtPenetration(primaryElem?.penetration ?? 0),
+    {
+      valColor: "#e8c772",
+    },
+  )
 
   // Section 4: DAMAGE BOOSTS & CLASS BUFFS
   currentY += 25
@@ -691,15 +793,19 @@ export function drawBuildCard(
     fmtBoost(data.affinityDamageBoost ?? 0),
     { valColor: (data.affinityDamageBoost ?? 0) > 0 ? "#e8c772" : "#666666" },
   )
-  const weaponLabel = data.weaponBoost?.label || labels?.sustainDmgBoostLabel || "Sustain Damage Boost"
-  const weaponVal = data.weaponBoost ? fmtBoost(data.weaponBoost.value) : fmtBoost(data.sustainDamageBoost ?? 0)
+  const weaponLabel =
+    data.weaponBoost?.label || labels?.sustainDmgBoostLabel || "Sustain Damage Boost"
+  const weaponVal = data.weaponBoost
+    ? fmtBoost(data.weaponBoost.value)
+    : fmtBoost(data.sustainDamageBoost ?? 0)
   drawStatPair(ctx, subCol2X, currentY, subColW, weaponLabel, weaponVal, {
     valColor: "#e8c772",
   })
 
   // Row 4: Top Class Boost | Physical Damage Boost
   currentY += 20
-  const classLabel = data.topClassBoost?.label || labels?.classSkillBoostLabel || "Class Skill Boost"
+  const classLabel =
+    data.topClassBoost?.label || labels?.classSkillBoostLabel || "Class Skill Boost"
   const classVal = data.topClassBoost ? fmtBoost(data.topClassBoost.value) : "+0%"
   drawStatPair(ctx, subCol1X, currentY, subColW, classLabel, classVal, {
     valColor: "#e8c772",

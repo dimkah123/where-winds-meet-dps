@@ -281,11 +281,7 @@ function DistanceChip({
         <div className={styles.distancePopover}>
           <div className={styles.distancePopoverHeader}>
             <span>{t("rotation.editor.setCastDistance", "Cast Distance")}</span>
-            <button
-              type="button"
-              className={styles.closePopoverBtn}
-              onClick={() => setOpen(false)}
-            >
+            <button type="button" className={styles.closePopoverBtn} onClick={() => setOpen(false)}>
               ✕
             </button>
           </div>
@@ -334,8 +330,7 @@ function DistanceChip({
                 className="btn small"
                 onClick={() => {
                   const n = parseFloat(customValue)
-                  const targetMeters =
-                    Number.isFinite(n) && n >= 0 ? n : stepDistanceMeters ?? 5
+                  const targetMeters = Number.isFinite(n) && n >= 0 ? n : (stepDistanceMeters ?? 5)
                   handleSelect(targetMeters, true)
                 }}
               >

@@ -2,7 +2,10 @@ import { useMemo, useState } from "react"
 import type { Result } from "../../../../engine/types"
 import { useI18n } from "../../../../i18n/i18nContext"
 import { groupByBreakdownName } from "../../../utils/skillBreakdown"
-import { groupIntoInGameCategories, type CompactBreakdownRow } from "../../../utils/compactBreakdown"
+import {
+  groupIntoInGameCategories,
+  type CompactBreakdownRow,
+} from "../../../utils/compactBreakdown"
 import styles from "./RotationBreakdownPanel.module.scss"
 
 export type BreakdownViewMode = "detailed" | "compact"
@@ -229,9 +232,7 @@ function CompactRowGroup({
         <td>
           <div className={styles.categoryNameCell}>
             {hasSubSkills && (
-              <span className={`${styles.expandChevron} ${isExpanded ? styles.open : ""}`}>
-                ▶
-              </span>
+              <span className={`${styles.expandChevron} ${isExpanded ? styles.open : ""}`}>▶</span>
             )}
             <span>{t(row.nameKey, row.name)}</span>
             {hasSubSkills && (

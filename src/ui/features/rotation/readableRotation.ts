@@ -251,9 +251,7 @@ export function readableRotationText(
     const name = getSkillShortName(skill, skillId)
 
     const step =
-      cast.stepIndex !== undefined
-        ? steps[cast.stepIndex]
-        : steps.find((s) => s.id === cast.stepId)
+      cast.stepIndex !== undefined ? steps[cast.stepIndex] : steps.find((s) => s.id === cast.stepId)
     const distTag = step?.distanceMeters !== undefined ? ` (${step.distanceMeters}m)` : ""
 
     if (i === startCastIndex) {
@@ -515,7 +513,10 @@ export const QUICK_ADD_GROUPS_BY_CLASS: Record<string, QuickAddGroup[]> = {
         { shortName: "Sword Q", skillId: "bellstrikeUmbra-swordq" },
         { shortName: "Sword QQ", skillId: "bellstrikeUmbra-swordqfollowup" },
         { shortName: "Sword QQQ", skillId: "bellstrikeUmbra-sword-martial-qqq" },
-        { shortName: "Sword Followup", skillId: "bellstrikeUmbra-sword-r-charge-follow-up-1-hit-cancel" },
+        {
+          shortName: "Sword Followup",
+          skillId: "bellstrikeUmbra-sword-r-charge-follow-up-1-hit-cancel",
+        },
       ],
     },
     {
@@ -700,9 +701,7 @@ export function parseReadableRotation(
   const steps: RotationStep[] = []
   const classCanonical = CANONICAL_SKILLS_BY_CLASS[classId] ?? {}
 
-  const startIndex = rawSegments.findIndex((seg) =>
-    /\(start(?:\s+at\s+hit\s+\d+)?\)/i.test(seg),
-  )
+  const startIndex = rawSegments.findIndex((seg) => /\(start(?:\s+at\s+hit\s+\d+)?\)/i.test(seg))
 
   for (let i = 0; i < rawSegments.length; i++) {
     const raw = rawSegments[i]
@@ -747,10 +746,7 @@ export function parseReadableRotation(
         ) {
           resolvedSkillId = "stonesplitStrength-phalanxspecial-prepull"
         }
-        if (
-          normKey === "heng q" &&
-          skillsById.has("stonesplitStrength-snowpartingslide-prepull")
-        ) {
+        if (normKey === "heng q" && skillsById.has("stonesplitStrength-snowpartingslide-prepull")) {
           resolvedSkillId = "stonesplitStrength-snowpartingslide-prepull"
         }
       }

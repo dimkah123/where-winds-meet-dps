@@ -61,7 +61,10 @@ export function UserAuthButton({ onOpenMyBuilds, onUserChanged }: Props) {
                 onUserChanged?.(profile)
               } catch (err) {
                 console.error("Login failed:", err)
-                alert("Ошибка входа через Google: " + (err instanceof Error ? err.message : String(err)))
+                alert(
+                  "Ошибка входа через Google: " +
+                    (err instanceof Error ? err.message : String(err)),
+                )
               } finally {
                 setIsLoading(false)
               }
@@ -90,7 +93,9 @@ export function UserAuthButton({ onOpenMyBuilds, onUserChanged }: Props) {
         window.google.accounts.id.prompt((notification) => {
           if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
             // If One Tap popup was skipped or blocked, click the rendered Google button
-            const realBtn = hiddenBtnRef.current?.querySelector('div[role="button"]') as HTMLElement | null
+            const realBtn = hiddenBtnRef.current?.querySelector(
+              'div[role="button"]',
+            ) as HTMLElement | null
             if (realBtn) {
               realBtn.click()
             }

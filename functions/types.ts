@@ -1,6 +1,6 @@
 export interface D1PreparedStatement {
   bind(...values: unknown[]): D1PreparedStatement
-  first<T = unknown>(colName?: string): Promise<T | null>
+  first<T = unknown>(_colName?: string): Promise<T | null>
   run<T = unknown>(): Promise<D1Response>
   all<T = unknown>(): Promise<D1Result<T>>
 }

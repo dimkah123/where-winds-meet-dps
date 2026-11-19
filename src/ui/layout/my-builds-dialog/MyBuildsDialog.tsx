@@ -19,7 +19,6 @@ export function MyBuildsDialog({ onClose, onSelectBuild }: Props) {
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
   useEffect(() => {
-    setIsLoading(true)
     fetchMyBuilds()
       .then((data) => {
         setBuilds(data)
@@ -60,9 +59,7 @@ export function MyBuildsDialog({ onClose, onSelectBuild }: Props) {
       </div>
 
       <div className={styles.body}>
-        {isLoading && (
-          <div className={styles.loading}>{t("common.loading", "Загрузка...")}</div>
-        )}
+        {isLoading && <div className={styles.loading}>{t("common.loading", "Загрузка...")}</div>}
 
         {error && <div className={styles.empty}>{error}</div>}
 

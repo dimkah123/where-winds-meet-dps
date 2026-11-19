@@ -41,13 +41,14 @@ export async function onRequestPost(context: EventContext<Env>): Promise<Respons
         .bind(body.shortId, ownerId, body.editToken || "")
         .run()
     } else if (body.editToken) {
-      deleteRes = await env.DB.prepare(
-        `DELETE FROM builds WHERE shortId = ? AND editToken = ?`,
-      )
+      deleteRes = await env.DB.prepare(`DELETE FROM builds WHERE shortId = ? AND editToken = ?`)
         .bind(body.shortId, body.editToken)
         .run()
     } else {
-      return jsonResponse({ error: "Unauthorized: требуется авторизация или токен" }, { status: 401 })
+      return jsonResponse(
+        { error: "Unauthorized: требуется авторизация или токен" },
+        { status: 401 },
+      )
     }
 
     const changes = (deleteRes.meta as { changes?: number })?.changes ?? 1

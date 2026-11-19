@@ -17,7 +17,12 @@ declare global {
             auto_select?: boolean
             cancel_on_tap_outside?: boolean
           }) => void
-          prompt: (momentListener?: (notification: { isNotDisplayed: () => boolean; isSkippedMoment: () => boolean }) => void) => void
+          prompt: (
+            momentListener?: (notification: {
+              isNotDisplayed: () => boolean
+              isSkippedMoment: () => boolean
+            }) => void,
+          ) => void
           renderButton: (
             parent: HTMLElement,
             options: {

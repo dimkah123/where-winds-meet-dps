@@ -68,7 +68,12 @@ describe("Bow quick set selection and auto-pairing", () => {
     }
 
     // User manually changes thumbRing to affinity
-    const changed = withSetChoice(pairedInputs, { kind: "bow", slot: "thumbRing" }, false, "affinity")
+    const changed = withSetChoice(
+      pairedInputs,
+      { kind: "bow", slot: "thumbRing" },
+      false,
+      "affinity",
+    )
     expect(changed.bowGear.thumbRing?.set).toBe("affinity")
     expect(changed.bowGear.bow?.set).toBe("crit")
 

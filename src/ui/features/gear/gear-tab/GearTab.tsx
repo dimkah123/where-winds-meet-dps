@@ -207,7 +207,10 @@ export function GearTab({
       }
     }
     if (mode === "equip") {
-      commitGearChange([...inventory, pieceToSave], { ...equipped, [pieceToSave.slot]: pieceToSave.id })
+      commitGearChange([...inventory, pieceToSave], {
+        ...equipped,
+        [pieceToSave.slot]: pieceToSave.id,
+      })
       setSelectedPieceId(pieceToSave.id)
       return
     }
@@ -235,7 +238,9 @@ export function GearTab({
       const slotSet = slotSetFor(inputs, slot)
       if (slotSet && selectedPiece.set !== slotSet) {
         pieceToEquip = { ...selectedPiece, set: slotSet }
-        nextInventory = inventory.map((piece) => (piece.id === pieceToEquip.id ? pieceToEquip : piece))
+        nextInventory = inventory.map((piece) =>
+          piece.id === pieceToEquip.id ? pieceToEquip : piece,
+        )
       }
     }
     commitGearChange(nextInventory, { ...equipped, [slot]: pieceToEquip.id })

@@ -82,7 +82,10 @@ export async function onRequestPost(context: EventContext<Env>): Promise<Respons
         picture?: string
       }
     } else {
-      return jsonResponse({ error: "No valid Google credential or code provided." }, { status: 400 })
+      return jsonResponse(
+        { error: "No valid Google credential or code provided." },
+        { status: 400 },
+      )
     }
 
     if (!userInfo || !userInfo.sub) {
@@ -101,22 +104,14 @@ export async function onRequestPost(context: EventContext<Env>): Promise<Respons
          name = excluded.name,
          picture = excluded.picture`,
     )
-      .bind(
-        userId,
-        userInfo.email ?? "",
-        userInfo.name ?? "User",
-        userInfo.picture ?? "",
-        now,
-      )
+      .bind(userId, userInfo.email ?? "", userInfo.name ?? "User", userInfo.picture ?? "", now)
       .run()
 
     // Create session (30 days validity)
     const sessionId = generateToken(32)
     const expiresAt = now + 30 * 24 * 60 * 60 * 1000
 
-    await env.DB.prepare(
-      `INSERT INTO sessions (id, userId, expiresAt) VALUES (?, ?, ?)`,
-    )
+    await env.DB.prepare(`INSERT INTO sessions (id, userId, expiresAt) VALUES (?, ?, ?)`)
       .bind(sessionId, userId, expiresAt)
       .run()
 

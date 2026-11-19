@@ -72,7 +72,11 @@ export function ShareBuildDialog({
 
   const [activeTab, setActiveTab] = useState<TabKey>("link")
   const [author, setAuthor] = useState(() => {
-    return defaultAuthor || localStorage.getItem("wwm.share.author") || t("share.defaultPlayerName", "Игрок")
+    return (
+      defaultAuthor ||
+      localStorage.getItem("wwm.share.author") ||
+      t("share.defaultPlayerName", "Игрок")
+    )
   })
   const [title, setTitle] = useState(defaultTitle || "")
   const [encodedData, setEncodedData] = useState<string>("")
@@ -135,7 +139,9 @@ export function ShareBuildDialog({
     if (activeTab !== "card" || !canvasRef.current) return
 
     const classDef = classDefinition(inputs.classId)
-    const classDisplayName = classDef ? t(classKey(classDef.id), classDef.displayName) : inputs.classId
+    const classDisplayName = classDef
+      ? t(classKey(classDef.id), classDef.displayName)
+      : inputs.classId
     const lvl = gearLevelForBreakthrough(inputs.breakthrough)
     const breakthroughTemplate = t("share.breakthroughText", "Прорыв {count} ({level} ур.)")
     const breakthroughText = breakthroughTemplate
@@ -301,7 +307,10 @@ export function ShareBuildDialog({
         maxClassVal = val
         const option = getAttunement(attId)
         topClassBoost = {
-          label: formatClassBoostLabel(attId, option ? t(attunementKey(option.id), option.label) : attId),
+          label: formatClassBoostLabel(
+            attId,
+            option ? t(attunementKey(option.id), option.label) : attId,
+          ),
           value: val,
         }
       }
@@ -380,7 +389,10 @@ export function ShareBuildDialog({
       directAffinityLabel: statPathLabel("directAffinityRate", t),
       finalCritLabel: t("components.statsOverviewPanel.finalCrit", "Final Crit"),
       finalAffinityLabel: t("components.statsOverviewPanel.finalAffinity", "Final Affinity"),
-      finalCritAffinityLabel: t("components.statsOverviewPanel.finalCritAffinity", "Final Crit & Affinity"),
+      finalCritAffinityLabel: t(
+        "components.statsOverviewPanel.finalCritAffinity",
+        "Final Crit & Affinity",
+      ),
       finalAbrasionLabel: t("components.statsOverviewPanel.finalAbrasion", "Final Abrasion"),
       finalNormalLabel: t("components.statsOverviewPanel.finalNormal", "Final Normal"),
 
@@ -501,7 +513,9 @@ export function ShareBuildDialog({
         const shortUrl = `${currentOrigin}#/b/${cloudShortId}`
         await navigator.clipboard.writeText(shortUrl)
         setCopiedCloudLink(true)
-        setCloudSaveMessage(t("share.cloud.updatedSuccess", "✓ Сборка обновлена в облаке и ссылка скопирована!"))
+        setCloudSaveMessage(
+          t("share.cloud.updatedSuccess", "✓ Сборка обновлена в облаке и ссылка скопирована!"),
+        )
         setTimeout(() => setCopiedCloudLink(false), 2500)
       } else {
         const res = await saveBuildToCloud({
@@ -516,7 +530,12 @@ export function ShareBuildDialog({
         const shortUrl = `${currentOrigin}#/b/${res.shortId}`
         await navigator.clipboard.writeText(shortUrl)
         setCopiedCloudLink(true)
-        setCloudSaveMessage(t("share.cloud.savedSuccess", "✓ Сборка сохранена в облаке и короткая ссылка скопирована!"))
+        setCloudSaveMessage(
+          t(
+            "share.cloud.savedSuccess",
+            "✓ Сборка сохранена в облаке и короткая ссылка скопирована!",
+          ),
+        )
         setTimeout(() => setCopiedCloudLink(false), 2500)
       }
     } catch (err) {
@@ -569,7 +588,10 @@ export function ShareBuildDialog({
     if (!canvasRef.current) return
     const url = canvasRef.current.toDataURL("image/png")
     const anchor = document.createElement("a")
-    const safeAuthor = (author.trim() || t("share.defaultPlayerName", "Игрок")).replace(/[^\wа-яА-Я\-.]+/g, "_")
+    const safeAuthor = (author.trim() || t("share.defaultPlayerName", "Игрок")).replace(
+      /[^\wа-яА-Я\-.]+/g,
+      "_",
+    )
     anchor.href = url
     const filePrefix = t("share.buildFilePrefix", "Сборка")
     anchor.download = `${filePrefix}_${safeAuthor}.png`
@@ -605,7 +627,9 @@ export function ShareBuildDialog({
 
       <div className={styles.fieldsGrid}>
         <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>{t("share.playerLabel", "Имя игрока / Никнейм:")}</label>
+          <label className={styles.fieldLabel}>
+            {t("share.playerLabel", "Имя игрока / Никнейм:")}
+          </label>
           <input
             type="text"
             className={styles.input}
@@ -615,7 +639,9 @@ export function ShareBuildDialog({
           />
         </div>
         <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>{t("share.buildTitleLabel", "Название сборки:")}</label>
+          <label className={styles.fieldLabel}>
+            {t("share.buildTitleLabel", "Название сборки:")}
+          </label>
           <input
             type="text"
             className={styles.input}
@@ -643,9 +669,7 @@ export function ShareBuildDialog({
               <span className={styles.cloudTitle}>
                 ☁️ {t("share.cloud.shortLinkTitle", "Короткая облачная ссылка")}
               </span>
-              {cloudShortId && (
-                <span className={styles.cloudBadge}>ID: {cloudShortId}</span>
-              )}
+              {cloudShortId && <span className={styles.cloudBadge}>ID: {cloudShortId}</span>}
             </div>
             <div className={styles.linkBox}>
               <input
@@ -679,16 +703,14 @@ export function ShareBuildDialog({
                       : t("share.cloud.createShortLink", "Получить короткую ссылку")}
               </button>
             </div>
-            {cloudSaveMessage && (
-              <span className={styles.copySuccess}>{cloudSaveMessage}</span>
-            )}
-            {cloudError && (
-              <span className={styles.cloudError}>⚠ {cloudError}</span>
-            )}
+            {cloudSaveMessage && <span className={styles.copySuccess}>{cloudSaveMessage}</span>}
+            {cloudError && <span className={styles.cloudError}>⚠ {cloudError}</span>}
           </div>
 
           <div className={styles.fieldGroup}>
-            <label className={styles.fieldLabel}>{t("share.directLinkLabel", "Полная ссылка (без сервера):")}</label>
+            <label className={styles.fieldLabel}>
+              {t("share.directLinkLabel", "Полная ссылка (без сервера):")}
+            </label>
             <div className={styles.linkBox}>
               <input
                 type="text"
@@ -703,7 +725,9 @@ export function ShareBuildDialog({
                 onClick={handleCopyLink}
                 disabled={isGenerating || !encodedData}
               >
-                {copiedLink ? t("share.copiedSuccess", "✓ Скопировано!") : t("share.copyLinkButton", "Копировать ссылку")}
+                {copiedLink
+                  ? t("share.copiedSuccess", "✓ Скопировано!")
+                  : t("share.copyLinkButton", "Копировать ссылку")}
               </button>
             </div>
             {copiedLink && (
@@ -717,7 +741,9 @@ export function ShareBuildDialog({
           </div>
 
           <div className={styles.fieldGroup} style={{ marginTop: 8 }}>
-            <label className={styles.fieldLabel}>{t("share.rawCodeLabel", "Текстовый код сборки:")}</label>
+            <label className={styles.fieldLabel}>
+              {t("share.rawCodeLabel", "Текстовый код сборки:")}
+            </label>
             <div className={styles.linkBox}>
               <input
                 type="text"
@@ -732,7 +758,9 @@ export function ShareBuildDialog({
                 onClick={handleCopyCode}
                 disabled={isGenerating || !encodedData}
               >
-                {copiedCode ? t("share.copiedSuccess", "✓ Скопировано!") : t("share.copyCodeButton", "Копировать код")}
+                {copiedCode
+                  ? t("share.copiedSuccess", "✓ Скопировано!")
+                  : t("share.copyCodeButton", "Копировать код")}
               </button>
             </div>
             {copiedCode && (
@@ -746,12 +774,7 @@ export function ShareBuildDialog({
 
       {activeTab === "card" && (
         <div className={styles.previewContainer}>
-          <canvas
-            ref={canvasRef}
-            width={1200}
-            height={675}
-            className={styles.cardCanvas}
-          />
+          <canvas ref={canvasRef} width={1200} height={675} className={styles.cardCanvas} />
           <div className={styles.cardActions}>
             <button type="button" className="btn primary" onClick={handleCopyImage}>
               {copiedImage

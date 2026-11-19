@@ -70,4 +70,3 @@ export function slotSetFor(inputs: Inputs, slot: GearSlot): string | undefined {
 
   return undefined
 }
-

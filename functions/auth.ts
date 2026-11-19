@@ -57,9 +57,7 @@ export async function resolveUserProfile(
 
     if (!session?.userId) return null
 
-    const user = await env.DB.prepare(
-      "SELECT id, email, name, picture FROM users WHERE id = ?",
-    )
+    const user = await env.DB.prepare("SELECT id, email, name, picture FROM users WHERE id = ?")
       .bind(session.userId)
       .first<UserProfile>()
 

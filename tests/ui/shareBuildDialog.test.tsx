@@ -3,7 +3,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { I18nProvider } from "../../src/i18n/I18nProvider"
 import { ShareBuildDialog } from "../../src/ui/features/share/share-build-dialog/ShareBuildDialog"
 import { SharedBuildBanner } from "../../src/ui/layout/shared-build-banner/SharedBuildBanner"
-import { drawBuildCard, type BuildCardData, type BuildCardLabels } from "../../src/ui/features/share/build-showcase/drawBuildCard"
+import {
+  drawBuildCard,
+  type BuildCardData,
+  type BuildCardLabels,
+} from "../../src/ui/features/share/build-showcase/drawBuildCard"
 import { defaultInputs } from "../../src/engine/defaults"
 import type { Result } from "../../src/engine/types"
 import { kvStore } from "../../src/kvStore"
@@ -170,7 +174,14 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
       physPenetration: 0.511,
 
       elements: [
-        { id: "stonesplit", name: "Камнелом", min: 374.3, max: 845.72, isPrimary: true, penetration: 0.296 },
+        {
+          id: "stonesplit",
+          name: "Камнелом",
+          min: 374.3,
+          max: 845.72,
+          isPrimary: true,
+          penetration: 0.296,
+        },
         { id: "bellstrike", name: "Колокольный Удар", min: 48.32, max: 0 },
         { id: "bamboocut", name: "Бамбуковый клинок", min: 96.64, max: 0 },
         { id: "silkbind", name: "Шелковые путы", min: 0, max: 0 },

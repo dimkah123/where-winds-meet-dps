@@ -176,6 +176,9 @@ function AppInner() {
   }
   const [lastSavedJson, setLastSavedJson] = useState(() => JSON.stringify(initialActive.inputs))
   const [savedAt, setSavedAt] = useState<number | null>(null)
+  const [wizard, setWizard] = useState<{ mode: SetupMode; defaultName: string } | null>(() =>
+    initial.firstRun ? { mode: "first-run", defaultName: "" } : null,
+  )
   const [graduationDialogOpen, setGraduationDialogOpen] = useState(false)
   const [encounterDialogOpen, setEncounterDialogOpen] = useState(false)
   const [encounterCategory, setEncounterCategory] = useState<EncounterCategory>("food")
@@ -300,10 +303,6 @@ function AppInner() {
       setSavedAt(null)
     }
   }
-
-  const [wizard, setWizard] = useState<{ mode: SetupMode; defaultName: string } | null>(() =>
-    initial.firstRun ? { mode: "first-run", defaultName: "" } : null,
-  )
 
   const [breakthroughAskedClassIds, setBreakthroughAskedClassIds] = useState<readonly string[]>([])
   const breakthroughRequest = useMemo(
