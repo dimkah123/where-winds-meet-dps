@@ -75,6 +75,50 @@
   gap: 12px;
   flex-wrap: wrap;
   margin-bottom: 12px;
+
+  &.appTitlebarCollapsed {
+    margin-bottom: 6px;
+  }
+}
+
+.collapsedTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.expandHeaderBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--color-accent);
+  padding: 3px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.05em;
+  letter-spacing: 0.03em;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(192, 160, 96, 0.12);
+    border-color: rgba(192, 160, 96, 0.35);
+    color: var(--color-accent-bright);
+  }
+}
+
+.expandChevron {
+  font-size: 11px;
+  opacity: 0.8;
+  transition: transform 0.15s ease;
+}
+
+.collapsedTitleText {
+  color: var(--color-accent);
+  font-size: 1.05em;
+  font-weight: 700;
 }
 
 .appTitle {
@@ -283,6 +327,41 @@
   height: 17px;
   line-height: 1;
   vertical-align: middle;
+}
+
+.compactDpsWidget {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  align-self: center;
+  margin-left: 10px;
+  padding: 4px 10px;
+  background: rgba(192, 160, 96, 0.08);
+  border: 1px solid rgba(192, 160, 96, 0.3);
+  border-radius: 5px;
+  cursor: default;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(192, 160, 96, 0.14);
+    border-color: rgba(192, 160, 96, 0.5);
+  }
+}
+
+.compactDpsLabel {
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--color-text-dim, #999);
+  text-transform: uppercase;
+}
+
+.compactDpsValue {
+  font-size: 1.05em;
+  font-weight: 700;
+  color: var(--color-accent, #c0a060);
+  font-variant-numeric: tabular-nums;
 }
 
 .tabRight {

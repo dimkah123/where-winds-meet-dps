@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   HashRouter,
   NavLink,
@@ -50,6 +50,7 @@ import { UserAuthButton } from "../ui/layout/user-auth-button/UserAuthButton"
 import { HeaderSettingsButton } from "../ui/layout/header-settings/HeaderSettingsButton"
 import { useHeaderSettings } from "../ui/hooks/useHeaderSettings"
 import type { UserProfile } from "../cloud/types"
+import { formatNumber, formatCompactDamage } from "../ui/utils/numberFormatting"
 import { MyBuildsDialog } from "../ui/layout/my-builds-dialog/MyBuildsDialog"
 import { loadBuildFromCloud, getEditToken, updateBuildInCloud } from "../cloud/cloudBuilds"
 import { getStoredSession } from "../cloud/auth"
@@ -759,10 +760,33 @@ function AppInner() {
         {hasUpdate && !updateDismissed && (
           <UpdateBanner version={serverVersion} onReload={reloadApp} onDismiss={dismissUpdate} />
         )}
-        <header className={styles.appTitlebar}>
+        <header
+          className={
+            styles.appTitlebar +
+            (headerSettings.collapseHeader ? ` ${styles.appTitlebarCollapsed}` : "")
+          }
+        >
           <div className={styles.appTitle}>
-            <h1>{t("app.whereWindsMeetDps")}</h1>
-            <ChangelogButton />
+            {!headerSettings.collapseHeader ? (
+              <>
+                <h1>{t("app.whereWindsMeetDps")}</h1>
+                <ChangelogButton />
+              </>
+            ) : (
+              <div className={styles.collapsedTitleGroup}>
+                <button
+                  type="button"
+                  className={styles.expandHeaderBtn}
+                  onClick={() => updateHeaderSetting("collapseHeader", false)}
+                  title={t("app.settings.expandHeader", "Развернуть шапку")}
+                  aria-label={t("app.settings.expandHeader", "Развернуть шапку")}
+                >
+                  <span className={styles.expandChevron}>▾</span>
+                  <span className={styles.collapsedTitleText}>WWM DPS</span>
+                </button>
+                <ChangelogButton />
+              </div>
+            )}
             {sharedBannerInfo && (
               <SharedBuildBanner
                 author={sharedBannerInfo.author}
@@ -887,53 +911,67 @@ function AppInner() {
           </div>
         </header>
 
-        <MetricsCard
-          result={headerResult}
-          className={styles.headerMetrics}
-          graduationPending={graduation.isPending}
-          theoreticalDps={graduation.theoreticalDps}
-          onGraduationClick={() => setGraduationDialogOpen(true)}
-          graduationDisabled={isSimulationRunning}
-          graduationBuildName={
-            followedBuild
-              ? followedBuild.id === customGraduationBuild?.id
-                ? `${t("gear.customGraduationBuild.custom")} - ${followedBuild.name}`
-                : t(graduationBuildKey(followedBuild.id), followedBuild.name)
-              : null
-          }
-          rotationName={rotationName}
-          onRotationClick={goToRotationTab}
-          encounterTrigger={
-            <EncounterSettingsTrigger
-              inputs={inputs}
-              onOpen={() => setEncounterDialogOpen(true)}
-              disabled={isSimulationRunning}
-            />
-          }
-        />
+        {!headerSettings.collapseHeader && (
+          <MetricsCard
+            result={headerResult}
+            className={styles.headerMetrics}
+            graduationPending={graduation.isPending}
+            theoreticalDps={graduation.theoreticalDps}
+            onGraduationClick={() => setGraduationDialogOpen(true)}
+            graduationDisabled={isSimulationRunning}
+            graduationBuildName={
+              followedBuild
+                ? followedBuild.id === customGraduationBuild?.id
+                  ? `${t("gear.customGraduationBuild.custom")} - ${followedBuild.name}`
+                  : t(graduationBuildKey(followedBuild.id), followedBuild.name)
+                : null
+            }
+            rotationName={rotationName}
+            onRotationClick={goToRotationTab}
+            encounterTrigger={
+              <EncounterSettingsTrigger
+                inputs={inputs}
+                onOpen={() => setEncounterDialogOpen(true)}
+                disabled={isSimulationRunning}
+              />
+            }
+          />
+        )}
 
         <nav className={styles.tabs} role="tablist">
           {TABS.map((tab) => (
-            <NavLink
-              key={tab.path}
-              to={tab.path}
-              role="tab"
-              ref={(node) => {
-                tabRefs.current[tab.path] = node
-              }}
-              className={({ isActive }) =>
-                styles.tab +
-                (isActive ? ` ${styles.active}` : "") +
-                (tab.align === "right" ? ` ${styles.tabRight}` : "") +
-                (tab.gapBefore ? ` ${styles.tabGapBefore}` : "") +
-                (tab.pulsing ? ` ${styles.tabPulsing}` : "")
-              }
-            >
-              {tab.label}
-              {typeof tab.badge === "number" && tab.badge > 0 && (
-                <span className={styles.alertBadge}>{tab.badge}</span>
+            <Fragment key={tab.path}>
+              <NavLink
+                to={tab.path}
+                role="tab"
+                ref={(node) => {
+                  tabRefs.current[tab.path] = node
+                }}
+                className={({ isActive }) =>
+                  styles.tab +
+                  (isActive ? ` ${styles.active}` : "") +
+                  (tab.align === "right" ? ` ${styles.tabRight}` : "") +
+                  (tab.gapBefore ? ` ${styles.tabGapBefore}` : "") +
+                  (tab.pulsing ? ` ${styles.tabPulsing}` : "")
+                }
+              >
+                {tab.label}
+                {typeof tab.badge === "number" && tab.badge > 0 && (
+                  <span className={styles.alertBadge}>{tab.badge}</span>
+                )}
+              </NavLink>
+              {tab.path === "/alerts" && headerSettings.collapseHeader && (
+                <div
+                  className={styles.compactDpsWidget}
+                  title={`${t("common.totalDamage")}: ${formatCompactDamage(headerResult.totalDamage)} · ${formatNumber(headerResult.rotationDuration, 2)}s ${rotationName ? `· ${rotationName}` : ""}`}
+                >
+                  <span className={styles.compactDpsLabel}>DPS</span>
+                  <span className={styles.compactDpsValue}>
+                    {formatNumber(headerResult.dps, 2)}
+                  </span>
+                </div>
               )}
-            </NavLink>
+            </Fragment>
           ))}
         </nav>
       </div>

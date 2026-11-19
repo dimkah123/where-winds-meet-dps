@@ -18,6 +18,7 @@ describe("useHeaderSettings", () => {
     expect(result.current.settings.showShare).toBe(true)
     expect(result.current.settings.showUndoRedo).toBe(true)
     expect(result.current.settings.showSaveReset).toBe(true)
+    expect(result.current.settings.collapseHeader).toBe(false)
   })
 
   it("updates individual setting and persists to localStorage", () => {
@@ -25,14 +26,17 @@ describe("useHeaderSettings", () => {
 
     act(() => {
       result.current.updateSetting("showProfile", false)
+      result.current.updateSetting("collapseHeader", true)
     })
 
     expect(result.current.settings.showProfile).toBe(false)
+    expect(result.current.settings.collapseHeader).toBe(true)
     expect(result.current.settings.showUndoRedo).toBe(true)
 
     // Check localStorage persistence
     const stored = getStoredHeaderSettings()
     expect(stored.showProfile).toBe(false)
+    expect(stored.collapseHeader).toBe(true)
   })
 
   it("resets back to default settings", () => {

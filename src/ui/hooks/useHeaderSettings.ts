@@ -5,6 +5,7 @@ export interface HeaderSettings {
   showShare: boolean
   showUndoRedo: boolean
   showSaveReset: boolean
+  collapseHeader: boolean
 }
 
 export const DEFAULT_HEADER_SETTINGS: HeaderSettings = {
@@ -12,6 +13,7 @@ export const DEFAULT_HEADER_SETTINGS: HeaderSettings = {
   showShare: true,
   showUndoRedo: true,
   showSaveReset: true,
+  collapseHeader: false,
 }
 
 const STORAGE_KEY = "wwm.ui.headerSettings"
@@ -26,6 +28,7 @@ export function getStoredHeaderSettings(): HeaderSettings {
       showShare: typeof parsed.showShare === "boolean" ? parsed.showShare : true,
       showUndoRedo: typeof parsed.showUndoRedo === "boolean" ? parsed.showUndoRedo : true,
       showSaveReset: typeof parsed.showSaveReset === "boolean" ? parsed.showSaveReset : true,
+      collapseHeader: typeof parsed.collapseHeader === "boolean" ? parsed.collapseHeader : false,
     }
   } catch {
     return DEFAULT_HEADER_SETTINGS
