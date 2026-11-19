@@ -191,6 +191,20 @@
   }
 }
 
+.toolbarIcon {
+  width: 15px;
+  height: 15px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.shareIcon {
+  width: 13.5px;
+  height: 13.5px;
+  display: block;
+  flex-shrink: 0;
+}
+
 .shareBtnText {
   font-size: 0.85em;
 

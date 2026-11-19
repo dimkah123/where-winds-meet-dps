@@ -817,7 +817,19 @@ function AppInner() {
                   title={t("common.shareBuild")}
                   aria-label={t("common.shareBuild")}
                 >
-                  <span>🔗</span>
+                  <svg
+                    className={styles.shareIcon}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                  </svg>
                   <span className={styles.shareBtnText}>{t("common.shareBuild")}</span>
                 </button>
               )}
@@ -835,7 +847,19 @@ function AppInner() {
                     }
                     aria-label="Отменить (Ctrl+Z)"
                   >
-                    ↶
+                    <svg
+                      className={styles.toolbarIcon}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M9 14 4 9l5-5" />
+                      <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11" />
+                    </svg>
                   </button>
                   <button
                     type="button"
@@ -849,7 +873,19 @@ function AppInner() {
                     }
                     aria-label="Повторить (Ctrl+Y)"
                   >
-                    ↷
+                    <svg
+                      className={styles.toolbarIcon}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="m15 14 5-5-5-5" />
+                      <path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5v0A5.5 5.5 0 0 0 9.5 20H13" />
+                    </svg>
                   </button>
                 </>
               )}
@@ -882,7 +918,20 @@ function AppInner() {
                             : t("app.saved2")
                     }
                   >
-                    💾
+                    <svg
+                      className={styles.toolbarIcon}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                      <polyline points="17 21 17 13 7 13 7 21" />
+                      <polyline points="7 3 7 8 15 8" />
+                    </svg>
                   </button>
                   <button
                     type="button"
@@ -896,7 +945,19 @@ function AppInner() {
                         : t("app.noChangesToDiscard", "Нет несохранённых изменений")
                     }
                   >
-                    ↺
+                    <svg
+                      className={styles.toolbarIcon}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                      <path d="M3 3v5h5" />
+                    </svg>
                   </button>
                 </>
               )}
