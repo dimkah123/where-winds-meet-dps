@@ -184,9 +184,17 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
       affinityRate: 0.1033,
       agility: 517.64,
       power: 187,
+      momentum: 187,
+      body: 187,
+      defense: 187,
+      physDefense: 656.19,
+      baseHp: 181541,
+      effHp: 217849,
 
       allMartialBoost: 0.0676,
       bossBoost: 0.0737,
+      critDamageBoost: 0.54,
+      attributeDamageBoost: 0.118,
       topClassBoost: {
         label: "Mo - Charge Boost",
         value: 0.279,
@@ -199,6 +207,8 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
       divinecraftName: "Огненное масло (Тлеющий пепел)",
       foodName: "Жаркое из оленины",
       innerWays: ["Frost-Clad Night", "Morale Chant", "Steadfast Devotion", "Throat-Pierce"],
+      bossName: "Хозяин Реки",
+      resistance: 85,
     }
 
     const labels: BuildCardLabels = {
@@ -208,18 +218,23 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
       totalDamage: "Всего урона",
       duration: "Длительность",
       rotation: "Ротация",
-      attackTitle: "АТАКА И СТИХИИ",
-      ratesTitle: "ПАРАМЕТРЫ И УСИЛЕНИЯ",
+      panelStatsTitle: "ХАРАКТЕРИСТИКИ ПАНЕЛИ",
+      resistanceLabel: "Сопротивление",
       gearTitle: "КОМПЛЕКТЫ И СТОЛКНОВЕНИЕ",
+      attributesTitle: "АТРИБУТЫ",
+      threeRatesTitle: "ТРОЙНЫЕ ШАНСЫ",
+      attackTitle: "АТАКА И ПРОНИКНОВЕНИЕ",
+      damageBoostsTitle: "УВЕЛИЧЕНИЕ И СНИЖЕНИЕ УРОНА",
       physAttackLabel: "Физ. атака (Мин – Макс)",
+      minPhysAttackLabel: "Мин. физ. атака",
+      maxPhysAttackLabel: "Макс. физ. атака",
       physPenLabel: "Физ. пробитие",
-      attrAttackLabel: "Атака: {attr}",
       attrPenLabel: "Пробитие: {attr}",
-      formlessLabel: "Бесформенная атака",
+      minFormlessLabel: "Мин. бесформенная атака",
+      maxFormlessLabel: "Макс. бесформенная атака",
       agilityLabel: "Ловкость (Agility)",
       powerLabel: "Сила (Power)",
       critLabel: "Крит. шанс",
-      critCombinedLabel: "Крит. шанс (+ Прямой)",
       precisionLabel: "Точность (Precision)",
       affinityLabel: "Сокрушение (Affinity)",
       allMartialArtsLabel: "Все боевые искусства",
@@ -245,25 +260,25 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
     expect(filledTexts.some((t) => t.includes("Лёха"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("5.0M") || t.includes("5,020,541"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("Mixed 1 Min"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("2,752 – 2,501"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("2,751.66"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("2,501.22"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("51.1"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("374 – 846"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("374.30"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("845.72"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("29.6"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("48 – 0"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("97 – 0"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("0 – 0"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("26 – 123"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("78.0% + 9.2%"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("517.6"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("+6.8%"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("+7.4%"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("Mo - Charge Boost"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("+27.9%"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("Frost-Clad Night"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("+7.4%"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("Mo - Charge Boost"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("+27.9%"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("48.32"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("96.64"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("26.40"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("123.32"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("78.03%"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("9.2%"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("517.64"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("+6.76%"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("+7.37%"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("+54%"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("Mo - Charge Boost"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("+27.9%"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("Frost-Clad Night"))).toBe(true)
+    expect(filledTexts.some((t) => t.includes("181,541 → 217,849"))).toBe(true)
   })
 })

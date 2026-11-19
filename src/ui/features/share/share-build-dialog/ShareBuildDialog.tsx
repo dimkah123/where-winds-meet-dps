@@ -12,8 +12,8 @@ import { useI18n } from "../../../../i18n/i18nContext"
 import { attunementKey, classKey, innerWayKey, setKey } from "../../../../i18n/contentKeys"
 import { classDefinition } from "../../../../definitions/classes/registry"
 import { equippedPiecesFor, withDerivedStats } from "../../../../engine/derivedInputs"
-import { applySetBonuses, resolveActiveSets } from "../../../../engine/setBonuses"
-import { effectiveRates, getSchool } from "../../../../engine/panel"
+import { applySetBonuses, resolveActiveSets, setPhysDefBonus } from "../../../../engine/setBonuses"
+import { effectiveRates, getSchool, resistanceForInputs } from "../../../../engine/panel"
 import { finalHitOutcomeRates } from "../../../components/stats-overview-panel/finalHitOutcomeRates"
 import { activeRotationName } from "../../rotation/rotationOptions"
 import { SET_BY_ID } from "../../../../definitions/sets/registry"
@@ -22,9 +22,16 @@ import { BOW_SET_DEFS } from "../../../../data/sets/bowSets"
 import { formatSetBonusValue, setBonusStatKey } from "../../gear/shared/setBonusText"
 import { gearLevelForBreakthrough } from "../../../../definitions/baseStats/breakthroughs"
 import {
+  averageEnhancementBonus,
+  effectiveEnhancementLevels,
+  enhancedSlotsOf,
+  effectiveMaxHp,
   totalFormlessAttack,
+  totalMaxHp,
+  totalPhysDef,
   totalPlayerAttributes,
 } from "../../../../definitions/baseStats"
+import { foodPhysAttackBeforeMultiplier } from "../../../../data/consumables/foods"
 import { getAttunement } from "../../../../engine/attunements"
 import { SCRIPT_LABEL_KEYS } from "../../../../data/skills/buffs/scriptOptions"
 import { OPTION_LABEL_KEYS } from "../../overview/encounter-settings-dialog/encounterOptionText"
@@ -34,7 +41,7 @@ import {
   refinementOptionId,
 } from "../../../../engine/encounterOptions"
 import { innerWayName, slotInnerWayId } from "../../../../definitions/innerWays/registry"
-import { readPath } from "../../../utils/statFormatting"
+import { readPath, statPathLabel } from "../../../utils/statFormatting"
 import styles from "./ShareBuildDialog.module.scss"
 
 interface Props {
@@ -151,6 +158,8 @@ export function ShareBuildDialog({
     const physPenetration = readPath(withSets, "phys.penetration")
 
     const equippedPieces = equippedPiecesFor(inputs)
+    const enhancedSlots = enhancedSlotsOf(inputs)
+    const enhancements = effectiveEnhancementLevels(inputs.enhancements, inputs.breakthrough)
     const baseAttrs = totalPlayerAttributes(
       inputs.breakthrough,
       equippedPieces,
@@ -158,6 +167,50 @@ export function ShareBuildDialog({
     )
     const power = inputs.statOverrides?.power ?? baseAttrs.power
     const agility = inputs.statOverrides?.agility ?? baseAttrs.agility
+    const momentum = inputs.statOverrides?.momentum ?? baseAttrs.momentum
+    const body = inputs.statOverrides?.body ?? baseAttrs.body
+    const defense = inputs.statOverrides?.defense ?? baseAttrs.defense
+
+    const baseMaxHp = totalMaxHp(
+      inputs.breakthrough,
+      equippedPieces,
+      inputs.disabledTalentNodes,
+      enhancements,
+      inputs.unclaimedOddityNodes,
+      inputs.arsenalScores,
+      enhancedSlots,
+    )
+    const baseHp = Math.round(inputs.statOverrides?.maxHp ?? baseMaxHp)
+    const effHp = Math.round(
+      inputs.statOverrides?.maxHp !== undefined
+        ? baseHp * (1 + averageEnhancementBonus(enhancements).percent)
+        : effectiveMaxHp(
+            inputs.breakthrough,
+            equippedPieces,
+            inputs.disabledTalentNodes,
+            enhancements,
+            inputs.unclaimedOddityNodes,
+            inputs.arsenalScores,
+            enhancedSlots,
+          ),
+    )
+    const physDefense =
+      inputs.statOverrides?.physDef ??
+      totalPhysDef(
+        inputs.breakthrough,
+        equippedPieces,
+        inputs.disabledTalentNodes,
+        enhancements,
+        inputs.unclaimedOddityNodes,
+        setPhysDefBonus(inputs),
+        enhancedSlots,
+      )
+
+    const minPhys = readPath(withSets, "phys.min")
+    const maxPhys = readPath(withSets, "phys.max")
+    const foodPhysAttack = foodPhysAttackBeforeMultiplier(withSets)
+    const minPhysEff = foodPhysAttack.min ? minPhys + foodPhysAttack.min : undefined
+    const maxPhysEff = foodPhysAttack.max ? maxPhys + foodPhysAttack.max : undefined
 
     const baseFormless = totalFormlessAttack(inputs, equippedPieces)
     const formless = {
@@ -180,6 +233,9 @@ export function ShareBuildDialog({
       const maxVal = isPrimary ? Math.max(0, rawMax - formless.max) : rawMax
       const penetration = isPrimary ? readPath(withSets, `${lower}.penetration`) : undefined
       const name = t(`share.card.attrName.${attrKey}`, attrKey)
+      const minLabel = t(`content.statLine.min${attrKey}`, `Min ${name} Attack`)
+      const maxLabel = t(`content.statLine.max${attrKey}`, `Max ${name} Attack`)
+      const penLabel = t(`content.statLine.${lower}Penetration`, `${name} Penetration`)
       return {
         id: lower,
         name,
@@ -187,11 +243,43 @@ export function ShareBuildDialog({
         max: maxVal,
         isPrimary,
         penetration,
+        minLabel,
+        maxLabel,
+        penLabel,
       }
     })
 
+    const physBoost = readPath(withSets, "physBoost")
+    const critDamageBoost = readPath(withSets, "critDamageBoost")
+    const affinityDamageBoost = readPath(withSets, "affinityDamageBoost")
+    const attributeDamageBoost = readPath(withSets, "attributeDamageBoost")
+    const sustainDamageBoost = readPath(withSets, "sustainDamageBoost")
     const allMartialBoost = readPath(withSets, "allMartialBoost")
     const bossBoost = readPath(withSets, "bossBoost")
+
+    // Weapon Boost
+    const weaponBoostCandidates = [
+      "modaoBoost",
+      "hengDaoBoost",
+      "swordBoost",
+      "spearBoost",
+      "fanBoost",
+      "umbrellaBoost",
+      "dualKnivesBoost",
+      "ropeDartBoost",
+      "gauntletsBoost",
+    ]
+    let weaponBoost: { label: string; value: number } | undefined
+    for (const path of weaponBoostCandidates) {
+      const val = readPath(withSets, path)
+      if (val > 0) {
+        weaponBoost = {
+          label: statPathLabel(path, t),
+          value: val,
+        }
+        break
+      }
+    }
 
     let topClassBoost: { label: string; value: number } | undefined
     let maxClassVal = 0
@@ -243,6 +331,11 @@ export function ShareBuildDialog({
       })
       .filter(Boolean)
 
+    const resistance = resistanceForInputs(inputs)
+    const bossKey = inputs.swordTrialBoss ? `content.boss.${inputs.swordTrialBoss}` : null
+    const bossName = bossKey ? t(bossKey, inputs.swordTrialBoss) : inputs.swordTrialBoss || null
+    const isTrainingDummy = Boolean(inputs.dummyMode)
+
     const labels: BuildCardLabels = {
       playerBuildPrefix: t("share.card.playerBuildPrefix", "Сборка игрока:"),
       defaultPlayer: t("share.defaultPlayerName", "Игрок"),
@@ -251,24 +344,47 @@ export function ShareBuildDialog({
       duration: t("share.card.duration", "Длительность"),
       rotation: t("share.card.rotation", "Ротация"),
 
-      attackTitle: t("share.card.attackTitle", "АТАКА И СТИХИИ"),
-      ratesTitle: t("share.card.ratesTitle", "ПАРАМЕТРЫ И УСИЛЕНИЯ"),
+      panelStatsTitle: t("common.panelStats", "ХАРАКТЕРИСТИКИ ПАНЕЛИ"),
+      resistanceLabel: t("common.resistance", "Сопротивление"),
       gearTitle: t("share.card.gearTitle", "КОМПЛЕКТЫ И СТОЛКНОВЕНИЕ"),
 
-      physAttackLabel: t("share.card.physAttackLabel", "Физ. атака (Мин – Макс)"),
-      physPenLabel: t("share.card.physPenLabel", "Физ. пробитие"),
-      attrAttackLabel: t("share.card.attrAttackLabel", "Атака: {attr}"),
-      attrPenLabel: t("share.card.attrPenLabel", "Пробитие: {attr}"),
-      formlessLabel: t("share.card.formlessLabel", "Бесформенная атака"),
-      agilityLabel: t("share.card.agilityLabel", "Ловкость (Agility)"),
-      powerLabel: t("share.card.powerLabel", "Сила (Power)"),
+      attributesTitle: t("components.statsOverviewPanel.attributes", "АТРИБУТЫ"),
+      threeRatesTitle: t("components.statsOverviewPanel.threeRates", "ТРОЙНЫЕ ШАНСЫ"),
+      attackTitle: t("components.statsOverviewPanel.attackPenetration", "АТАКА И ПРОНИКНОВЕНИЕ"),
+      damageBoostsTitle: t("components.statsOverviewPanel.damageBoosts", "УВЕЛИЧЕНИЕ И СНИЖЕНИЕ УРОНА"),
 
-      critLabel: t("share.card.critLabel", "Крит. шанс"),
-      critCombinedLabel: t("share.card.critCombinedLabel", "Крит. шанс (+ Прямой)"),
-      precisionLabel: t("share.card.precisionLabel", "Точность (Precision)"),
-      affinityLabel: t("share.card.affinityLabel", "Сокрушение (Affinity)"),
-      allMartialArtsLabel: t("share.card.allMartialArtsLabel", "Все боевые искусства"),
-      bossBoostLabel: t("share.card.bossBoostLabel", "Урон против боссов"),
+      powerLabel: t("content.statLine.power", "Сила"),
+      agilityLabel: t("content.statLine.agility", "Ловкость"),
+      momentumLabel: t("content.statLine.momentum", "Сноровка"),
+      constitutionLabel: t("content.statLine.body", "Телосложение"),
+      defenseLabel: t("content.statLine.defense", "Защита"),
+      maxHpLabel: t("content.statLine.maxHp", "Макс. ОЗ"),
+      physDefenseLabel: t("content.statLine.physDef", "Физ. защита"),
+
+      precisionLabel: t("content.statLine.precision", "Меткость"),
+      critLabel: t("content.statLine.critRate", "Крит. шанс"),
+      affinityLabel: t("content.statLine.affinityRate", "Сокрушение"),
+      directCritLabel: t("content.statLine.directCritRate", "Прямой крит"),
+      directAffinityLabel: t("content.statLine.directAffinityRate", "Прямое сокрушение"),
+      finalCritLabel: t("components.statsOverviewPanel.finalCrit", "Финальный крит"),
+      finalAffinityLabel: t("components.statsOverviewPanel.finalAffinity", "Финальное сокрушение"),
+      finalCritAffinityLabel: t("components.statsOverviewPanel.finalCritAffinity", "Фин. крит и сокруш."),
+      finalAbrasionLabel: t("components.statsOverviewPanel.finalAbrasion", "Финальный износ"),
+      finalNormalLabel: t("components.statsOverviewPanel.finalNormal", "Обычные удары"),
+
+      minPhysAttackLabel: t("content.statLine.minPhys", "Мин. физ. атака"),
+      maxPhysAttackLabel: t("content.statLine.maxPhys", "Макс. физ. атака"),
+      physPenLabel: t("content.statLine.physPenetration", "Физ. пробитие"),
+      minFormlessLabel: t("content.statLine.minFormless", "Мин. бесформенная атака"),
+      maxFormlessLabel: t("content.statLine.maxFormless", "Макс. бесформенная атака"),
+
+      physBoostLabel: t("content.statLine.physBoost", "Физ. урон"),
+      critDmgBoostLabel: t("content.statLine.critDamageBoost", "Крит. урон"),
+      affinityDmgBoostLabel: t("content.statLine.affinityDamageBoost", "Урон сокрушения"),
+      attributeDmgBoostLabel: t("content.statLine.attributeDamageBoost", "Урон атрибута"),
+      sustainDmgBoostLabel: t("content.statLine.sustainDamageBoost", "Продолжительный урон"),
+      allMartialArtsLabel: t("content.statLine.allMartialBoost", "Все боевые искусства"),
+      bossBoostLabel: t("content.statLine.bossBoost", "Урон против боссов"),
       classSkillBoostLabel: t("share.card.classSkillBoostLabel", "Навык класса"),
 
       armorSetLabel: t("share.card.armorSetLabel", "Комплект брони (4/4):"),
@@ -279,6 +395,10 @@ export function ShareBuildDialog({
       noScript: t("share.card.noScript", "Без свитка"),
       innerWaysLabel: t("share.card.innerWaysLabel", "Внутренние пути (4/4):"),
       notEquipped: t("share.card.notEquipped", "Не надет"),
+
+      encounterTitle: t("share.card.encounterTitle", "Столкновение и Босс:"),
+      bossLabel: t("overview.swordTrialBoss", "Босс"),
+      dummyLabel: t("overview.trainingDummy", "Манекен"),
 
       generated: t("share.card.generated", "Сгенерировано:"),
       locale,
@@ -296,23 +416,47 @@ export function ShareBuildDialog({
         rotationDuration: result.rotationDuration,
         rotationName: activeRotationName(inputs) || "",
 
-        minPhys: readPath(withSets, "phys.min"),
-        maxPhys: readPath(withSets, "phys.max"),
+        power,
+        agility,
+        momentum,
+        body,
+        defense,
+        physDefense,
+        baseHp,
+        effHp,
+
+        precisionRate: withSets.precision,
+        effPrecisionRate: eff.precision,
+        critRate: withSets.critRate,
+        effCritRate: eff.critRate,
+        affinityRate: withSets.affinityRate,
+        effAffinityRate: eff.affinityRate,
+        directCritRate: withSets.directCritRate,
+        directAffinityRate: withSets.directAffinityRate,
+        finalCrit: finalRates.critRate,
+        finalAffinity: finalRates.affinityRate,
+        finalCritAffinity: finalRates.critRate + finalRates.affinityRate,
+        finalAbrasion: finalRates.abrasionRate,
+        finalNormal: finalRates.normalRate,
+
+        minPhys,
+        maxPhys,
+        minPhysEff,
+        maxPhysEff,
         physPenetration,
 
         elements,
         formlessMin: formless.min,
         formlessMax: formless.max,
 
-        critRate: finalRates.critRate,
-        directCritRate: withSets.directCritRate,
-        precisionRate: eff.precision,
-        affinityRate: finalRates.affinityRate,
-        agility,
-        power,
-
+        physBoost,
+        critDamageBoost,
+        affinityDamageBoost,
+        attributeDamageBoost,
+        sustainDamageBoost,
         allMartialBoost,
         bossBoost,
+        weaponBoost,
         topClassBoost,
 
         armorSetName,
@@ -322,6 +466,9 @@ export function ShareBuildDialog({
         divinecraftName,
         foodName,
         innerWays,
+        bossName,
+        resistance,
+        isTrainingDummy,
       },
       labels,
     )
