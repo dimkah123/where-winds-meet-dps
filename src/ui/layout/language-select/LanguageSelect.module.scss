@@ -2,6 +2,8 @@
   display: inline-flex;
   flex: 0 0 auto;
   width: 108px;
+  align-items: center;
+  height: 100%;
 
   &.inline {
     height: 100%;
@@ -9,15 +11,36 @@
     min-width: 82px;
 
     button {
-      height: 100%;
+      height: 100% !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       border: none !important;
       border-radius: 0 !important;
       background: transparent !important;
-      padding: 0 8px 0 10px !important;
+      padding: 0 10px !important;
       box-shadow: none !important;
+      font-size: 13px !important;
+      line-height: 1 !important;
 
       &:hover {
         background: var(--color-surface-hover) !important;
+      }
+
+      > span:first-child {
+        display: inline-flex !important;
+        align-items: center !important;
+        line-height: 1 !important;
+        height: 100% !important;
+      }
+
+      > span:last-child {
+        display: inline-flex !important;
+        align-items: center !important;
+        border-left: none !important;
+        padding-left: 4px !important;
+        height: 100% !important;
+        margin-top: 1px;
       }
     }
   }

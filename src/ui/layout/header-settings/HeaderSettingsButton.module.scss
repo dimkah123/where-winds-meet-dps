@@ -12,26 +12,35 @@
   color: var(--color-text-dim);
   padding: 0 10px;
   cursor: pointer;
-  font-size: 1.05em;
-  line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transition:
     background 0.1s,
-    color 0.1s,
-    transform 0.2s ease;
+    color 0.1s;
 
   &:hover {
     color: var(--color-accent-bright, #ffd88a);
     background: var(--color-surface-hover);
-    transform: rotate(25deg);
+
+    .gearIcon {
+      transform: rotate(45deg);
+    }
   }
 
   &.active {
     color: var(--color-accent, #c0a060);
     background: var(--color-surface-hover);
   }
+}
+
+.gearIcon {
+  width: 15px;
+  height: 15px;
+  display: block;
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+  transform-origin: center center;
 }
 
 .popover {
