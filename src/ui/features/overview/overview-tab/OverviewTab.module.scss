@@ -2,9 +2,9 @@
 
 .overviewGrid {
   display: grid;
-  grid-template-columns: minmax(0, 0.68fr) minmax(0, 0.88fr) minmax(0, 1.44fr);
+  grid-template-columns: minmax(0, 0.74fr) minmax(0, 1.08fr) minmax(0, 1.18fr);
   grid-template-areas: "slots stats lift";
-  gap: 10px;
+  gap: 12px;
   align-items: start;
 }
 
@@ -40,7 +40,7 @@
 
 @include breakpoints.below(breakpoints.$bp-1500) {
   .overviewGrid {
-    grid-template-columns: minmax(0, 0.68fr) minmax(0, 0.88fr) minmax(0, 1.44fr);
+    grid-template-columns: minmax(0, 0.74fr) minmax(0, 1.08fr) minmax(0, 1.18fr);
     grid-template-areas: "slots stats lift";
   }
 }
