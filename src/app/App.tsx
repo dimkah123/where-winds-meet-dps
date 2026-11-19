@@ -47,6 +47,9 @@ import { UpdateBanner } from "../ui/layout/update-banner/UpdateBanner"
 import { useAppUpdateChecker } from "../ui/hooks/useAppUpdateChecker"
 import { decodeSharedBuild, encodeSharedBuild } from "../engine/shareBuild"
 import { UserAuthButton } from "../ui/layout/user-auth-button/UserAuthButton"
+import { HeaderSettingsButton } from "../ui/layout/header-settings/HeaderSettingsButton"
+import { useHeaderSettings } from "../ui/hooks/useHeaderSettings"
+import type { UserProfile } from "../cloud/types"
 import { MyBuildsDialog } from "../ui/layout/my-builds-dialog/MyBuildsDialog"
 import { loadBuildFromCloud, getEditToken, updateBuildInCloud } from "../cloud/cloudBuilds"
 import { getStoredSession } from "../cloud/auth"
@@ -160,6 +163,14 @@ function AppInner() {
     profiles: initial.profiles,
     activeId: initial.activeId,
   })
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(
+    () => getStoredSession().userProfile,
+  )
+  const {
+    settings: headerSettings,
+    updateSetting: updateHeaderSetting,
+    resetSettings: resetHeaderSettings,
+  } = useHeaderSettings()
   const initialActive = committed.profiles.find((profile) => profile.id === committed.activeId)!
   const {
     state: activeDraft,
@@ -762,92 +773,116 @@ function AppInner() {
             )}
           </div>
           <div className={styles.appTitlebarActions}>
-            <LanguageSelect />
-            <UserAuthButton onOpenMyBuilds={() => setMyBuildsDialogOpen(true)} />
-            <button
-              type="button"
-              className="share-btn"
-              onClick={() => {
-                setShareTargetProfile(null)
-                setShareDialogOpen(true)
-              }}
-              title={t("common.shareBuild")}
-              aria-label={t("common.shareBuild")}
-            >
-              🔗 {t("common.shareBuild")}
-            </button>
-            <div className={styles.historyButtonGroup}>
-              <button
-                type="button"
-                className={styles.historyBtn}
-                onClick={handleUndo}
-                disabled={!canUndo || isSimulationRunning}
-                title={
-                  canUndo
-                    ? "Отменить последнее действие (Ctrl+Z)"
-                    : "История изменений пуста (Ctrl+Z)"
-                }
-                aria-label="Отменить (Ctrl+Z)"
-              >
-                ↶
-              </button>
-              <button
-                type="button"
-                className={styles.historyBtn}
-                onClick={handleRedo}
-                disabled={!canRedo || isSimulationRunning}
-                title={
-                  canRedo
-                    ? "Повторить отменённое действие (Ctrl+Y или Ctrl+Shift+Z)"
-                    : "Нет действий для повтора"
-                }
-                aria-label="Повторить (Ctrl+Y)"
-              >
-                ↷
-              </button>
-              <button
-                type="button"
-                className={
-                  styles.historyBtn +
-                  ` ${styles.saveBtn}` +
-                  (isDirty && !sharedBannerInfo
-                    ? ` ${styles.saveBtnDirty}`
-                    : isJustSaved
-                      ? ` ${styles.saveBtnSaved}`
-                      : "")
-                }
-                onClick={handleSave}
-                disabled={!isDirty || !!sharedBannerInfo}
-                aria-label={t("common.save")}
-                title={
-                  sharedBannerInfo
-                    ? t(
-                        "app.saveDisabledSharedBuild",
-                        "Нельзя перезаписать свой профиль чужим билдом. Сохраните его в профили с помощью кнопки «Сохранить в мои профили».",
-                      )
-                    : isDirty
-                      ? `${t("common.save")} (Ctrl+S)`
-                      : isJustSaved
-                        ? t("app.saved")
-                        : t("app.saved2")
-                }
-              >
-                💾
-              </button>
-              <button
-                type="button"
-                className={`${styles.historyBtn} ${styles.discardBtn}`}
-                onClick={handleReset}
-                disabled={!isDirty || isSimulationRunning}
-                aria-label={t("app.discardChanges")}
-                title={
-                  isDirty
-                    ? t("app.discardEditsSinceTheLast")
-                    : t("app.noChangesToDiscard", "Нет несохранённых изменений")
-                }
-              >
-                ↺
-              </button>
+            <div className={styles.headerToolbar}>
+              <LanguageSelect inline />
+              {headerSettings.showProfile && (
+                <UserAuthButton
+                  inline
+                  onOpenMyBuilds={() => setMyBuildsDialogOpen(true)}
+                  onUserChanged={setCurrentUser}
+                />
+              )}
+              {headerSettings.showShare && (
+                <button
+                  type="button"
+                  className={styles.toolbarBtn}
+                  onClick={() => {
+                    setShareTargetProfile(null)
+                    setShareDialogOpen(true)
+                  }}
+                  title={t("common.shareBuild")}
+                  aria-label={t("common.shareBuild")}
+                >
+                  <span>🔗</span>
+                  <span className={styles.shareBtnText}>{t("common.shareBuild")}</span>
+                </button>
+              )}
+              {headerSettings.showUndoRedo && (
+                <>
+                  <button
+                    type="button"
+                    className={styles.toolbarBtn}
+                    onClick={handleUndo}
+                    disabled={!canUndo || isSimulationRunning}
+                    title={
+                      canUndo
+                        ? "Отменить последнее действие (Ctrl+Z)"
+                        : "История изменений пуста (Ctrl+Z)"
+                    }
+                    aria-label="Отменить (Ctrl+Z)"
+                  >
+                    ↶
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.toolbarBtn}
+                    onClick={handleRedo}
+                    disabled={!canRedo || isSimulationRunning}
+                    title={
+                      canRedo
+                        ? "Повторить отменённое действие (Ctrl+Y или Ctrl+Shift+Z)"
+                        : "Нет действий для повтора"
+                    }
+                    aria-label="Повторить (Ctrl+Y)"
+                  >
+                    ↷
+                  </button>
+                </>
+              )}
+              {headerSettings.showSaveReset && (
+                <>
+                  <button
+                    type="button"
+                    className={
+                      styles.toolbarBtn +
+                      ` ${styles.saveBtn}` +
+                      (isDirty && !sharedBannerInfo
+                        ? ` ${styles.saveBtnDirty}`
+                        : isJustSaved
+                          ? ` ${styles.saveBtnSaved}`
+                          : "")
+                    }
+                    onClick={handleSave}
+                    disabled={!isDirty || !!sharedBannerInfo}
+                    aria-label={t("common.save")}
+                    title={
+                      sharedBannerInfo
+                        ? t(
+                            "app.saveDisabledSharedBuild",
+                            "Нельзя перезаписать свой профиль чужим билдом. Сохраните его в профили с помощью кнопки «Сохранить в мои профили».",
+                          )
+                        : isDirty
+                          ? `${t("common.save")} (Ctrl+S)`
+                          : isJustSaved
+                            ? t("app.saved")
+                            : t("app.saved2")
+                    }
+                  >
+                    💾
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.toolbarBtn} ${styles.discardBtn}`}
+                    onClick={handleReset}
+                    disabled={!isDirty || isSimulationRunning}
+                    aria-label={t("app.discardChanges")}
+                    title={
+                      isDirty
+                        ? t("app.discardEditsSinceTheLast")
+                        : t("app.noChangesToDiscard", "Нет несохранённых изменений")
+                    }
+                  >
+                    ↺
+                  </button>
+                </>
+              )}
+              <HeaderSettingsButton
+                settings={headerSettings}
+                onUpdateSetting={updateHeaderSetting}
+                onResetSettings={resetHeaderSettings}
+                user={currentUser}
+                onOpenMyBuilds={() => setMyBuildsDialogOpen(true)}
+              />
             </div>
           </div>
         </header>

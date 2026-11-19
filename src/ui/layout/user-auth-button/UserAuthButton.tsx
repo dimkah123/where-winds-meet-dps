@@ -14,9 +14,10 @@ import styles from "./UserAuthButton.module.scss"
 interface Props {
   onOpenMyBuilds: () => void
   onUserChanged?: (user: UserProfile | null) => void
+  inline?: boolean
 }
 
-export function UserAuthButton({ onOpenMyBuilds, onUserChanged }: Props) {
+export function UserAuthButton({ onOpenMyBuilds, onUserChanged, inline }: Props) {
   const { t } = useI18n()
   const [user, setUser] = useState<UserProfile | null>(() => getStoredSession().userProfile)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -113,7 +114,7 @@ export function UserAuthButton({ onOpenMyBuilds, onUserChanged }: Props) {
   }
 
   return (
-    <div className={styles.authContainer} ref={dropdownRef}>
+    <div className={styles.authContainer + (inline ? ` ${styles.inline}` : "")} ref={dropdownRef}>
       {/* Hidden button container for GIS fallback */}
       <div ref={hiddenBtnRef} className={styles.hiddenGoogleBtn} />
 

@@ -90,16 +90,35 @@
   gap: 12px;
 }
 
+.headerToolbar,
 .historyButtonGroup {
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--color-border-strong);
   border-radius: 6px;
-  overflow: hidden;
-  background: transparent;
+  background: rgba(22, 21, 19, 0.65);
   height: 31px;
+  box-sizing: border-box;
+
+  > :first-child,
+  > :first-child button,
+  > :first-child span button {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+  }
+
+  > :last-child,
+  > :last-child button {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+
+  > :not(:last-child) {
+    border-right: 1px solid var(--color-border-strong);
+  }
 }
 
+.toolbarBtn,
 .historyBtn {
   background: transparent;
   border: none;
@@ -112,13 +131,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 5px;
   transition:
     background 0.1s,
     color 0.1s;
-
-  &:not(:last-child) {
-    border-right: 1px solid var(--color-border-strong);
-  }
 
   &:hover:not(:disabled) {
     color: var(--color-text);
@@ -128,6 +144,14 @@
   &:disabled {
     cursor: not-allowed;
     opacity: 0.35;
+  }
+}
+
+.shareBtnText {
+  font-size: 0.85em;
+
+  @media (max-width: 900px) {
+    display: none;
   }
 }
 

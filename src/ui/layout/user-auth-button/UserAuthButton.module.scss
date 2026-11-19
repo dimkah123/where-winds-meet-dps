@@ -2,6 +2,28 @@
   position: relative;
   display: inline-flex;
   align-items: center;
+
+  &.inline {
+    height: 100%;
+
+    .userBtn,
+    .loginBtn {
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      height: 100%;
+      padding: 0 10px;
+
+      &:hover {
+        background: var(--color-surface-hover);
+        border-color: transparent;
+      }
+    }
+
+    .userBtn {
+      border-radius: 0;
+    }
+  }
 }
 
 .loginBtn {

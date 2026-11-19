@@ -2,4 +2,23 @@
   display: inline-flex;
   flex: 0 0 auto;
   width: 108px;
+
+  &.inline {
+    height: 100%;
+    width: auto;
+    min-width: 82px;
+
+    button {
+      height: 100%;
+      border: none !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      padding: 0 8px 0 10px !important;
+      box-shadow: none !important;
+
+      &:hover {
+        background: var(--color-surface-hover) !important;
+      }
+    }
+  }
 }
