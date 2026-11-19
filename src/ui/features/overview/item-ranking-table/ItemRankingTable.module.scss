@@ -1,7 +1,23 @@
+.rankingTable th:first-child,
+.rankingTable td:first-child {
+  text-align: left;
+  width: auto;
+}
+
 .rankingTable th:not(:first-child),
 .rankingTable td:not(:first-child) {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  text-align: right;
+  width: 1%;
+}
+
+.rankingTable tbody tr {
+  transition: background-color 0.1s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.035);
+  }
 }
 
 .dpsDelta:global(.is-positive) {

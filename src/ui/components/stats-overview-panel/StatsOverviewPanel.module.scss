@@ -24,6 +24,10 @@
   row-gap: 2px;
 }
 
+.statsOverviewGridSingle {
+  grid-template-columns: 1fr;
+}
+
 @include breakpoints.below(breakpoints.$bp-1100) {
   .statsOverviewGrid {
     grid-template-columns: 1fr;
@@ -31,18 +35,42 @@
 }
 
 .statsOverviewRow {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) max-content;
+  display: flex;
   align-items: center;
-  column-gap: 6px;
-  padding: 0.5px 0;
+  gap: 6px;
+  padding: 1.5px 4px;
+  border-radius: 3px;
+  min-height: 22px;
+  transition: background-color 0.12s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.035);
+
+    .statsOverviewLeader {
+      border-bottom-color: rgba(229, 169, 59, 0.3);
+    }
+  }
 }
 
 .statsOverviewLabel {
   color: var(--color-text-dim);
   white-space: nowrap;
+  flex-shrink: 0;
+  max-width: 72%;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.statsOverviewGridSingle .statsOverviewLabel {
+  max-width: 82%;
+}
+
+.statsOverviewLeader {
+  flex: 1 1 0%;
+  min-width: 6px;
+  height: 1px;
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.13);
+  margin-top: 2px;
 }
 
 .statsOverviewValue {
@@ -50,6 +78,11 @@
   font-variant-numeric: tabular-nums;
   text-align: right;
   white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-left: auto;
 }
 
 .statValueGroup {

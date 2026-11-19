@@ -397,6 +397,7 @@ export function StatsOverviewPanel({ inputs, onChange }: Props) {
           rows={classBuffRows}
           onStatChange={onChange ? handleStatChange : undefined}
           statOverrides={statOverrides}
+          singleColumn
         />
       )}
     </div>
@@ -515,17 +516,21 @@ function Section({
   rows,
   onStatChange,
   statOverrides,
+  singleColumn,
 }: {
   title: string
   rows: RowEntry[]
   onStatChange?: (path: string, value: number | undefined) => void
   statOverrides?: Record<string, number>
+  singleColumn?: boolean
 }) {
   if (rows.length === 0) return null
   return (
     <div>
       <div className={styles.statsOverviewSectionHead}>{title}</div>
-      <div className={styles.statsOverviewGrid}>
+      <div
+        className={`${styles.statsOverviewGrid} ${singleColumn ? styles.statsOverviewGridSingle : ""}`}
+      >
         {rows.map((entry, index) => {
           const isOverridden = Boolean(entry.path && statOverrides?.[entry.path] !== undefined)
           return (
@@ -533,6 +538,7 @@ function Section({
               <div className={styles.statsOverviewLabel} title={entry.hint ?? entry.label}>
                 {entry.label}
               </div>
+              <div className={styles.statsOverviewLeader} />
               <div className={styles.statsOverviewValue}>
                 {onStatChange && entry.path ? (
                   <StatInput

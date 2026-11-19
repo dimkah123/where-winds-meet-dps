@@ -2,7 +2,7 @@
 
 .overviewGrid {
   display: grid;
-  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.4fr) minmax(0, 0.82fr);
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.02fr) minmax(0, 1.26fr);
   grid-template-areas: "slots stats lift";
   gap: 12px;
   align-items: start;
@@ -40,7 +40,7 @@
 
 @include breakpoints.below(breakpoints.$bp-1500) {
   .overviewGrid {
-    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.4fr) minmax(0, 0.82fr);
+    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.02fr) minmax(0, 1.26fr);
     grid-template-areas: "slots stats lift";
   }
 }
