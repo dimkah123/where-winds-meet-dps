@@ -412,3 +412,37 @@
     padding: 8px 16px;
   }
 }
+
+.gameFonts {
+  h1 {
+    font-family: var(--font-heading);
+    letter-spacing: 0.05em;
+  }
+
+  .collapsedTitleText {
+    font-family: var(--font-heading);
+    letter-spacing: 0.04em;
+  }
+
+  :global(.panel-head h2),
+  :global(.panel h2) {
+    font-family: var(--font-heading);
+    letter-spacing: 0.04em;
+    font-weight: 700;
+  }
+
+  :global(.dps .value) {
+    font-family: var(--font-dps);
+    font-size: 2.15em;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    line-height: 1;
+  }
+
+  .compactDpsValue {
+    font-family: var(--font-dps);
+    font-size: 1.15em;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+}

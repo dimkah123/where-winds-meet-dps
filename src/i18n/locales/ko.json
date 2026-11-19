@@ -40,6 +40,8 @@
   "app.settings.account": "계정",
   "app.settings.collapseHeader": "헤더 접기 (컴팩트 모드)",
   "app.settings.collapseHeaderHint": "상단 타이틀과 큰 메트릭 카드를 접고 알림 옆에 DPS를 표시합니다.",
+  "app.settings.gameFonts": "게임 스타일 글꼴 (무협 & 게이밍)",
+  "app.settings.gameFontsHint": "제목에 스타일화된 글꼴(Cinzel / Philosopher)을 적용하고 DPS에 선명한 게이밍 숫자(Rajdhani)를 사용합니다.",
   "app.settings.expandHeader": "헤더 펼치기",
   "app.settings.layout": "인터페이스 레이아웃",
   "app.settings.resetDefaults": "기본값으로 재설정",

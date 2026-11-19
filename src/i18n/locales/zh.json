@@ -40,6 +40,8 @@
   "app.settings.account": "账户",
   "app.settings.collapseHeader": "折叠顶部栏（紧凑模式）",
   "app.settings.collapseHeaderHint": "隐藏标题与大面板，DPS 显示在警报标签旁。",
+  "app.settings.gameFonts": "游戏风格字体 (武侠 & 游戏)",
+  "app.settings.gameFontsHint": "为标题启用古典风格字体 (Cinzel / Philosopher)，并为 DPS 启用清晰战术数字 (Rajdhani)。",
   "app.settings.expandHeader": "展开顶部栏",
   "app.settings.layout": "界面布局",
   "app.settings.resetDefaults": "恢复默认设置",

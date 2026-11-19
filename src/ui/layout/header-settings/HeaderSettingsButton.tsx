@@ -127,6 +127,15 @@ export function HeaderSettingsButton({
               checked={settings.collapseHeader}
               onChange={(v) => onUpdateSetting("collapseHeader", v)}
             />
+            <ToggleRow
+              label={t("app.settings.gameFonts", "Game Fonts (Wuxia & Gaming)")}
+              hint={t(
+                "app.settings.gameFontsHint",
+                "Stylized typography for headers (Cinzel / Philosopher) and crisp gaming digits for DPS (Rajdhani).",
+              )}
+              checked={settings.gameFonts}
+              onChange={(v) => onUpdateSetting("gameFonts", v)}
+            />
           </div>
 
           <div className={styles.sectionTitle}>

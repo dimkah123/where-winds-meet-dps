@@ -666,7 +666,7 @@ function AppInner() {
   const isJustSaved = Boolean(savedAt && !isDirty)
 
   return (
-    <div className={styles.app}>
+    <div className={styles.app + (headerSettings.gameFonts ? ` ${styles.gameFonts}` : "")}>
       <DpsActivityToast hidden={isSimulationRunning} />
       <CornerToasts
         result={result}

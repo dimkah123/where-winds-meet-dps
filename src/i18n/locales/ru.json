@@ -40,6 +40,8 @@
   "app.settings.account": "Аккаунт",
   "app.settings.collapseHeader": "Свернуть шапку (компактный вид)",
   "app.settings.collapseHeaderHint": "Скрывает большой блок DPS и название; DPS отображается у алертов.",
+  "app.settings.gameFonts": "Игровые шрифты (Wuxia & Gaming)",
+  "app.settings.gameFontsHint": "Стилизованный шрифт для заголовков (Cinzel / Philosopher) и чёткие цифры урона (Rajdhani).",
   "app.settings.expandHeader": "Развернуть шапку",
   "app.settings.layout": "Макет интерфейса",
   "app.settings.resetDefaults": "Сбросить по умолчанию",
