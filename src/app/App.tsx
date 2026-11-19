@@ -43,6 +43,8 @@ import { activeRotationName } from "../ui/features/rotation/rotationOptions"
 import { useUndoRedo } from "../ui/hooks/useUndoRedo"
 import { ShareBuildDialog } from "../ui/features/share/share-build-dialog/ShareBuildDialog"
 import { SharedBuildBanner } from "../ui/layout/shared-build-banner/SharedBuildBanner"
+import { UpdateBanner } from "../ui/layout/update-banner/UpdateBanner"
+import { useAppUpdateChecker } from "../ui/hooks/useAppUpdateChecker"
 import { decodeSharedBuild, encodeSharedBuild } from "../engine/shareBuild"
 import { UserAuthButton } from "../ui/layout/user-auth-button/UserAuthButton"
 import { MyBuildsDialog } from "../ui/layout/my-builds-dialog/MyBuildsDialog"
@@ -192,6 +194,13 @@ function AppInner() {
   const [currentCloudId, setCurrentCloudId] = useState<string | null>(null)
   const [myBuildsDialogOpen, setMyBuildsDialogOpen] = useState(false)
   const lastLoadedCloudIdRef = useRef<string | null>(null)
+  const {
+    hasUpdate,
+    serverVersion,
+    dismissed: updateDismissed,
+    dismiss: dismissUpdate,
+    reload: reloadApp,
+  } = useAppUpdateChecker()
 
   useEffect(() => {
     const hashStr = typeof window !== "undefined" ? window.location.hash : ""
@@ -703,6 +712,9 @@ function AppInner() {
         />
       )}
       <div className={styles.appHeader}>
+        {hasUpdate && !updateDismissed && (
+          <UpdateBanner version={serverVersion} onReload={reloadApp} onDismiss={dismissUpdate} />
+        )}
         <header className={styles.appTitlebar}>
           <div className={styles.appTitle}>
             <h1>{t("app.whereWindsMeetDps")}</h1>
