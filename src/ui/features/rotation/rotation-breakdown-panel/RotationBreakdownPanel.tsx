@@ -256,22 +256,29 @@ function CompactRowGroup({
 
       {hasSubSkills &&
         isExpanded &&
-        row.subSkills.map((sub) => (
-          <tr key={sub.name} className={styles.subSkillRow}>
-            <td>
-              <div className={styles.subSkillName}>
-                <span>{t(sub.nameKey, sub.name)}</span>
-              </div>
-            </td>
-            <td className="bar-col" />
-            <td>
-              {sub.count} {sub.count === 1 ? "hit" : "hits"}
-            </td>
-            <td className={styles.percentCell}>{(sub.percentOfTotal * 100).toFixed(1)}%</td>
-            <td>{fmt(sub.dps, 1)}</td>
-            <td>{fmt(sub.expectedDamage, 0)}</td>
-          </tr>
-        ))}
+        row.subSkills.map((sub) => {
+          const categoryTitle = t(row.nameKey, row.name)
+          const translatedName = t(sub.nameKey, sub.name)
+          const displayName =
+            translatedName === categoryTitle && sub.name !== row.name ? sub.name : translatedName
+
+          return (
+            <tr key={sub.name} className={styles.subSkillRow}>
+              <td>
+                <div className={styles.subSkillName}>
+                  <span>{displayName}</span>
+                </div>
+              </td>
+              <td className="bar-col" />
+              <td>
+                {sub.count} {sub.count === 1 ? "hit" : "hits"}
+              </td>
+              <td className={styles.percentCell}>{(sub.percentOfTotal * 100).toFixed(1)}%</td>
+              <td>{fmt(sub.dps, 1)}</td>
+              <td>{fmt(sub.expectedDamage, 0)}</td>
+            </tr>
+          )
+        })}
     </>
   )
 }

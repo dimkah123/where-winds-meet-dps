@@ -176,4 +176,42 @@ describe("groupIntoInGameCategories", () => {
     expect(grouped[0].attempt).toBe(6) // 3 + 3 hits
     expect(grouped[0].subSkills).toHaveLength(2)
   })
+
+  it("preserves distinct skillKey on subskills when sharing identical breakdownName and breakdownKey", () => {
+    const rows: SkillTickResult[] = [
+      makeRow({
+        name: "Flute Ripple (DoT)",
+        breakdownName: "Flute Chanting a Thousand Waves",
+        breakdownKey: "content.debuff.debuff-mystic-flute-ripple.breakdown",
+        skillKey: "content.debuff.debuff-mystic-flute-ripple",
+        count: 10,
+        expectedDamage: 218_000,
+        percentOfTotal: 0.042,
+      }),
+      makeRow({
+        name: "Flute of the Tides Cancel",
+        breakdownName: "Flute Chanting a Thousand Waves",
+        breakdownKey: "content.skill.mystic-flute-of-the-tides-cancel.breakdown",
+        skillKey: "content.skill.mystic-flute-of-the-tides-cancel",
+        count: 1,
+        expectedDamage: 22_000,
+        percentOfTotal: 0.004,
+      }),
+    ]
+
+    const grouped = groupIntoInGameCategories(rows, 60)
+    expect(grouped).toHaveLength(1)
+    const flute = grouped[0]
+    expect(flute.categoryId).toBe("flute")
+    expect(flute.name).toBe("Flute Chanting a Thousand Waves")
+    expect(flute.attempt).toBe(11) // 10 + 1 hits
+    expect(flute.subSkills).toHaveLength(2)
+
+    // Verify subSkills have distinct nameKeys for proper localization display
+    expect(flute.subSkills[0].name).toBe("Flute Ripple (DoT)")
+    expect(flute.subSkills[0].nameKey).toBe("content.debuff.debuff-mystic-flute-ripple")
+
+    expect(flute.subSkills[1].name).toBe("Flute of the Tides Cancel")
+    expect(flute.subSkills[1].nameKey).toBe("content.skill.mystic-flute-of-the-tides-cancel")
+  })
 })

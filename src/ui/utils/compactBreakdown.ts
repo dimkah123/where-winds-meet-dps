@@ -244,7 +244,7 @@ export function groupIntoInGameCategories(
     const subSkills: CompactSubSkill[] = items
       .map((i) => ({
         name: i.name,
-        nameKey: i.breakdownKey,
+        nameKey: i.skillKey || i.breakdownKey,
         count: i.count,
         castCount: i.castCount ?? 0,
         expectedDamage: i.expectedDamage,
@@ -275,7 +275,7 @@ export function groupIntoInGameCategories(
     const subSkills: CompactSubSkill[] = items
       .map((i) => ({
         name: i.name,
-        nameKey: i.breakdownKey,
+        nameKey: i.skillKey || i.breakdownKey,
         count: i.count,
         castCount: i.castCount ?? 0,
         expectedDamage: i.expectedDamage,

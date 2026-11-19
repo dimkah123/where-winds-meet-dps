@@ -508,6 +508,7 @@ export interface SkillTickResult {
   name: string
   breakdownName: string
   breakdownKey: string
+  skillKey?: string
   type: "weapon" | "mindMethod" | "mystic" | "sustain" | "settlement" | "weaponMystic" | string
   count: number
   expectedDamage: number

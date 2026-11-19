@@ -1494,6 +1494,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
     dotName: string
     dotBreakdownName: string
     dotBreakdownKey: string
+    dotSkillKey: string
     dotType: string
   }
 
@@ -1609,7 +1610,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
 
   const byName = new Map<
     string,
-    { breakdownName: string; breakdownKey: string; type: string; count: number; damage: number }
+    { breakdownName: string; breakdownKey: string; skillKey: string; type: string; count: number; damage: number }
   >()
   function add(
     name: string,
@@ -1618,13 +1619,14 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
     damage: number,
     breakdownName: string,
     breakdownKey: string,
+    skillKey?: string,
   ): void {
     if (!collectDetail) return
     const tallied = byName.get(name)
     if (tallied) {
       tallied.count += count
       tallied.damage += damage
-    } else byName.set(name, { breakdownName, breakdownKey, type, count, damage })
+    } else byName.set(name, { breakdownName, breakdownKey, skillKey: skillKey ?? breakdownKey, type, count, damage })
   }
 
   const timeline: TimelineEvent[] = []
@@ -3223,6 +3225,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
                 damage,
                 breakdownNameOf(skill.breakdownName, skill.name),
                 skillBreakdownRowKey(skill),
+                skillKey(skill),
               )
             }
             bankEcho(frame, st.echoFeeds, damage)
@@ -3263,6 +3266,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
         dotBreakdownKey: status.breakdownName
           ? debuffBreakdownKey(status.id)
           : debuffKey(status.id),
+        dotSkillKey: debuffKey(status.id),
         dotSkill: dotTickSkill(status, tickSkill),
         dotName: dotRowName(status),
         dotBreakdownName: breakdownNameOf(status.breakdownName, status.name),
@@ -3365,7 +3369,15 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
       settleTally(entry.frame, () => {
         totalDamage += damage
         if (tickRolled) tallyRoll(tickRolled, damage)
-        add(entry.dotName, entry.dotType, 1, damage, entry.dotBreakdownName, entry.dotBreakdownKey)
+        add(
+          entry.dotName,
+          entry.dotType,
+          1,
+          damage,
+          entry.dotBreakdownName,
+          entry.dotBreakdownKey,
+          entry.dotSkillKey,
+        )
         bankEcho(entry.frame, st.echoFeeds, damage)
       })
       pushWindowBoundEvent({
@@ -3423,6 +3435,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
           damage,
           breakdownNameOf(mechEvent.skill.breakdownName, mechEvent.name),
           skillBreakdownRowKey(mechEvent.skill),
+          skillKey(mechEvent.skill),
         )
         bankEcho(mechEvent.frame, st.echoFeeds, damage)
       })
@@ -3478,6 +3491,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
           1,
           paid,
           echo.breakdownName,
+          debuffEchoKey(releasedDebuffId),
           debuffEchoKey(releasedDebuffId),
         )
         pushWindowBoundEvent({
@@ -3629,6 +3643,7 @@ export function simulateTimeline(inputs: Inputs, options?: EngineRunOptions): Re
     name,
     breakdownName: tallied.breakdownName,
     breakdownKey: tallied.breakdownKey,
+    skillKey: tallied.skillKey,
     type: tallied.type,
     count: tallied.count,
     expectedDamage: tallied.damage,
