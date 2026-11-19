@@ -74,7 +74,7 @@ export function MetricsCard({
     <div className={styles.metricsCard + (className ? ` ${className}` : "")}>
       <div className={styles.dps}>
         <span className={styles.label}>{t("common.dps")}</span>
-        <span className={styles.value}>{formatNumber(result.dps, 2)}</span>
+        <span className={styles.value}>{formatNumber(result.dps, 0)}</span>
         <span className={styles.subline}>
           {formatCompactDamage(result.totalDamage)} · {durationText}
           {rotationName ? ` · ${rotationName}` : ""}

@@ -43,7 +43,7 @@
   "app.settings.collapseHeader": "Collapse header (compact mode)",
   "app.settings.collapseHeaderHint": "Hides title & big metrics card; DPS displays next to alerts.",
   "app.settings.gameFonts": "Stylized game fonts (Wuxia & Gaming)",
-  "app.settings.gameFontsHint": "Stylized typography for headers (Cinzel / Philosopher) and crisp gaming digits for DPS (Rajdhani).",
+  "app.settings.gameFontsHint": "Stylized typography for headers (Cinzel / Philosopher).",
   "app.settings.expandHeader": "Expand header",
   "app.settings.layout": "Interface Layout",
   "app.settings.resetDefaults": "Reset to defaults",

@@ -1043,7 +1043,7 @@ function AppInner() {
                 >
                   <span className={styles.compactDpsLabel}>DPS</span>
                   <span className={styles.compactDpsValue}>
-                    {formatNumber(headerResult.dps, 2)}
+                    {formatNumber(headerResult.dps, 0)}
                   </span>
                 </div>
               )}

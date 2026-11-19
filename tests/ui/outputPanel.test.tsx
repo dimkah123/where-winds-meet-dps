@@ -30,7 +30,7 @@ describe("MetricsCard", () => {
       </I18nProvider>,
     )
 
-    expect(screen.getByText("8,642.00")).toBeInTheDocument()
+    expect(screen.getByText("8,642")).toBeInTheDocument()
     expect(screen.getByText("86.4%")).toBeInTheDocument()
     expect(screen.getByText("Graduation")).toBeInTheDocument()
     expect(screen.getByLabelText("Graduation: 86.4% · Example Build")).toHaveAttribute(
