@@ -51,7 +51,7 @@ export const STONESPLIT_STRENGTH_ATTUNEMENTS = [
   },
   {
     id: "snowpartingVariedCombo",
-    label: "Snowparting Blade - Light/Heavy Attack Varied Combo DMG Boost",
+    label: "Snowparting Blade - Light/Heavy Attack Varied Combo DMG",
     min: SKILL_BOOST_MIN,
     max: SKILL_BOOST_MAX,
     slots: ARMOR_SLOTS,

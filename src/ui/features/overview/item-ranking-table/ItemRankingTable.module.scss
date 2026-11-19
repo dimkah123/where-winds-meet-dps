@@ -2,6 +2,7 @@
 .rankingTable td:first-child {
   text-align: left;
   width: auto;
+  white-space: nowrap;
 }
 
 .rankingTable th:not(:first-child),

@@ -54,7 +54,7 @@ export const SILKBIND_JADE_ATTUNEMENTS = [
   },
   {
     id: "umbLightHeavyVariedCombo",
-    label: "Vernal Umbrella Light/Heavy Attack & Varied Combo DMG Boost",
+    label: "Vernal Umbrella Light/Heavy Attack & Varied Combo DMG",
     min: VERNAL_UMBRELLA_MIN,
     max: VERNAL_UMBRELLA_MAX,
     slots: ARMOR_SLOTS,

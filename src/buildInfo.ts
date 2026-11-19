@@ -6,5 +6,5 @@ export interface BuildInfo {
 
 export const BUILD_INFO: BuildInfo = {
   "version": "1.3.1",
-  "buildTime": 1795101084824
+  "buildTime": 1795101861698
 }

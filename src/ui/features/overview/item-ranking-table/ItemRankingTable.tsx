@@ -47,7 +47,7 @@ export function ItemRankingTable({ rows }: Props) {
       <tbody>
         {sorted.map((row, index) => (
           <tr key={row.statLineId + index}>
-            <td>
+            <td className={styles.labelCell}>
               <span
                 className={`${styles.rankBadge} ${
                   index === 0
