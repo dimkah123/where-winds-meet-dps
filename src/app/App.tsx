@@ -770,6 +770,9 @@ function AppInner() {
             {!headerSettings.collapseHeader ? (
               <>
                 <h1>{t("app.whereWindsMeetDps")}</h1>
+                <span className={styles.titleSeparator} aria-hidden="true">
+                  |
+                </span>
                 <ChangelogButton />
               </>
             ) : (
@@ -784,6 +787,9 @@ function AppInner() {
                   <span className={styles.expandChevron}>▾</span>
                   <span className={styles.collapsedTitleText}>WWM DPS</span>
                 </button>
+                <span className={styles.titleSeparator} aria-hidden="true">
+                  |
+                </span>
                 <ChangelogButton />
               </div>
             )}
