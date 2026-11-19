@@ -42,6 +42,7 @@ import {
 } from "../../../../engine/encounterOptions"
 import { innerWayName, slotInnerWayId } from "../../../../definitions/innerWays/registry"
 import { readPath, statPathLabel } from "../../../utils/statFormatting"
+import { saveBuildToCloud, updateBuildInCloud } from "../../../../cloud/cloudBuilds"
 import styles from "./ShareBuildDialog.module.scss"
 
 interface Props {
@@ -49,6 +50,8 @@ interface Props {
   result: Result
   defaultAuthor?: string
   defaultTitle?: string
+  currentCloudId?: string | null
+  onCloudSaved?: (shortId: string) => void
   onClose: () => void
 }
 
@@ -59,6 +62,8 @@ export function ShareBuildDialog({
   result,
   defaultAuthor = "",
   defaultTitle = "",
+  currentCloudId,
+  onCloudSaved,
   onClose,
 }: Props) {
   const { t, locale } = useI18n()
@@ -75,6 +80,13 @@ export function ShareBuildDialog({
   const [copiedCode, setCopiedCode] = useState(false)
   const [copiedImage, setCopiedImage] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
+
+  // Cloud Short Link states
+  const [cloudShortId, setCloudShortId] = useState<string | null>(currentCloudId || null)
+  const [isSavingCloud, setIsSavingCloud] = useState(false)
+  const [cloudSaveMessage, setCloudSaveMessage] = useState<string | null>(null)
+  const [cloudError, setCloudError] = useState<string | null>(null)
+  const [copiedCloudLink, setCopiedCloudLink] = useState(false)
 
   // Persist author name
   useEffect(() => {
@@ -470,6 +482,50 @@ export function ShareBuildDialog({
     )
   }, [activeTab, inputs, result, author, title, t, locale])
 
+  async function handleSaveToCloud() {
+    if (!encodedData) return
+    setIsSavingCloud(true)
+    setCloudError(null)
+    setCloudSaveMessage(null)
+
+    try {
+      if (cloudShortId) {
+        await updateBuildInCloud({
+          shortId: cloudShortId,
+          data: encodedData,
+          title: title.trim() || undefined,
+          author: author.trim() || undefined,
+          classId: inputs.classId,
+          dps: result.dps,
+        })
+        const shortUrl = `${currentOrigin}#/b/${cloudShortId}`
+        await navigator.clipboard.writeText(shortUrl)
+        setCopiedCloudLink(true)
+        setCloudSaveMessage(t("share.cloud.updatedSuccess", "✓ Сборка обновлена в облаке и ссылка скопирована!"))
+        setTimeout(() => setCopiedCloudLink(false), 2500)
+      } else {
+        const res = await saveBuildToCloud({
+          data: encodedData,
+          title: title.trim() || undefined,
+          author: author.trim() || undefined,
+          classId: inputs.classId,
+          dps: result.dps,
+        })
+        setCloudShortId(res.shortId)
+        onCloudSaved?.(res.shortId)
+        const shortUrl = `${currentOrigin}#/b/${res.shortId}`
+        await navigator.clipboard.writeText(shortUrl)
+        setCopiedCloudLink(true)
+        setCloudSaveMessage(t("share.cloud.savedSuccess", "✓ Сборка сохранена в облаке и короткая ссылка скопирована!"))
+        setTimeout(() => setCopiedCloudLink(false), 2500)
+      }
+    } catch (err) {
+      setCloudError(err instanceof Error ? err.message : "Ошибка сохранения в облако")
+    } finally {
+      setIsSavingCloud(false)
+    }
+  }
+
   function handleCopyLink() {
     navigator.clipboard.writeText(shareUrl).then(() => {
       setCopiedLink(true)
@@ -581,8 +637,58 @@ export function ShareBuildDialog({
 
       {activeTab === "link" && (
         <div className={styles.linkSection}>
+          {/* Cloud Short Link Box */}
+          <div className={styles.cloudSection}>
+            <div className={styles.cloudHeader}>
+              <span className={styles.cloudTitle}>
+                ☁️ {t("share.cloud.shortLinkTitle", "Короткая облачная ссылка")}
+              </span>
+              {cloudShortId && (
+                <span className={styles.cloudBadge}>ID: {cloudShortId}</span>
+              )}
+            </div>
+            <div className={styles.linkBox}>
+              <input
+                type="text"
+                readOnly
+                className={styles.linkInput}
+                value={
+                  cloudShortId
+                    ? `${currentOrigin}#/b/${cloudShortId}`
+                    : isSavingCloud
+                      ? t("share.cloud.saving", "Сохранение в облако...")
+                      : t(
+                          "share.cloud.placeholder",
+                          "Нажмите кнопку справа, чтобы сгенерировать короткую ссылку",
+                        )
+                }
+                onClick={(e) => (e.target as HTMLInputElement).select()}
+              />
+              <button
+                type="button"
+                className="btn primary"
+                onClick={handleSaveToCloud}
+                disabled={isSavingCloud || isGenerating || !encodedData}
+              >
+                {copiedCloudLink
+                  ? t("share.copiedSuccess", "✓ Скопировано!")
+                  : isSavingCloud
+                    ? "..."
+                    : cloudShortId
+                      ? t("share.cloud.updateShortLink", "Обновить и скопировать")
+                      : t("share.cloud.createShortLink", "Получить короткую ссылку")}
+              </button>
+            </div>
+            {cloudSaveMessage && (
+              <span className={styles.copySuccess}>{cloudSaveMessage}</span>
+            )}
+            {cloudError && (
+              <span className={styles.cloudError}>⚠ {cloudError}</span>
+            )}
+          </div>
+
           <div className={styles.fieldGroup}>
-            <label className={styles.fieldLabel}>{t("share.directLinkLabel", "Прямая ссылка на билд:")}</label>
+            <label className={styles.fieldLabel}>{t("share.directLinkLabel", "Полная ссылка (без сервера):")}</label>
             <div className={styles.linkBox}>
               <input
                 type="text"

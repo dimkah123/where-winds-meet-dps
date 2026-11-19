@@ -100,12 +100,50 @@
 .linkSection {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   margin-top: 8px;
   padding: 16px;
   background: var(--color-surface-alt);
   border: 1px solid var(--color-border);
   border-radius: 6px;
+}
+
+.cloudSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: rgba(232, 199, 114, 0.05);
+  border: 1px solid rgba(232, 199, 114, 0.25);
+  border-radius: 6px;
+}
+
+.cloudHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cloudTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-gold, #e8c772);
+}
+
+.cloudBadge {
+  font-size: 0.75rem;
+  font-family: monospace;
+  background: rgba(232, 199, 114, 0.15);
+  color: #e8c772;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(232, 199, 114, 0.3);
+}
+
+.cloudError {
+  font-size: 0.82rem;
+  color: #ff7777;
+  font-weight: 500;
 }
 
 .linkBox {

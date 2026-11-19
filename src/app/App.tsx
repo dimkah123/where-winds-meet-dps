@@ -43,7 +43,11 @@ import { activeRotationName } from "../ui/features/rotation/rotationOptions"
 import { useUndoRedo } from "../ui/hooks/useUndoRedo"
 import { ShareBuildDialog } from "../ui/features/share/share-build-dialog/ShareBuildDialog"
 import { SharedBuildBanner } from "../ui/layout/shared-build-banner/SharedBuildBanner"
-import { decodeSharedBuild } from "../engine/shareBuild"
+import { decodeSharedBuild, encodeSharedBuild } from "../engine/shareBuild"
+import { UserAuthButton } from "../ui/layout/user-auth-button/UserAuthButton"
+import { MyBuildsDialog } from "../ui/layout/my-builds-dialog/MyBuildsDialog"
+import { loadBuildFromCloud, getEditToken, updateBuildInCloud } from "../cloud/cloudBuilds"
+import { getStoredSession } from "../cloud/auth"
 import { followedGraduationBuild } from "../engine/graduation"
 import { graduationBuildKey } from "../i18n/contentKeys"
 import { useI18n } from "../i18n/i18nContext"
@@ -95,6 +99,30 @@ function extractSharedData(search: string): string | null {
         : window.location.search,
     )
     const val = params.get("d") || params.get("data")
+    if (val) return val
+  }
+  return null
+}
+
+function extractCloudShortId(search: string, hash: string): string | null {
+  if (hash) {
+    const bMatch = hash.match(/#\/b\/([A-Za-z0-9_-]+)/)
+    if (bMatch) return bMatch[1]
+    const qIdx = hash.indexOf("?")
+    if (qIdx >= 0) {
+      const params = new URLSearchParams(hash.slice(qIdx + 1))
+      const val = params.get("b") || params.get("id")
+      if (val) return val
+    }
+  }
+  if (search) {
+    const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search)
+    const val = params.get("b") || params.get("id")
+    if (val) return val
+  }
+  if (typeof window !== "undefined" && window.location.search) {
+    const params = new URLSearchParams(window.location.search)
+    const val = params.get("b") || params.get("id")
     if (val) return val
   }
   return null
@@ -158,6 +186,61 @@ function AppInner() {
     title: string
     inputs: Inputs
   } | null>(null)
+  const [currentCloudId, setCurrentCloudId] = useState<string | null>(null)
+  const [myBuildsDialogOpen, setMyBuildsDialogOpen] = useState(false)
+  const lastLoadedCloudIdRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    const hashStr = typeof window !== "undefined" ? window.location.hash : ""
+    const shortId = extractCloudShortId(location.search, hashStr)
+    if (!shortId || shortId === lastLoadedCloudIdRef.current) return
+    lastLoadedCloudIdRef.current = shortId
+
+    loadBuildFromCloud(shortId)
+      .then(async (loaded) => {
+        let inputsData: Inputs | null = null
+        let authorName = loaded.author || ""
+        let titleName = loaded.title || ""
+
+        try {
+          const payload = await decodeSharedBuild(loaded.data)
+          inputsData = payload.inputs
+          if (!authorName) authorName = payload.author
+          if (!titleName) titleName = payload.title
+        } catch {
+          try {
+            inputsData = JSON.parse(loaded.data) as Inputs
+          } catch (e) {
+            console.error("Failed to parse cloud build data", e)
+          }
+        }
+
+        if (!inputsData) return
+
+        const editToken = getEditToken(shortId)
+        const user = getStoredSession().userProfile
+        const isOwner = Boolean((user && loaded.ownerId && user.id === loaded.ownerId) || editToken)
+
+        setCurrentCloudId(shortId)
+        setWizard(null)
+        resetActiveDraft(inputsData)
+        setLastSavedJson(JSON.stringify(inputsData))
+
+        if (!isOwner) {
+          setSharedBannerInfo({
+            author: authorName,
+            title: titleName,
+            inputs: inputsData,
+          })
+        } else {
+          setSharedBannerInfo(null)
+        }
+        navigate("/overview", { replace: true })
+      })
+      .catch((err) => {
+        console.error("Failed to load cloud build:", err)
+      })
+  }, [location.pathname, location.search, navigate])
 
   useEffect(() => {
     const data = extractSharedData(location.search)
@@ -302,6 +385,26 @@ function AppInner() {
     persist(next)
     setLastSavedJson(draftJson)
     setSavedAt(Date.now())
+
+    if (currentCloudId) {
+      const activeProf = committed.profiles.find((p) => p.id === committed.activeId)
+      encodeSharedBuild({
+        v: 2,
+        author: localStorage.getItem("wwm.share.author") || "",
+        title: activeProf?.name || "",
+        inputs: activeDraft,
+      })
+        .then((encoded) => {
+          updateBuildInCloud({
+            shortId: currentCloudId,
+            data: encoded,
+            title: activeProf?.name,
+            dps: headerResult.dps,
+            classId: activeDraft.classId,
+          }).catch((e) => console.error("Cloud auto-update error:", e))
+        })
+        .catch(() => {})
+    }
   }
   async function handleReset() {
     if (isSimulationRunning) return
@@ -582,9 +685,20 @@ function AppInner() {
           defaultTitle={
             shareTargetProfile ? shareTargetProfile.name : activeRotationName(inputs) || ""
           }
+          currentCloudId={currentCloudId}
+          onCloudSaved={(shortId) => setCurrentCloudId(shortId)}
           onClose={() => {
             setShareDialogOpen(false)
             setShareTargetProfile(null)
+          }}
+        />
+      )}
+      {myBuildsDialogOpen && (
+        <MyBuildsDialog
+          onClose={() => setMyBuildsDialogOpen(false)}
+          onSelectBuild={(shortId) => {
+            lastLoadedCloudIdRef.current = null
+            window.location.hash = `#/b/${shortId}`
           }}
         />
       )}
@@ -604,6 +718,7 @@ function AppInner() {
           </div>
           <div className={styles.appTitlebarActions}>
             <LanguageSelect />
+            <UserAuthButton onOpenMyBuilds={() => setMyBuildsDialogOpen(true)} />
             <button
               type="button"
               className="share-btn"
