@@ -32,6 +32,7 @@
   "app.discardChanges": "Discard changes",
   "app.discardEditsSinceTheLast": "Discard edits since the last save",
   "app.discardUnsavedChanges": "Discard unsaved changes?",
+  "app.noChangesToDiscard": "No unsaved changes",
   "app.gear": "Gear",
   "app.saved": "Saved ✓",
   "app.saved2": "Saved",

@@ -32,6 +32,7 @@
   "app.discardChanges": "放弃更改",
   "app.discardEditsSinceTheLast": "放弃上次保存后的编辑",
   "app.discardUnsavedChanges": "要放弃未保存的更改吗？",
+  "app.noChangesToDiscard": "无未保存的更改",
   "app.gear": "装备",
   "app.saved": "已保存 ✓",
   "app.saved2": "已保存",

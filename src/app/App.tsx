@@ -528,6 +528,40 @@ function AppInner() {
     return () => clearTimeout(id)
   }, [savedAt])
 
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      const isCtrlOrCmd = e.ctrlKey || e.metaKey
+      if (!isCtrlOrCmd) return
+
+      const isS = e.code === "KeyS" || e.key.toLowerCase() === "s" || e.key.toLowerCase() === "ы"
+      if (!isS) return
+
+      const target = e.target as HTMLElement | null
+      const isTextEntry =
+        target &&
+        ((target.tagName === "INPUT" &&
+          (target as HTMLInputElement).type !== "checkbox" &&
+          (target as HTMLInputElement).type !== "radio" &&
+          (target as HTMLInputElement).type !== "range" &&
+          (target as HTMLInputElement).type !== "button" &&
+          (target as HTMLInputElement).type !== "submit") ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+
+      if (isTextEntry) {
+        return
+      }
+
+      e.preventDefault()
+      if (isDirty && !sharedBannerInfo && !isSimulationRunning) {
+        handleSave()
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [handleSave, isDirty, sharedBannerInfo, isSimulationRunning])
+
   const tabRefs = useRef<Record<string, HTMLAnchorElement | null>>({})
   useEffect(() => {
     tabRefs.current[pathname]?.scrollIntoView({ block: "nearest", inline: "nearest" })
@@ -617,8 +651,7 @@ function AppInner() {
     { path: "/profile", label: t("common.profiles"), gapBefore: true },
   ]
 
-  const saveLabel =
-    savedAt && !isDirty ? t("app.saved") : isDirty ? t("common.save") : t("app.saved2")
+  const isJustSaved = Boolean(savedAt && !isDirty)
 
   return (
     <div className={styles.app}>
@@ -772,34 +805,50 @@ function AppInner() {
               >
                 ↷
               </button>
+              <button
+                type="button"
+                className={
+                  styles.historyBtn +
+                  ` ${styles.saveBtn}` +
+                  (isDirty && !sharedBannerInfo
+                    ? ` ${styles.saveBtnDirty}`
+                    : isJustSaved
+                      ? ` ${styles.saveBtnSaved}`
+                      : "")
+                }
+                onClick={handleSave}
+                disabled={!isDirty || !!sharedBannerInfo}
+                aria-label={t("common.save")}
+                title={
+                  sharedBannerInfo
+                    ? t(
+                        "app.saveDisabledSharedBuild",
+                        "Нельзя перезаписать свой профиль чужим билдом. Сохраните его в профили с помощью кнопки «Сохранить в мои профили».",
+                      )
+                    : isDirty
+                      ? `${t("common.save")} (Ctrl+S)`
+                      : isJustSaved
+                        ? t("app.saved")
+                        : t("app.saved2")
+                }
+              >
+                💾
+              </button>
+              <button
+                type="button"
+                className={`${styles.historyBtn} ${styles.discardBtn}`}
+                onClick={handleReset}
+                disabled={!isDirty || isSimulationRunning}
+                aria-label={t("app.discardChanges")}
+                title={
+                  isDirty
+                    ? t("app.discardEditsSinceTheLast")
+                    : t("app.noChangesToDiscard", "Нет несохранённых изменений")
+                }
+              >
+                ↺
+              </button>
             </div>
-            <button
-              type="button"
-              className={"save-btn" + (isDirty && !sharedBannerInfo ? " dirty" : "")}
-              onClick={handleSave}
-              disabled={!isDirty || !!sharedBannerInfo}
-              aria-label={t("common.save")}
-              title={
-                sharedBannerInfo
-                  ? t(
-                      "app.saveDisabledSharedBuild",
-                      "Нельзя перезаписать свой профиль чужим билдом. Сохраните его в профили с помощью кнопки «Сохранить в мои профили».",
-                    )
-                  : undefined
-              }
-            >
-              {saveLabel}
-            </button>
-            <button
-              type="button"
-              className="reset-btn"
-              onClick={handleReset}
-              disabled={!isDirty || isSimulationRunning}
-              aria-label={t("app.discardChanges")}
-              title={t("app.discardEditsSinceTheLast")}
-            >
-              {t("app.discardChanges")}
-            </button>
           </div>
         </header>
 
