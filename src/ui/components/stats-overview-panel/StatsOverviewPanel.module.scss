@@ -32,7 +32,7 @@
 
 .statsOverviewRow {
   display: grid;
-  grid-template-columns: minmax(70px, 1fr) minmax(50px, max-content);
+  grid-template-columns: minmax(0, 1fr) max-content;
   align-items: center;
   column-gap: 6px;
   padding: 0.5px 0;

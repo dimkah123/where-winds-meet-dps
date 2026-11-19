@@ -5,6 +5,7 @@
     "Fixed": "Исправлено"
   },
   "headlines": {
+    "1.3.0": "Облачные билды, вход через Google и полировка панели статов",
     "1.2.3": "Экспорт билда по ссылке и карточки персонажа PNG",
     "1.2.2": "Быстрый выбор сета лука и ротация '3 Heng + Bow'",
     "1.2.1": "Сохранение сета за слотом и предупреждения о неполных сетах",
@@ -25,6 +26,10 @@
     "1.0.0": "Релиз калькулятора УВС для Расколотого пика (Сила)"
   },
   "items": {
+    "Cloud build saving and short links (/#/b/...) powered by Cloudflare D1 with instant sharing.": "Сохранение сборок в облако и короткие ссылки (/#/b/...) на базе Cloudflare D1 для мгновенного шеринга.",
+    "Google Sign-In integration and 'My Builds' cloud dialog to manage and synchronize builds across devices.": "Авторизация через Google и меню 'Мои сборки' для удобного хранения и синхронизации билдов между устройствами.",
+    "Full Russian keyboard layout support for Undo/Redo shortcuts (Ctrl+Я and Ctrl+Н) with atomic state tracking.": "Полная поддержка русской раскладки клавиатуры для отмены и повтора (Ctrl+Я и Ctrl+Н) с надёжной историей изменений.",
+    "Expanded Overview stats column width and optimized stat rows to prevent Mo charged attack buffs from truncating.": "Расширена центральная колонка панели характеристик и оптимизированы строки, чтобы баффы заряженных атак Мо отображались полностью без обрезки текста.",
     "Shareable build URLs with compressed payload, custom player name ('Сборка игрока...'), and one-click import.": "Шеринг билдов по ссылке: компактное сжатие параметров, указание ника ('Сборка игрока...') и загрузка в один клик.",
     "Build showcase card generator rendering high-resolution PNG with DPS, stats, gear sets, and copy-to-clipboard.": "Генератор карточки персонажа: рендер красивого PNG в высоком разрешении с УВС, статами, сетами и быстрым копированием в буфер обмена.",
     "Top banner for incoming shared builds with instant one-click save into custom profile library.": "Информационный баннер при переходе по ссылке на сборку с возможностью сохранить билд в свои профили в один клик.",
