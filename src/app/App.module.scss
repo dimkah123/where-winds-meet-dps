@@ -190,7 +190,7 @@
   box-sizing: border-box;
   cursor: pointer;
   white-space: nowrap;
-  font-size: 0.88em;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.02em;
   line-height: 1;
@@ -214,11 +214,23 @@
   }
 
   .shareIcon {
-    width: 13.5px;
-    height: 13.5px;
+    width: 14px;
+    height: 14px;
     display: block;
     flex-shrink: 0;
     color: #ffd88a;
+  }
+
+  .shareBtnText {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    position: relative;
+    top: 1px;
+
+    @media (max-width: 900px) {
+      display: none;
+    }
   }
 }
 
@@ -286,20 +298,6 @@
   flex-shrink: 0;
 }
 
-.shareIcon {
-  width: 13.5px;
-  height: 13.5px;
-  display: block;
-  flex-shrink: 0;
-}
-
-.shareBtnText {
-  font-size: 0.85em;
-
-  @media (max-width: 900px) {
-    display: none;
-  }
-}
 
 .saveBtn {
   font-size: 0.95em;
