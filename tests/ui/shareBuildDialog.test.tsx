@@ -279,6 +279,8 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
     expect(filledTexts.some((t) => t.includes("Mo - Charge Boost"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("+27.9%"))).toBe(true)
     expect(filledTexts.some((t) => t.includes("Frost-Clad Night"))).toBe(true)
-    expect(filledTexts.some((t) => t.includes("181,541 → 217,849"))).toBe(true)
+    // Defense, Max HP and Encounter box are intentionally excluded from the export card
+    expect(filledTexts.some((t) => t.includes("181,541 → 217,849"))).toBe(false)
+    expect(filledTexts.some((t) => t.includes("Encounter & Target"))).toBe(false)
   })
 })

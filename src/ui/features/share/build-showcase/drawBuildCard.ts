@@ -419,7 +419,7 @@ export function drawBuildCard(
   const subCol2X = subCol1X + subColW + 16
 
   // Section 1: ATTRIBUTES
-  let currentY = panelY + 50
+  let currentY = panelY + 48
   drawSectionHeading(ctx, subCol1X, currentY, panel1W - 32, labels?.attributesTitle || "ATTRIBUTES")
 
   // Row 1: Power | Agility
@@ -439,40 +439,6 @@ export function drawBuildCard(
   drawStatPair(ctx, subCol2X, currentY, subColW, labels?.constitutionLabel || "Constitution", fmtAtk(data.body ?? 0), {
     valColor: "#f0f0f0",
   })
-
-  // Row 3: Defense | Max HP
-  currentY += 20
-  drawStatPair(ctx, subCol1X, currentY, subColW, labels?.defenseLabel || "Defense", fmtAtk(data.defense ?? 0), {
-    valColor: "#f0f0f0",
-  })
-  const hpText =
-    data.effHp && data.baseHp && Math.abs(data.effHp - data.baseHp) > 1
-      ? `${formatNumber(data.baseHp, 0)} → ${formatNumber(data.effHp, 0)}`
-      : formatNumber(data.effHp ?? data.baseHp ?? 0, 0)
-  drawStatPair(ctx, subCol2X, currentY, subColW, labels?.maxHpLabel || "Max HP", hpText, {
-    valColor: data.effHp && data.baseHp && data.effHp > data.baseHp ? "#e8c772" : "#f0f0f0",
-  })
-
-  // Row 4: Physical Defense | Physical Damage Boost
-  currentY += 20
-  drawStatPair(
-    ctx,
-    subCol1X,
-    currentY,
-    subColW,
-    labels?.physDefenseLabel || "Physical Defense",
-    fmtAtk(data.physDefense ?? 0),
-    { valColor: "#f0f0f0" },
-  )
-  drawStatPair(
-    ctx,
-    subCol2X,
-    currentY,
-    subColW,
-    labels?.physBoostLabel || "Physical Damage Boost",
-    fmtBoost(data.physBoost ?? 0),
-    { valColor: (data.physBoost ?? 0) > 0 ? "#e8c772" : "#666666" },
-  )
 
   // Section 2: THREE RATES
   currentY += 25
@@ -731,7 +697,7 @@ export function drawBuildCard(
     valColor: "#e8c772",
   })
 
-  // Row 4: Top Class Boost | Sustain Damage Boost
+  // Row 4: Top Class Boost | Physical Damage Boost
   currentY += 20
   const classLabel = data.topClassBoost?.label || labels?.classSkillBoostLabel || "Class Skill Boost"
   const classVal = data.topClassBoost ? fmtBoost(data.topClassBoost.value) : "+0%"
@@ -743,17 +709,17 @@ export function drawBuildCard(
     subCol2X,
     currentY,
     subColW,
-    labels?.sustainDmgBoostLabel || "Sustain Damage Boost",
-    fmtBoost(data.sustainDamageBoost ?? 0),
-    { valColor: (data.sustainDamageBoost ?? 0) > 0 ? "#e8c772" : "#666666" },
+    labels?.physBoostLabel || "Physical Damage Boost",
+    fmtBoost(data.physBoost ?? 0),
+    { valColor: (data.physBoost ?? 0) > 0 ? "#e8c772" : "#666666" },
   )
 
   // ==========================================
-  // Right Panel: GEAR & ENCOUNTER
+  // Right Panel: GEAR SETS & BUFFS
   // ==========================================
   const panel2X = 776
   const panel2W = 400
-  drawPanelShell(ctx, panel2X, panelY, panel2W, panelH, labels?.gearTitle || "GEAR & ENCOUNTER")
+  drawPanelShell(ctx, panel2X, panelY, panel2W, panelH, labels?.gearTitle || "GEAR SETS & BUFFS")
 
   let setY = panelY + 54
 
@@ -769,10 +735,10 @@ export function drawBuildCard(
     setY,
     data.armorSetName || labels?.notEquipped || "Not equipped",
     panel2W - 32,
-    30,
+    32,
   )
 
-  setY += 46
+  setY += 52
   // Bow Set
   ctx.font = "600 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#8c8c8c"
@@ -782,14 +748,14 @@ export function drawBuildCard(
   const bowText = data.bowSetName
     ? `${data.bowSetName}${data.bowSetBonus ? ` (${data.bowSetBonus})` : ""}`
     : labels?.notEquipped || "Not equipped"
-  drawGoldBadge(ctx, panel2X + 16, setY, bowText, panel2W - 32, 30)
+  drawGoldBadge(ctx, panel2X + 16, setY, bowText, panel2W - 32, 32)
 
-  setY += 46
+  setY += 52
   // Separator
   drawSubtleDivider(ctx, panel2X + 16, setY, panel2W - 32)
 
   // Crafting Script
-  setY += 20
+  setY += 22
   ctx.font = "400 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#8c8c8c"
   ctx.fillText(labels?.scriptLabel || "Crafting Script:", panel2X + 16, setY)
@@ -805,11 +771,11 @@ export function drawBuildCard(
   ctx.textAlign = "left"
 
   // Separator
-  setY += 14
+  setY += 16
   drawSubtleDivider(ctx, panel2X + 16, setY, panel2W - 32)
 
   // Divinecraft
-  setY += 20
+  setY += 22
   ctx.font = "400 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#8c8c8c"
   ctx.fillText(labels?.divinecraftLabel || "Divinecraft / Oil:", panel2X + 16, setY)
@@ -821,11 +787,11 @@ export function drawBuildCard(
   ctx.textAlign = "left"
 
   // Separator
-  setY += 14
+  setY += 16
   drawSubtleDivider(ctx, panel2X + 16, setY, panel2W - 32)
 
   // Food Buff
-  setY += 20
+  setY += 22
   ctx.font = "400 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#8c8c8c"
   ctx.fillText(labels?.foodLabel || "Combat Food:", panel2X + 16, setY)
@@ -837,53 +803,18 @@ export function drawBuildCard(
   ctx.textAlign = "left"
 
   // Separator
-  setY += 14
+  setY += 16
   drawSubtleDivider(ctx, panel2X + 16, setY, panel2W - 32)
 
   // Inner Ways
-  setY += 22
+  setY += 24
   ctx.font = "600 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   ctx.fillStyle = "#8c8c8c"
   ctx.fillText(labels?.innerWaysLabel || "Inner Ways (4/4):", panel2X + 16, setY)
 
-  setY += 12
+  setY += 14
   const ways = data.innerWays && data.innerWays.length > 0 ? data.innerWays : ["—"]
   drawInnerWayPills(ctx, panel2X + 16, setY, panel2W - 32, ways)
-
-  // Separator
-  setY += 76
-  drawSubtleDivider(ctx, panel2X + 16, setY, panel2W - 32)
-
-  // Encounter & Boss Info Box
-  setY += 20
-  ctx.font = "600 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-  ctx.fillStyle = "#8c8c8c"
-  ctx.fillText(labels?.encounterTitle || "Encounter & Target:", panel2X + 16, setY)
-
-  setY += 10
-  const boxW = panel2W - 32
-  const boxH = 54
-  ctx.fillStyle = "rgba(0, 0, 0, 0.3)"
-  ctx.beginPath()
-  if (typeof ctx.roundRect === "function") {
-    ctx.roundRect(panel2X + 16, setY, boxW, boxH, 4)
-  } else {
-    ctx.rect(panel2X + 16, setY, boxW, boxH)
-  }
-  ctx.fill()
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.08)"
-  ctx.lineWidth = 1
-  ctx.stroke()
-
-  ctx.font = "600 12.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-  ctx.fillStyle = "#f0f0f0"
-  const bossText = `${labels?.bossLabel || "Boss"}: ${data.bossName || "River Master"}`
-  ctx.fillText(truncateText(ctx, bossText, boxW - 20), panel2X + 26, setY + 22)
-
-  ctx.font = "600 11.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-  ctx.fillStyle = "#c0a060"
-  const dummyText = `${labels?.dummyLabel || "Dummy"}: ${data.isTrainingDummy !== false ? "ON" : "OFF"} · ${labels?.resistanceLabel || "Resistance"}: ${data.resistance ?? 85}%`
-  ctx.fillText(truncateText(ctx, dummyText, boxW - 20), panel2X + 26, setY + 42)
 
   // 5. Footer
   ctx.font = "400 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
