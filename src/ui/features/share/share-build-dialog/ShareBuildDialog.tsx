@@ -81,7 +81,6 @@ export function ShareBuildDialog({
   const [title, setTitle] = useState(defaultTitle || "")
   const [encodedData, setEncodedData] = useState<string>("")
   const [copiedLink, setCopiedLink] = useState(false)
-  const [copiedCode, setCopiedCode] = useState(false)
   const [copiedImage, setCopiedImage] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
 
@@ -552,13 +551,6 @@ export function ShareBuildDialog({
     })
   }
 
-  function handleCopyCode() {
-    navigator.clipboard.writeText(encodedData).then(() => {
-      setCopiedCode(true)
-      setTimeout(() => setCopiedCode(false), 2500)
-    })
-  }
-
   function handleCopyImage() {
     if (!canvasRef.current) return
     canvasRef.current.toBlob((blob) => {
@@ -736,36 +728,6 @@ export function ShareBuildDialog({
                   "share.copyLinkSuccessMsg",
                   "✓ Ссылка скопирована в буфер обмена! При переходе откроется этот билд.",
                 )}
-              </span>
-            )}
-          </div>
-
-          <div className={styles.fieldGroup} style={{ marginTop: 8 }}>
-            <label className={styles.fieldLabel}>
-              {t("share.rawCodeLabel", "Текстовый код сборки:")}
-            </label>
-            <div className={styles.linkBox}>
-              <input
-                type="text"
-                readOnly
-                className={styles.linkInput}
-                value={encodedData}
-                onClick={(e) => (e.target as HTMLInputElement).select()}
-              />
-              <button
-                type="button"
-                className="btn"
-                onClick={handleCopyCode}
-                disabled={isGenerating || !encodedData}
-              >
-                {copiedCode
-                  ? t("share.copiedSuccess", "✓ Скопировано!")
-                  : t("share.copyCodeButton", "Копировать код")}
-              </button>
-            </div>
-            {copiedCode && (
-              <span className={styles.copySuccess}>
-                {t("share.copyCodeSuccessMsg", "✓ Код сборки скопирован!")}
               </span>
             )}
           </div>

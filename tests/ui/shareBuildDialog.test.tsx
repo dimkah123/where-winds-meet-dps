@@ -49,7 +49,7 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
     expect(screen.getByDisplayValue("Dimka")).toBeInTheDocument()
     expect(screen.getByDisplayValue("Stonesplit 85k")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Copy Link" })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Copy Code" })).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "Copy Code" })).not.toBeInTheDocument()
 
     const cardTab = screen.getByRole("tab", { name: /Showcase Card/ })
     fireEvent.click(cardTab)
@@ -78,7 +78,7 @@ describe("Share Build & Showcase Card UI (English & Russian Localization)", () =
     expect(screen.getByDisplayValue("Dimka")).toBeInTheDocument()
     expect(screen.getByDisplayValue("Stonesplit 85k")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Копировать ссылку" })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Копировать код" })).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "Копировать код" })).not.toBeInTheDocument()
 
     const cardTab = screen.getByRole("tab", { name: /Карточка персонажа/ })
     fireEvent.click(cardTab)
