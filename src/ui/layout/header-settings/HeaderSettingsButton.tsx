@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import type { UserProfile } from "../../../cloud/types"
 import { useI18n } from "../../../i18n/i18nContext"
 import type { HeaderSettings } from "../../hooks/useHeaderSettings"
+import { LanguageSelect } from "../language-select/LanguageSelect"
 import styles from "./HeaderSettingsButton.module.scss"
 
 interface Props {
@@ -167,6 +168,19 @@ export function HeaderSettingsButton({
             </button>
           </div>
 
+          <div className={styles.sectionTitle}>
+            {t("layout.languageSelect.language", "Язык интерфейса")}
+          </div>
+          <div className={styles.languageSection}>
+            <div className={styles.languageRow}>
+              <span className={styles.languageLabel}>
+                <span className={styles.languageIcon}>🌐</span>
+                <span>{t("layout.languageSelect.selectLanguage", "Выбор языка")}</span>
+              </span>
+              <LanguageSelect />
+            </div>
+          </div>
+
           <div className={styles.sectionTitle}>{t("app.settings.layout", "Макет интерфейса")}</div>
           <div className={styles.sectionBody}>
             <ToggleRow
@@ -216,6 +230,12 @@ export function HeaderSettingsButton({
               label={t("app.settings.showSaveReset", "Кнопки сохранения и сброса (💾 ↺)")}
               checked={settings.showSaveReset}
               onChange={(v) => onUpdateSetting("showSaveReset", v)}
+            />
+
+            <ToggleRow
+              label={t("app.settings.showLanguage", "Переключатель языка в шапке")}
+              checked={settings.showLanguage}
+              onChange={(v) => onUpdateSetting("showLanguage", v)}
             />
           </div>
 

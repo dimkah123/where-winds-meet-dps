@@ -260,6 +260,34 @@
   }
 }
 
+.languageSection {
+  padding: 4px 6px 10px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 8px;
+}
+
+.languageRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.languageLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--color-text, #e8e8e8);
+  font-weight: 500;
+}
+
+.languageIcon {
+  font-size: 15px;
+  line-height: 1;
+  opacity: 0.85;
+}
+
 .sectionTitle {
   font-size: 10.5px;
   text-transform: uppercase;

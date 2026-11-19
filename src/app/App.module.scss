@@ -141,16 +141,94 @@
 .appTitlebarActions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
-.headerToolbar,
-.historyButtonGroup {
+// Group 1: Work / Editing group [Undo Redo | Save Discard]
+.editGroup {
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--color-border-strong);
   border-radius: 6px;
-  background: rgba(22, 21, 19, 0.65);
+  background: rgba(22, 21, 19, 0.75);
+  height: 31px;
+  box-sizing: border-box;
+
+  > :first-child {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+  }
+
+  > :last-child {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+
+  > .toolbarBtn:not(:last-child) {
+    border-right: 1px solid var(--color-border-strong);
+  }
+}
+
+.groupDivider {
+  display: block;
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.16);
+  margin: 0;
+  flex-shrink: 0;
+}
+
+// Group 2: Main Call to Action (CTA) [Share]
+.shareCtaBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 31px;
+  padding: 0 13px;
+  border-radius: 6px;
+  box-sizing: border-box;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 0.88em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  background: linear-gradient(180deg, rgba(192, 160, 96, 0.22) 0%, rgba(145, 115, 55, 0.32) 100%);
+  border: 1px solid rgba(210, 175, 105, 0.55);
+  color: #ffd88a;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 235, 180, 0.2);
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: linear-gradient(180deg, rgba(220, 185, 115, 0.32) 0%, rgba(165, 130, 65, 0.44) 100%);
+    border-color: #ffd580;
+    color: #fff8e8;
+    box-shadow: 0 0 10px rgba(210, 175, 105, 0.35), inset 0 1px 0 rgba(255, 245, 205, 0.28);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  }
+
+  .shareIcon {
+    width: 13.5px;
+    height: 13.5px;
+    display: block;
+    flex-shrink: 0;
+    color: #ffd88a;
+  }
+}
+
+// Group 3: Global / System group [Settings | Profile]
+.systemGroup {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 6px;
+  background: rgba(22, 21, 19, 0.75);
   height: 31px;
   box-sizing: border-box;
 
@@ -469,18 +547,26 @@
 
   .appTitlebarActions {
     width: 100%;
-  }
-
-  .headerToolbar {
-    width: 100%;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+  }
 
+  .editGroup {
     .toolbarBtn {
-      padding: 0 7px;
-      flex: 1 1 auto;
-      justify-content: center;
+      padding: 0 8px;
     }
+  }
+
+  .shareCtaBtn {
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 520px) {
+  .shareBtnText {
+    display: none;
   }
 }
 

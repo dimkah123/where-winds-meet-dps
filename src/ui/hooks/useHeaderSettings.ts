@@ -7,6 +7,7 @@ export interface HeaderSettings {
   showSaveReset: boolean
   collapseHeader: boolean
   gameFonts: boolean
+  showLanguage: boolean
 }
 
 export const DEFAULT_HEADER_SETTINGS: HeaderSettings = {
@@ -16,6 +17,7 @@ export const DEFAULT_HEADER_SETTINGS: HeaderSettings = {
   showSaveReset: true,
   collapseHeader: false,
   gameFonts: true,
+  showLanguage: false,
 }
 
 const STORAGE_KEY = "wwm.ui.headerSettings"
@@ -32,6 +34,7 @@ export function getStoredHeaderSettings(): HeaderSettings {
       showSaveReset: typeof parsed.showSaveReset === "boolean" ? parsed.showSaveReset : true,
       collapseHeader: typeof parsed.collapseHeader === "boolean" ? parsed.collapseHeader : false,
       gameFonts: typeof parsed.gameFonts === "boolean" ? parsed.gameFonts : true,
+      showLanguage: typeof parsed.showLanguage === "boolean" ? parsed.showLanguage : false,
     }
   } catch {
     return DEFAULT_HEADER_SETTINGS

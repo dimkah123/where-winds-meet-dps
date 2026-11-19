@@ -802,170 +802,175 @@ function AppInner() {
             )}
           </div>
           <div className={styles.appTitlebarActions}>
-            <div className={styles.headerToolbar}>
-              <LanguageSelect inline />
-              {headerSettings.showProfile && (
-                <UserAuthButton
-                  inline
-                  onOpenMyBuilds={() => setMyBuildsDialogOpen(true)}
-                  onUserChanged={setCurrentUser}
-                />
-              )}
-              {headerSettings.showShare && (
-                <button
-                  type="button"
-                  className={styles.toolbarBtn}
-                  onClick={() => {
-                    setShareTargetProfile(null)
-                    setShareDialogOpen(true)
-                  }}
-                  title={t("common.shareBuild")}
-                  aria-label={t("common.shareBuild")}
-                >
-                  <svg
-                    className={styles.shareIcon}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                  </svg>
-                  <span className={styles.shareBtnText}>{t("common.shareBuild")}</span>
-                </button>
-              )}
-              {headerSettings.showUndoRedo && (
-                <>
-                  <button
-                    type="button"
-                    className={styles.toolbarBtn}
-                    onClick={handleUndo}
-                    disabled={!canUndo || isSimulationRunning}
-                    title={
-                      canUndo
-                        ? "Отменить последнее действие (Ctrl+Z)"
-                        : "История изменений пуста (Ctrl+Z)"
-                    }
-                    aria-label="Отменить (Ctrl+Z)"
-                  >
-                    <svg
-                      className={styles.toolbarIcon}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.4"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
+            {/* Group 1: Editing & History (Work Zone) */}
+            {(headerSettings.showUndoRedo || headerSettings.showSaveReset) && (
+              <div className={styles.editGroup}>
+                {headerSettings.showUndoRedo && (
+                  <>
+                    <button
+                      type="button"
+                      className={styles.toolbarBtn}
+                      onClick={handleUndo}
+                      disabled={!canUndo || isSimulationRunning}
+                      title={
+                        canUndo
+                          ? "Отменить последнее действие (Ctrl+Z)"
+                          : "История изменений пуста (Ctrl+Z)"
+                      }
+                      aria-label="Отменить (Ctrl+Z)"
                     >
-                      <path d="M9 14 4 9l5-5" />
-                      <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11" />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.toolbarBtn}
-                    onClick={handleRedo}
-                    disabled={!canRedo || isSimulationRunning}
-                    title={
-                      canRedo
-                        ? "Повторить отменённое действие (Ctrl+Y или Ctrl+Shift+Z)"
-                        : "Нет действий для повтора"
-                    }
-                    aria-label="Повторить (Ctrl+Y)"
-                  >
-                    <svg
-                      className={styles.toolbarIcon}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.4"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
+                      <svg
+                        className={styles.toolbarIcon}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M9 14 4 9l5-5" />
+                        <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.toolbarBtn}
+                      onClick={handleRedo}
+                      disabled={!canRedo || isSimulationRunning}
+                      title={
+                        canRedo
+                          ? "Повторить отменённое действие (Ctrl+Y или Ctrl+Shift+Z)"
+                          : "Нет действий для повтора"
+                      }
+                      aria-label="Повторить (Ctrl+Y)"
                     >
-                      <path d="m15 14 5-5-5-5" />
-                      <path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5v0A5.5 5.5 0 0 0 9.5 20H13" />
-                    </svg>
-                  </button>
-                </>
-              )}
-              {headerSettings.showSaveReset && (
-                <>
-                  <button
-                    type="button"
-                    className={
-                      styles.toolbarBtn +
-                      ` ${styles.saveBtn}` +
-                      (isDirty && !sharedBannerInfo
-                        ? ` ${styles.saveBtnDirty}`
-                        : isJustSaved
-                          ? ` ${styles.saveBtnSaved}`
-                          : "")
-                    }
-                    onClick={handleSave}
-                    disabled={!isDirty || !!sharedBannerInfo}
-                    aria-label={t("common.save")}
-                    title={
-                      sharedBannerInfo
-                        ? t(
-                            "app.saveDisabledSharedBuild",
-                            "Нельзя перезаписать свой профиль чужим билдом. Сохраните его в профили с помощью кнопки «Сохранить в мои профили».",
-                          )
-                        : isDirty
-                          ? `${t("common.save")} (Ctrl+S)`
+                      <svg
+                        className={styles.toolbarIcon}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="m15 14 5-5-5-5" />
+                        <path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5v0A5.5 5.5 0 0 0 9.5 20H13" />
+                      </svg>
+                    </button>
+                  </>
+                )}
+                {headerSettings.showUndoRedo && headerSettings.showSaveReset && (
+                  <span className={styles.groupDivider} aria-hidden="true" />
+                )}
+                {headerSettings.showSaveReset && (
+                  <>
+                    <button
+                      type="button"
+                      className={
+                        styles.toolbarBtn +
+                        ` ${styles.saveBtn}` +
+                        (isDirty && !sharedBannerInfo
+                          ? ` ${styles.saveBtnDirty}`
                           : isJustSaved
-                            ? t("app.saved")
-                            : t("app.saved2")
-                    }
-                  >
-                    <svg
-                      className={styles.toolbarIcon}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
+                            ? ` ${styles.saveBtnSaved}`
+                            : "")
+                      }
+                      onClick={handleSave}
+                      disabled={!isDirty || !!sharedBannerInfo}
+                      aria-label={t("common.save")}
+                      title={
+                        sharedBannerInfo
+                          ? t(
+                              "app.saveDisabledSharedBuild",
+                              "Нельзя перезаписать свой профиль чужим билдом. Сохраните его в профили с помощью кнопки «Сохранить в мои профили».",
+                            )
+                          : isDirty
+                            ? `${t("common.save")} (Ctrl+S)`
+                            : isJustSaved
+                              ? t("app.saved")
+                              : t("app.saved2")
+                      }
                     >
-                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                      <polyline points="17 21 17 13 7 13 7 21" />
-                      <polyline points="7 3 7 8 15 8" />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.toolbarBtn} ${styles.discardBtn}`}
-                    onClick={handleReset}
-                    disabled={!isDirty || isSimulationRunning}
-                    aria-label={t("app.discardChanges")}
-                    title={
-                      isDirty
-                        ? t("app.discardEditsSinceTheLast")
-                        : t("app.noChangesToDiscard", "Нет несохранённых изменений")
-                    }
-                  >
-                    <svg
-                      className={styles.toolbarIcon}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.4"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
+                      <svg
+                        className={styles.toolbarIcon}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                        <polyline points="17 21 17 13 7 13 7 21" />
+                        <polyline points="7 3 7 8 15 8" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.toolbarBtn} ${styles.discardBtn}`}
+                      onClick={handleReset}
+                      disabled={!isDirty || isSimulationRunning}
+                      aria-label={t("app.discardChanges")}
+                      title={
+                        isDirty
+                          ? t("app.discardEditsSinceTheLast")
+                          : t("app.noChangesToDiscard", "Нет несохранённых изменений")
+                      }
                     >
-                      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                      <path d="M3 3v5h5" />
-                    </svg>
-                  </button>
-                </>
-              )}
+                      <svg
+                        className={styles.toolbarIcon}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                        <path d="M3 3v5h5" />
+                      </svg>
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Group 2: Main Call-To-Action (Share) */}
+            {headerSettings.showShare && (
+              <button
+                type="button"
+                className={styles.shareCtaBtn}
+                onClick={() => {
+                  setShareTargetProfile(null)
+                  setShareDialogOpen(true)
+                }}
+                title={t("common.shareBuild")}
+                aria-label={t("common.shareBuild")}
+              >
+                <svg
+                  className={styles.shareIcon}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                </svg>
+                <span className={styles.shareBtnText}>{t("common.shareBuild")}</span>
+              </button>
+            )}
+
+            {/* Group 3: Global / System Settings & User Profile (Right Edge) */}
+            <div className={styles.systemGroup}>
+              {headerSettings.showLanguage && <LanguageSelect inline />}
               <HeaderSettingsButton
                 settings={headerSettings}
                 onUpdateSetting={updateHeaderSetting}
@@ -976,6 +981,13 @@ function AppInner() {
                 hasAlerts={hasUnacknowledgedAlerts && !isAlertsDnd}
                 onOpenAlerts={() => navigate("/alerts")}
               />
+              {headerSettings.showProfile && (
+                <UserAuthButton
+                  inline
+                  onOpenMyBuilds={() => setMyBuildsDialogOpen(true)}
+                  onUserChanged={setCurrentUser}
+                />
+              )}
             </div>
           </div>
         </header>
