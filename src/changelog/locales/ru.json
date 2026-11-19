@@ -5,6 +5,7 @@
     "Fixed": "Исправлено"
   },
   "headlines": {
+    "1.3.1": "Единый тулбар в шапке, меню настроек и полировка интерфейса",
     "1.3.0": "Облачные билды, вход через Google и полировка панели статов",
     "1.2.3": "Экспорт билда по ссылке и карточки персонажа PNG",
     "1.2.2": "Быстрый выбор сета лука и ротация '3 Heng + Bow'",
@@ -26,6 +27,15 @@
     "1.0.0": "Релиз калькулятора УВС для Расколотого пика (Сила)"
   },
   "items": {
+    "Live server update detection with a top banner prompting to reload and apply the latest release.": "Уведомление об обновлении на сервере с баннером для быстрой перезагрузки страницы.",
+    "Unified monolithic header toolbar connecting language, account, sharing, undo/redo, save/discard, and settings.": "Монолитная панель управления в шапке: язык, профиль, шеринг, отмена/повтор, сохранение/сброс и настройки в едином блоке.",
+    "Interface Settings menu with animated golden tumblers to toggle toolbar buttons and collapse the main header.": "Меню настроек интерфейса с золотыми тумблерами для скрытия кнопок тулбара и сворачивания шапки сайта.",
+    "Collapsible header mode with a live DPS badge placed directly beside the Alerts tab for maximum vertical space.": "Режим сворачивания шапки с компактным бейджем УВС прямо в строке вкладок рядом с алертами.",
+    "Rebalanced Overview column widths, giving Gear-Stat Lift more room to eliminate awkward stat line word wrapping.": "Перебалансировка колонок Overview: расширена колонка Gear-Stat Lift, устранив переносы строк в названиях статов.",
+    "Subtle dot leaders connecting stat labels to values in Panel Stats with row hover highlights and compact spacing.": "Пунктирные направляющие от параметров к значениям в Panel Stats, подсветка строк и компактные отступы.",
+    "Visual vertical separator between the application title and version badge in both regular and collapsed modes.": "Визуальный разделитель | между названием калькулятора и версией в обычном и свёрнутом режимах.",
+    "Replaced emojis with crisp SVG vector icons for undo, redo, save, discard, and gear, with aligned toolbar baselines.": "Чёткие векторные SVG-иконки для отмены, повтора, дискеты и шестерёнки, масштаб аватарки 19px и выравнивание элементов.",
+    "Enforced strict minmax column bounds in Panel Stats, preventing long class buff names from overflowing the card.": "Строгие границы колонок Panel Stats, исключившие вылезание длинных названий классовых баффов за пределы карточки.",
     "Cloud build saving and short links (/#/b/...) powered by Cloudflare D1 with instant sharing.": "Сохранение сборок в облако и короткие ссылки (/#/b/...) на базе Cloudflare D1 для мгновенного шеринга.",
     "Google Sign-In integration and 'My Builds' cloud dialog to manage and synchronize builds across devices.": "Авторизация через Google и меню 'Мои сборки' для удобного хранения и синхронизации билдов между устройствами.",
     "Full Russian keyboard layout support for Undo/Redo shortcuts (Ctrl+Я and Ctrl+Н) with atomic state tracking.": "Полная поддержка русской раскладки клавиатуры для отмены и повтора (Ctrl+Я и Ctrl+Н) с надёжной историей изменений.",
