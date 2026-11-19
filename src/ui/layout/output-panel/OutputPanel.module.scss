@@ -34,13 +34,10 @@
 
 .dps .value {
   font-size: 1.9em;
+  color: var(--color-accent);
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
   font-weight: 700;
-  background: linear-gradient(135deg, #fae2a6 0%, #e5a93b 50%, #c48b28 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 10px rgba(229, 169, 59, 0.28));
 }
 
 .subline {

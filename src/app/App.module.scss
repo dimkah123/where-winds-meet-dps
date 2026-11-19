@@ -386,11 +386,8 @@
 .compactDpsValue {
   font-size: 1.05em;
   font-weight: 700;
+  color: var(--color-accent, #c0a060);
   font-variant-numeric: tabular-nums;
-  background: linear-gradient(135deg, #fae2a6 0%, #e5a93b 50%, #c48b28 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 6px rgba(229, 169, 59, 0.2));
 }
 
 .tabRight {
