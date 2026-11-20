@@ -2447,6 +2447,8 @@
   "overview.itemRankingTable.expectedDps": "Ожидаемый УВС",
   "overview.itemRankingTable.lead": "Преимущество",
   "overview.itemRankingTable.lift": "Прирост",
+  "overview.itemRankingTable.showLess": "Скрыть дополнительные статы",
+  "overview.itemRankingTable.showMore": "Показать ещё {count} {word}",
   "overview.itemRankingTable.statLine": "Свойства",
   "overview.mindMethods.innerWay": "Внутренние пути",
   "overview.resetToGear": "Сбросить до снаряжения",

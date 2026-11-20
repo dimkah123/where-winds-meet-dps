@@ -2447,6 +2447,8 @@
   "overview.itemRankingTable.expectedDps": "期望 DPS",
   "overview.itemRankingTable.lead": "领先",
   "overview.itemRankingTable.lift": "提升",
+  "overview.itemRankingTable.showLess": "收起附加词条",
+  "overview.itemRankingTable.showMore": "显示更多 {count} 个词条",
   "overview.itemRankingTable.statLine": "词条",
   "overview.mindMethods.innerWay": "心法",
   "overview.resetToGear": "重置为装备属性",

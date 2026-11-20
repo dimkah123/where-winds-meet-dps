@@ -2447,6 +2447,8 @@
   "overview.itemRankingTable.expectedDps": "Expected DPS",
   "overview.itemRankingTable.lead": "Lead",
   "overview.itemRankingTable.lift": "Lift",
+  "overview.itemRankingTable.showLess": "Show less",
+  "overview.itemRankingTable.showMore": "Show {count} more stats",
   "overview.itemRankingTable.statLine": "Stat Line",
   "overview.mindMethods.innerWay": "Inner Way",
   "overview.resetToGear": "Reset to gear",

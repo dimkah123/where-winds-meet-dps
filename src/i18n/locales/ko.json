@@ -2447,6 +2447,8 @@
   "overview.itemRankingTable.expectedDps": "예상 DPS",
   "overview.itemRankingTable.lead": "우위",
   "overview.itemRankingTable.lift": "상승량",
+  "overview.itemRankingTable.showLess": "추가 스탯 접기",
+  "overview.itemRankingTable.showMore": "스탯 {count}개 더보기",
   "overview.itemRankingTable.statLine": "능력치 옵션",
   "overview.mindMethods.innerWay": "심법",
   "overview.resetToGear": "장비 능력치로 초기화",
