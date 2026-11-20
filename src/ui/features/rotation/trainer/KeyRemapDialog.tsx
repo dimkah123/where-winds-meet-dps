@@ -10,6 +10,7 @@ interface Props {
   keyMap: TrainerKeyMap
   onChange: (next: TrainerKeyMap) => void
   onClose: () => void
+  isConnected?: boolean
 }
 
 type KeyAction = keyof TrainerKeyMap
@@ -72,7 +73,7 @@ const ACTIONS: ActionDef[] = [
   },
 ]
 
-export function KeyRemapDialog({ keyMap, onChange, onClose }: Props) {
+export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false }: Props) {
   const { t } = useI18n()
   const [draft, setDraft] = useState<TrainerKeyMap>({ ...keyMap })
   const [recordingAction, setRecordingAction] = useState<KeyAction | null>(null)
@@ -170,6 +171,63 @@ export function KeyRemapDialog({ keyMap, onChange, onClose }: Props) {
               </div>
             )
           })}
+        </div>
+
+        <div className={styles.companionSection}>
+          <div className={styles.companionHeader}>
+            <div className={styles.companionTitleGroup}>
+              <span className={styles.companionIcon}>🔌</span>
+              <div>
+                <div className={styles.companionTitle}>
+                  {t("trainer.companionSectionTitle", "In-Game Companion (Windows)")}
+                </div>
+                <div className={styles.companionDesc}>
+                  {t(
+                    "trainer.companionSectionDesc",
+                    "To capture keys while playing Where Winds Meet, run the companion on your PC:",
+                  )}
+                </div>
+              </div>
+            </div>
+            <div
+              className={`${styles.companionStatus} ${
+                isConnected ? styles.statusActive : styles.statusOffline
+              }`}
+            >
+              <span className={styles.statusDot} />
+              <span>
+                {isConnected
+                  ? t("trainer.companionRunning", "Companion active (In-game hook ready)")
+                  : t("trainer.companionNotRunning", "Companion offline")}
+              </span>
+            </div>
+          </div>
+
+          <div className={styles.downloadGroup}>
+            <a
+              href="/downloads/WWM-Companion.exe"
+              download="WWM-Companion.exe"
+              className={styles.downloadBtnPrimary}
+            >
+              📥 {t("trainer.downloadExe", "Download WWM-Companion.exe (9 MB, no Python needed)")}
+            </a>
+            <div className={styles.downloadSubGroup}>
+              <a
+                href="/downloads/WWM-Companion.zip"
+                download="WWM-Companion.zip"
+                className={styles.downloadBtnSecondary}
+              >
+                📦 {t("trainer.downloadZip", "Download ZIP archive")}
+              </a>
+              <a
+                href="/downloads/start-companion.bat"
+                download="start-companion.bat"
+                className={styles.downloadBtnSecondary}
+              >
+                📄 {t("trainer.downloadBat", "Download start-companion.bat")}
+              </a>
+            </div>
+          </div>
         </div>
       </DialogBody>
 

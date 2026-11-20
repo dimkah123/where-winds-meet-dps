@@ -50,8 +50,8 @@ export function useDocumentPictureInPicture() {
 
   const openPip = useCallback(
     async (options: PipOptions = {}) => {
-      const width = options.width ?? 620
-      const height = options.height ?? 220
+      const width = options.width ?? 800
+      const height = options.height ?? 260
       const title = options.title ?? "WWM Rotation Trainer"
 
       // 1. Try Document Picture-in-Picture API

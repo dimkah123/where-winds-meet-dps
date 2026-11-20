@@ -43,8 +43,8 @@ export function RotationTrainerHost({ inputs, result, rotationName, children }: 
   const handleOpenTrainer = useCallback(async () => {
     // Try Document Picture-in-Picture first
     const win = await openPip({
-      width: 620,
-      height: 220,
+      width: 800,
+      height: 260,
       title: `WWM Trainer — ${effectiveName}`,
     })
 
@@ -77,8 +77,8 @@ export function RotationTrainerHost({ inputs, result, rotationName, children }: 
             position: "fixed",
             bottom: "20px",
             right: "20px",
-            width: "580px",
-            height: "200px",
+            width: "780px",
+            height: "250px",
             zIndex: 99999,
             boxShadow: "0 8px 32px rgba(0,0,0,0.8)",
             borderRadius: "8px",

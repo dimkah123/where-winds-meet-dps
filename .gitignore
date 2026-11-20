@@ -18,4 +18,6 @@ eng.traineddata
 _worker.bundle
 __pycache__/
 *.pyc
+build/
+*.spec
 

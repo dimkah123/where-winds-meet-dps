@@ -232,7 +232,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   const visibleSteps = useMemo(() => {
     if (!steps.length) return []
     const list: Array<{ step: TrainerStep; relativeIdx: number; realIdx: number }> = []
-    for (let r = -1; r <= 3; r++) {
+    for (let r = -1; r <= 4; r++) {
       const idx = stepIndex + r
       if (idx >= 0 && idx < steps.length) {
         list.push({ step: steps[idx], relativeIdx: r, realIdx: idx })
@@ -261,7 +261,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
                 ? t("trainer.companionConnected", "Companion connected: Global game input active!")
                 : t(
                     "trainer.companionOffline",
-                    "Companion offline: Run start-companion.bat for in-game capture, or focus window.",
+                    "Companion offline: Run WWM-Companion.exe or start-companion.bat for in-game capture.",
                   )
             }
           >
@@ -272,6 +272,20 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
                 : t("trainer.companionOfflineShort", "LOCAL COMPANION OFF")}
             </span>
           </div>
+
+          {!isConnected && (
+            <a
+              href="/downloads/WWM-Companion.exe"
+              download="WWM-Companion.exe"
+              className={styles.companionDownloadCta}
+              title={t(
+                "trainer.downloadExeTooltip",
+                "Download WWM-Companion.exe to track keys in-game",
+              )}
+            >
+              📥 {t("trainer.downloadExeShort", "Download .exe")}
+            </a>
+          )}
 
           <span className={styles.rotationTitle}>
             {rotationTitle ?? t("common.rotation", "Rotation")}
@@ -417,6 +431,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           keyMap={settings.keyMap}
           onChange={handleKeyMapChange}
           onClose={() => setShowRemap(false)}
+          isConnected={isConnected}
         />
       )}
     </div>
