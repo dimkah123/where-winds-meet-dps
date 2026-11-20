@@ -195,10 +195,10 @@ describe("the Sword Trial boss choice on the Overview tab", () => {
     expect(screen.queryByText("Boss talent +0%")).not.toBeInTheDocument()
   })
 
-  it("disables the boss choice in dummy mode and says the talents are off", () => {
+  it("hides the boss choice entirely in dummy mode", () => {
     renderTab({ dummyMode: true })
-    expect(screen.getByRole("combobox", { name: "Sword Trial Boss" })).toBeDisabled()
-    expect(screen.getByText("Training dummy: boss talents do not apply")).toBeInTheDocument()
+    expect(screen.queryByRole("combobox", { name: "Sword Trial Boss" })).toBeNull()
+    expect(screen.queryByText("Training dummy: boss talents do not apply")).toBeNull()
   })
 
   it("keeps a boss saved above the breakthrough and says what it is scored as", () => {

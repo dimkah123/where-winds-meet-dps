@@ -21,6 +21,7 @@ interface Props {
 const percentOf = (fraction: number): string => String(Math.round(fraction * 1000) / 10)
 
 export function SwordTrialBossSelect({ inputs, onChange }: Props) {
+  if (inputs.dummyMode) return null
   const { t } = useI18n()
   const stored = inputs.swordTrialBoss ?? DEFAULT_SWORD_TRIAL_BOSS_ID
   const scored = swordTrialBossFor(inputs)
