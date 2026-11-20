@@ -87,12 +87,12 @@ export function resolveSkillKey(
   cleanName: string,
   keyMap: TrainerKeyMap,
   isRuLocale = false,
-): { key: string; label: string } {
+): { key: string; label: string; isHold?: boolean } {
   const norm = cleanName.toLowerCase()
 
   // 1. Weapon swap
   if (norm.includes("tab") || norm.includes("swap")) {
-    return { key: keyMap.swap, label: formatKeyDisplay(keyMap.swap, isRuLocale) }
+    return { key: keyMap.swap, label: formatKeyDisplay(keyMap.swap, isRuLocale), isHold: false }
   }
 
   // 2. Heavy / Charged attack
@@ -100,22 +100,23 @@ export function resolveSkillKey(
     return {
       key: keyMap.heavy,
       label: `${formatKeyDisplay(keyMap.heavy, isRuLocale)} ${isRuLocale ? "(Удерж.)" : "(Hold)"}`,
+      isHold: true,
     }
   }
 
   // 3. Stance / Special skill (e.g. Mo Special, Heng Special) -> '~'
   if (norm.includes("special") || norm.includes("stance")) {
-    return { key: keyMap.skill1, label: formatKeyDisplay(keyMap.skill1, isRuLocale) }
+    return { key: keyMap.skill1, label: formatKeyDisplay(keyMap.skill1, isRuLocale), isHold: false }
   }
 
   // 4. Varied combo (e.g. Heng VC, Mo VC)
   if (norm.includes("vc") || norm.includes("varied")) {
-    return { key: keyMap.varied, label: formatKeyDisplay(keyMap.varied, isRuLocale) }
+    return { key: keyMap.varied, label: formatKeyDisplay(keyMap.varied, isRuLocale), isHold: false }
   }
 
   // 5. Light combo / attack (e.g. Heng LC, Mo LC)
   if (norm.includes("lc") || norm.includes("light") || norm.includes("slash")) {
-    return { key: keyMap.light, label: formatKeyDisplay(keyMap.light, isRuLocale) }
+    return { key: keyMap.light, label: formatKeyDisplay(keyMap.light, isRuLocale), isHold: false }
   }
 
   // 6. Mystic / Flute skills
@@ -125,16 +126,16 @@ export function resolveSkillKey(
     norm.includes("mystic") ||
     norm.includes("cancel")
   ) {
-    return { key: keyMap.mystic, label: formatKeyDisplay(keyMap.mystic, isRuLocale) }
+    return { key: keyMap.mystic, label: formatKeyDisplay(keyMap.mystic, isRuLocale), isHold: false }
   }
 
   // 7. Q skills (e.g. Heng Q, Heng Q2, Heng Q Stab, Mo QQ)
   if (norm.includes("q")) {
-    return { key: keyMap.skill2, label: formatKeyDisplay(keyMap.skill2, isRuLocale) }
+    return { key: keyMap.skill2, label: formatKeyDisplay(keyMap.skill2, isRuLocale), isHold: false }
   }
 
   // Default fallback to skill 2 (Q)
-  return { key: keyMap.skill2, label: formatKeyDisplay(keyMap.skill2, isRuLocale) }
+  return { key: keyMap.skill2, label: formatKeyDisplay(keyMap.skill2, isRuLocale), isHold: false }
 }
 
 export function buildTrainerSteps(
@@ -146,14 +147,17 @@ export function buildTrainerSteps(
   return tokens.map((token, index) => {
     const keyInfo = resolveSkillKey(token.cleanName, keyMap, isRuLocale)
     const matchingCast = casts ? casts.find((c) => c.stepIndex === index || c.skillName === token.skillName) : undefined
+    const isHold = keyInfo.isHold ?? false
+    // Hold / Charged skills (e.g. Mo Charged x4) are held as 1 action, not tapped repeatedly
+    const count = isHold ? 1 : Math.max(1, token.multiplier || 1)
     return {
       id: `${index}-${token.cleanName}`,
       rawName: token.raw,
       cleanName: token.cleanName,
       expectedKey: normalizeKeyInput(keyInfo.key),
       expectedKeyLabel: keyInfo.label,
-      multiplier: Math.max(1, token.multiplier || 1),
-      remainingCount: Math.max(1, token.multiplier || 1),
+      multiplier: count,
+      remainingCount: count,
       targetTimeSec: matchingCast?.timeSec,
       durationSec: 1.0,
     }

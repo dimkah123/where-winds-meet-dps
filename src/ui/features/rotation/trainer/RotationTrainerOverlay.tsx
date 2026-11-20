@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useI18n } from "../../../../i18n/i18nContext"
 import type { RotationCast } from "../../../../engine/types"
 import type { ParsedRotationToken } from "../readableRotation"
@@ -72,6 +72,9 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     }
   }, [stepIndex, currentStep])
 
+  const heldKeysRef = useRef<Set<string>>(new Set())
+  const lastWrongTimeRef = useRef<{ key: string; time: number }>({ key: "", time: 0 })
+
   const triggerFeedback = useCallback((text: string, tone: "perfect" | "good" | "wrong" | "hit") => {
     setFeedback({ text, tone, id: Date.now() })
     setTimeout(() => {
@@ -112,27 +115,37 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           setTimingProgress(0)
         }
       } else {
-        // Wrong key
+        // Wrong key: Debounce repeated wrong inputs so holding down a key doesn't trigger 15 misses
+        const now = Date.now()
+        if (lastWrongTimeRef.current.key === pressed && now - lastWrongTimeRef.current.time < 300) {
+          return
+        }
+        lastWrongTimeRef.current = { key: pressed, time: now }
+
         setMisses((m) => m + 1)
         setCombo(0)
-        triggerFeedback(`✕ ${formatKeyDisplay(pressed)}`, "wrong")
+        triggerFeedback(`✕ ${formatKeyDisplay(pressed, isRuLocale)}`, "wrong")
         if (settings.sound) playSynthTone(220, "sawtooth", 0.12) // A3 buzz
 
-        // In timing mode, wrong key also pushes forward or penalizes
-        if (settings.mode === "timing") {
-          setStepIndex((idx) => (idx + 1 < steps.length ? idx + 1 : 0))
-          setTimingProgress(0)
-        }
+        // NOTE: We do NOT advance stepIndex on wrong key!
+        // Advancing on wrong key caused held keys to skip and fail all subsequent skills in a cascade.
       }
     },
-    [isPlaying, currentStep, remainingCount, steps.length, settings.sound, settings.mode, triggerFeedback],
+    [isPlaying, currentStep, remainingCount, steps.length, settings.sound, isRuLocale, triggerFeedback],
   )
 
   // Listen to companion WebSocket events
   const handleCompanionInput = useCallback(
     (e: TrainerInputEvent) => {
+      const norm = normalizeKeyInput(e.key)
       if (e.action === "down") {
-        handleKeyHit(e.key)
+        if (heldKeysRef.current.has(norm)) {
+          return // Drop OS auto-repeats while held
+        }
+        heldKeysRef.current.add(norm)
+        handleKeyHit(norm)
+      } else if (e.action === "up") {
+        heldKeysRef.current.delete(norm)
       }
     },
     [handleKeyHit],
@@ -146,11 +159,16 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   // Direct keyboard/mouse listeners inside the window (works when window has focus)
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (showRemap) return
-      let key = e.key.toLowerCase()
-      if (key === "`" || key === "~" || key === "ё") key = "~"
-      if (key === " ") key = "space"
-      handleKeyHit(key)
+      if (showRemap || e.repeat) return
+      const norm = normalizeKeyInput(e.key === " " ? "space" : e.key)
+      if (heldKeysRef.current.has(norm)) return
+      heldKeysRef.current.add(norm)
+      handleKeyHit(norm)
+    }
+
+    function onKeyUp(e: KeyboardEvent) {
+      const norm = normalizeKeyInput(e.key === " " ? "space" : e.key)
+      heldKeysRef.current.delete(norm)
     }
 
     function onMouseDown(e: MouseEvent) {
@@ -158,14 +176,27 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       let btn = "lclick"
       if (e.button === 2) btn = "rclick"
       else if (e.button === 1) btn = "mclick"
+      if (heldKeysRef.current.has(btn)) return
+      heldKeysRef.current.add(btn)
       handleKeyHit(btn)
     }
 
+    function onMouseUp(e: MouseEvent) {
+      let btn = "lclick"
+      if (e.button === 2) btn = "rclick"
+      else if (e.button === 1) btn = "mclick"
+      heldKeysRef.current.delete(btn)
+    }
+
     window.addEventListener("keydown", onKeyDown)
+    window.addEventListener("keyup", onKeyUp)
     window.addEventListener("mousedown", onMouseDown)
+    window.addEventListener("mouseup", onMouseUp)
     return () => {
       window.removeEventListener("keydown", onKeyDown)
+      window.removeEventListener("keyup", onKeyUp)
       window.removeEventListener("mousedown", onMouseDown)
+      window.removeEventListener("mouseup", onMouseUp)
     }
   }, [handleKeyHit, showRemap])
 

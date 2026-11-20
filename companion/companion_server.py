@@ -111,11 +111,23 @@ def normalize_key(name: str) -> str:
     return RU_TO_EN.get(n, n)
 
 
+held_keys = set()
+
+
 def on_keyboard_event(e):
     if not connected_clients:
         return
     norm = normalize_key(e.name)
     event_type = "down" if e.event_type == "down" else "up"
+
+    # Filter out OS auto-repeat for held keys
+    if event_type == "down":
+        if norm in held_keys:
+            return  # Auto-repeat dropped!
+        held_keys.add(norm)
+    elif event_type == "up":
+        held_keys.discard(norm)
+
     event_data = {
         "type": "input",
         "action": event_type,
