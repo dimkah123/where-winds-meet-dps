@@ -47,6 +47,8 @@ export function normalizeKeyInput(key: string): string {
   if (lower === "`" || lower === "~" || lower === "ё" || lower === "grave" || lower === "tilde") {
     return "~"
   }
+  if (lower === "xbutton1" || lower === "mouse4" || lower === "m4") return "mouse4"
+  if (lower === "xbutton2" || lower === "mouse5" || lower === "m5") return "mouse5"
   return RU_TO_EN_KEY_MAP[lower] ?? lower
 }
 
@@ -55,6 +57,8 @@ export function formatKeyDisplay(key: string, isRuLocale = false): string {
   if (norm === "lclick") return isRuLocale ? "ЛКМ" : "LClick"
   if (norm === "rclick") return isRuLocale ? "ПКМ" : "RClick"
   if (norm === "mclick") return isRuLocale ? "Колесико" : "Wheel (MMB)"
+  if (norm === "mouse4") return isRuLocale ? "Боковая 1" : "Mouse 4"
+  if (norm === "mouse5") return isRuLocale ? "Боковая 2" : "Mouse 5"
   if (norm === "~") return isRuLocale ? "~ (Ё)" : "~"
   if (norm === "space") return isRuLocale ? "Пробел" : "Space"
   if (norm === "shift") return "Shift"
@@ -130,14 +134,37 @@ export function resolveSkillKey(
     return { key: keyMap.light, label: formatKeyDisplay(keyMap.light, isRuLocale), isHold: false }
   }
 
-  // 6. Mystic / Flute skills
+  // 6. Mystic skills
+  // 6a. Flute / Флейта -> mystic1 (Default: "f")
+  if (norm.includes("flute") || norm.includes("флейт")) {
+    const key = keyMap.mystic1 ?? keyMap.mystic ?? "f"
+    return { key, label: formatKeyDisplay(key, isRuLocale), isHold: false }
+  }
+
+  // 6b. Toad / Bursting Nine / Жаба -> mystic2 (Default: "g")
   if (
-    norm.includes("flute") ||
     norm.includes("bursting") ||
-    norm.includes("mystic") ||
-    norm.includes("cancel")
+    norm.includes("toad") ||
+    norm.includes("жаб") ||
+    norm.includes("nine")
   ) {
-    return { key: keyMap.mystic, label: formatKeyDisplay(keyMap.mystic, isRuLocale), isHold: false }
+    const key = keyMap.mystic2 ?? "g"
+    return { key, label: formatKeyDisplay(key, isRuLocale), isHold: false }
+  }
+
+  // 6c. Other mystics
+  if (
+    norm.includes("mystic") ||
+    norm.includes("cancel") ||
+    norm.includes("drink") ||
+    norm.includes("poet") ||
+    norm.includes("dragon") ||
+    norm.includes("soaring") ||
+    norm.includes("breath") ||
+    norm.includes("smolder")
+  ) {
+    const key = keyMap.mystic1 ?? keyMap.mystic ?? "f"
+    return { key, label: formatKeyDisplay(key, isRuLocale), isHold: false }
   }
 
   // 7. Q skills (e.g. Heng Q, Heng Q2, Heng Q Stab, Mo QQ)

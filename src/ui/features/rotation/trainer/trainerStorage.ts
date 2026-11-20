@@ -11,7 +11,8 @@ export const DEFAULT_KEY_MAP: TrainerKeyMap = {
   dual: "mclick",
   light: "lclick",
   varied: "e",
-  mystic: "f",
+  mystic1: "f",
+  mystic2: "g",
   dodge: "shift",
 }
 
@@ -27,13 +28,18 @@ export function loadTrainerSettings(): TrainerSettings {
     const raw = kvStore.get(STORAGE_KEY)
     if (!raw) return DEFAULT_TRAINER_SETTINGS
     const parsed = JSON.parse(raw) as Partial<TrainerSettings>
+    const userMap = (parsed.keyMap ?? {}) as Partial<TrainerKeyMap>
+    const mystic1 = userMap.mystic1 ?? userMap.mystic ?? DEFAULT_KEY_MAP.mystic1
+    const mystic2 = userMap.mystic2 ?? DEFAULT_KEY_MAP.mystic2
     return {
       mode: parsed.mode === "timing" ? "timing" : "strict",
       speed: typeof parsed.speed === "number" ? parsed.speed : 1.0,
       sound: typeof parsed.sound === "boolean" ? parsed.sound : true,
       keyMap: {
         ...DEFAULT_KEY_MAP,
-        ...(parsed.keyMap ?? {}),
+        ...userMap,
+        mystic1,
+        mystic2,
       },
     }
   } catch {

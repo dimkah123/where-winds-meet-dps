@@ -114,8 +114,23 @@ describe("Rotation Trainer Key Resolution", () => {
     })
 
     expect(resolveSkillKey("Bursting Nine", DEFAULT_KEY_MAP)).toEqual({
-      key: "f",
-      label: "F",
+      key: "g",
+      label: "G",
+      isHold: false,
+    })
+
+    expect(resolveSkillKey("Toad", DEFAULT_KEY_MAP)).toEqual({
+      key: "g",
+      label: "G",
+      isHold: false,
+    })
+
+    // Custom mystic2 mapped to side mouse button (Mouse 4)
+    expect(
+      resolveSkillKey("Bursting Nine", { ...DEFAULT_KEY_MAP, mystic2: "mouse4" }, true),
+    ).toEqual({
+      key: "mouse4",
+      label: "Боковая 1",
       isHold: false,
     })
   })
@@ -124,6 +139,8 @@ describe("Rotation Trainer Key Resolution", () => {
     expect(formatKeyDisplay("lclick")).toBe("LClick")
     expect(formatKeyDisplay("rclick")).toBe("RClick")
     expect(formatKeyDisplay("mclick")).toBe("Wheel (MMB)")
+    expect(formatKeyDisplay("mouse4")).toBe("Mouse 4")
+    expect(formatKeyDisplay("mouse5")).toBe("Mouse 5")
     expect(formatKeyDisplay("tab")).toBe("Tab")
     expect(formatKeyDisplay("shift")).toBe("Shift")
     expect(formatKeyDisplay("space")).toBe("Space")
@@ -134,6 +151,8 @@ describe("Rotation Trainer Key Resolution", () => {
     expect(formatKeyDisplay("lclick", true)).toBe("ЛКМ")
     expect(formatKeyDisplay("rclick", true)).toBe("ПКМ")
     expect(formatKeyDisplay("mclick", true)).toBe("Колесико")
+    expect(formatKeyDisplay("mouse4", true)).toBe("Боковая 1")
+    expect(formatKeyDisplay("mouse5", true)).toBe("Боковая 2")
     expect(formatKeyDisplay("~", true)).toBe("~ (Ё)")
     expect(formatKeyDisplay("q", true)).toBe("Q (Й)")
     expect(formatKeyDisplay("r", true)).toBe("R (К)")
@@ -173,5 +192,7 @@ describe("Rotation Trainer Key Resolution", () => {
     expect(settings.keyMap.skill2).toBe("q")
     expect(settings.keyMap.heavy).toBe("r")
     expect(settings.keyMap.dual).toBe("mclick")
+    expect(settings.keyMap.mystic1).toBe("f")
+    expect(settings.keyMap.mystic2).toBe("g")
   })
 })

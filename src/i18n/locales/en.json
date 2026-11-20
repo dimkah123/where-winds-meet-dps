@@ -3013,6 +3013,8 @@
   "trainer.keys.heavy": "Heavy / Charged Attack (R Hold)",
   "trainer.keys.light": "Light Attack / Combo (LClick)",
   "trainer.keys.mystic": "Mystic / Flute (F)",
+  "trainer.keys.mystic1": "Mystic 1 — Flute (F)",
+  "trainer.keys.mystic2": "Mystic 2 — Toad / Bursting (G)",
   "trainer.keys.skill1": "Special / Stance Skill (~)",
   "trainer.keys.skill2": "Primary Skill (Q)",
   "trainer.keys.swap": "Weapon Swap / Stance (Tab)",

@@ -66,10 +66,16 @@ const ACTIONS: ActionDef[] = [
     desc: "Heng VC, Mo VC",
   },
   {
-    key: "mystic",
-    labelKey: "trainer.keys.mystic",
-    defaultLabel: "Mystic / Flute (F)",
-    desc: "Flute Cancel, Bursting Nine",
+    key: "mystic1",
+    labelKey: "trainer.keys.mystic1",
+    defaultLabel: "Mystic 1 — Flute (F)",
+    desc: "Flute Cancel, Flute Full (Флейта приливов)",
+  },
+  {
+    key: "mystic2",
+    labelKey: "trainer.keys.mystic2",
+    defaultLabel: "Mystic 2 — Toad / Bursting (G)",
+    desc: "Bursting Nine, Toad (Жаба / Взрыв девяти / Боковая мыши)",
   },
   {
     key: "dodge",
@@ -110,16 +116,25 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false 
       let btn = "lclick"
       if (e.button === 2) btn = "rclick"
       else if (e.button === 1) btn = "mclick"
+      else if (e.button === 3) btn = "mouse4"
+      else if (e.button === 4) btn = "mouse5"
 
       setDraft((prev) => ({ ...prev, [recordingAction!]: btn }))
       setRecordingAction(null)
     }
 
+    function handleAuxClick(e: MouseEvent) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+
     window.addEventListener("keydown", handleKeyDown, { capture: true })
     window.addEventListener("mousedown", handleMouseDown, { capture: true })
+    window.addEventListener("auxclick", handleAuxClick, { capture: true })
     return () => {
       window.removeEventListener("keydown", handleKeyDown, { capture: true })
       window.removeEventListener("mousedown", handleMouseDown, { capture: true })
+      window.removeEventListener("auxclick", handleAuxClick, { capture: true })
     }
   }, [recordingAction])
 

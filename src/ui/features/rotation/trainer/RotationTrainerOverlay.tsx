@@ -96,7 +96,9 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         pressed === expected ||
         (expected === "lclick" && pressed === "lclick") ||
         (expected === "rclick" && pressed === "rclick") ||
-        (expected === "mclick" && (pressed === "mclick" || pressed === "mouse3"))
+        (expected === "mclick" && (pressed === "mclick" || pressed === "mouse3")) ||
+        (expected === "mouse4" && (pressed === "mouse4" || pressed === "xbutton1")) ||
+        (expected === "mouse5" && (pressed === "mouse5" || pressed === "xbutton2"))
 
       // 1. Rotation has not started yet -> wait for the FIRST skill!
       // Silently ignore any other keys (WASD, jumps, etc.) before the first skill is pressed.
@@ -246,6 +248,12 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       let btn = "lclick"
       if (e.button === 2) btn = "rclick"
       else if (e.button === 1) btn = "mclick"
+      else if (e.button === 3) btn = "mouse4"
+      else if (e.button === 4) btn = "mouse5"
+
+      if (e.button === 3 || e.button === 4) {
+        e.preventDefault()
+      }
 
       const now = Date.now()
       const last = lastPressTimeRef.current[btn] || 0
@@ -255,11 +263,19 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       handleKeyHit(btn)
     }
 
+    function onAuxClick(e: MouseEvent) {
+      if (e.button === 3 || e.button === 4) {
+        e.preventDefault()
+      }
+    }
+
     window.addEventListener("keydown", onKeyDown)
     window.addEventListener("mousedown", onMouseDown)
+    window.addEventListener("auxclick", onAuxClick)
     return () => {
       window.removeEventListener("keydown", onKeyDown)
       window.removeEventListener("mousedown", onMouseDown)
+      window.removeEventListener("auxclick", onAuxClick)
     }
   }, [handleKeyHit, showRemap])
 

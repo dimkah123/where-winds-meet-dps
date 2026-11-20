@@ -3013,6 +3013,8 @@
   "trainer.keys.heavy": "Тяжёлая / Заряженная атака (R Удержание)",
   "trainer.keys.light": "Лёгкая атака / Комбо (ЛКМ)",
   "trainer.keys.mystic": "Мистик / Дудка (F)",
+  "trainer.keys.mystic1": "Мистик 1 — Флейта (F)",
+  "trainer.keys.mystic2": "Мистик 2 — Жаба / Взрыв (G)",
   "trainer.keys.skill1": "Особое умение / Стойка (~)",
   "trainer.keys.skill2": "Основное умение (Q)",
   "trainer.keys.swap": "Смена оружия / Стиль (Tab)",

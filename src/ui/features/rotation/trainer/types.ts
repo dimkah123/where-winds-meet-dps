@@ -8,7 +8,9 @@ export interface TrainerKeyMap {
   dual: string // Dual Weapon attack / switch without tab (Default: "mclick")
   light: string // Light attack (Default: "lclick")
   varied: string // Varied combo (Default: "e")
-  mystic: string // Mystic / Flute (Default: "f")
+  mystic1: string // Mystic 1 / Flute (Default: "f")
+  mystic2: string // Mystic 2 / Toad / Bursting Nine (Default: "g")
+  mystic?: string // Legacy fallback for mystic1
   dodge: string // Dodge / Sprint (Default: "shift")
 }
 
