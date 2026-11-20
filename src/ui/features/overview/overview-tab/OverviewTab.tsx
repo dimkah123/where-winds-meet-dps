@@ -100,7 +100,7 @@ export function OverviewTab({
 
       <div className={styles.lift}>
         <div className="panel">
-          <h2>{t("overview.gearStatLift")}</h2>
+          <h2 className={styles.liftTitle}>{t("overview.gearStatLift")}</h2>
           <div style={{ opacity: rankingPending ? 0.6 : 1 }}>
             <ItemRankingTable rows={rankingRows} />
           </div>

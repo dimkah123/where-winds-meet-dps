@@ -1,5 +1,10 @@
 .rankingTable {
-  margin-top: 4px;
+  margin-top: 0;
+}
+
+.rankingTable th {
+  padding-top: 0;
+  padding-bottom: 3px;
 }
 
 .rankingTable th:first-child,
