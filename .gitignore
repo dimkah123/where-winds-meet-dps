@@ -20,4 +20,5 @@ __pycache__/
 *.pyc
 build/
 *.spec
+/WWM-Companion.exe
 

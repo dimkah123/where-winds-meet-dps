@@ -15,15 +15,21 @@ import sys
 import time
 
 try:
+    sys.stdout.reconfigure(line_buffering=True)
+except Exception:
+    pass
+
+HAS_KEYBOARD_PKG = False
+try:
     import keyboard
+    HAS_KEYBOARD_PKG = True
 except ImportError:
-    print("[Error] 'keyboard' package not found. Run: pip install keyboard")
-    sys.exit(1)
+    HAS_KEYBOARD_PKG = False
 
 WS_HOST = "127.0.0.1"
 WS_PORT = 47999
 
-# Windows VK Codes for Mouse
+# Windows VK Codes for Mouse and Keys (native ctypes fallback with 0 dependencies)
 VK_LBUTTON = 0x01
 VK_RBUTTON = 0x02
 VK_MBUTTON = 0x04
@@ -32,6 +38,44 @@ user32 = ctypes.windll.user32
 
 connected_clients = set()
 event_queue = asyncio.Queue()
+
+# Comprehensive Virtual-Key mapping for native ctypes capture (zero dependencies)
+TRACKED_VKS = {
+    # Mouse
+    0x01: ("lclick", "mouse"),
+    0x02: ("rclick", "mouse"),
+    0x04: ("mclick", "mouse"),
+    # Skills / Combat
+    0xC0: ("~", "keyboard"),       # VK_OEM_3 (` ~ ё)
+    0x51: ("q", "keyboard"),
+    0x52: ("r", "keyboard"),
+    0x09: ("tab", "keyboard"),
+    0x45: ("e", "keyboard"),
+    0x46: ("f", "keyboard"),
+    0x10: ("shift", "keyboard"),
+    0xA0: ("shift", "keyboard"),   # VK_LSHIFT
+    0xA1: ("shift", "keyboard"),   # VK_RSHIFT
+    0x20: ("space", "keyboard"),
+    0x11: ("ctrl", "keyboard"),
+    0x12: ("alt", "keyboard"),
+    0x1B: ("escape", "keyboard"),
+    # Numbers
+    0x31: ("1", "keyboard"),
+    0x32: ("2", "keyboard"),
+    0x33: ("3", "keyboard"),
+    0x34: ("4", "keyboard"),
+    0x35: ("5", "keyboard"),
+    0x36: ("6", "keyboard"),
+    # Common combat letters
+    0x41: ("a", "keyboard"),
+    0x43: ("c", "keyboard"),
+    0x44: ("d", "keyboard"),
+    0x53: ("s", "keyboard"),
+    0x56: ("v", "keyboard"),
+    0x57: ("w", "keyboard"),
+    0x58: ("x", "keyboard"),
+    0x5A: ("z", "keyboard"),
+}
 
 
 def make_ws_handshake(key: str) -> str:
@@ -128,6 +172,29 @@ async def mouse_polling_loop():
         await asyncio.sleep(0.005)  # 5ms fast poll for near-zero latency
 
 
+async def ctypes_input_polling_loop():
+    """Poll keyboard and mouse states using Windows GetAsyncKeyState (0 dependencies)."""
+    states = {}
+    while True:
+        try:
+            for vk, (name, device) in TRACKED_VKS.items():
+                is_down = bool(user32.GetAsyncKeyState(vk) & 0x8000)
+                prev = states.get(vk, False)
+                if is_down != prev:
+                    states[vk] = is_down
+                    if connected_clients:
+                        await event_queue.put({
+                            "type": "input",
+                            "action": "down" if is_down else "up",
+                            "key": name,
+                            "device": device,
+                            "time": time.time(),
+                        })
+        except Exception:
+            pass
+        await asyncio.sleep(0.005)
+
+
 async def broadcaster_loop():
     while True:
         event = await event_queue.get()
@@ -211,13 +278,18 @@ async def main():
     print("  Where Winds Meet — Rotation Trainer Companion Service")
     print("=" * 64)
     print(f"  Status: Listening on ws://{WS_HOST}:{WS_PORT}")
+    if HAS_KEYBOARD_PKG:
+        print("  Input Engine: 'keyboard' library + Win32 mouse hook")
+        keyboard.hook(on_keyboard_event)
+        input_task = mouse_polling_loop()
+    else:
+        print("  Input Engine: Native Windows Win32 ctypes (0 external packages needed)")
+        input_task = ctypes_input_polling_loop()
+
     print("  Capturing global keys (keyboard + mouse) for game trainer overlay.")
     print("  Keep this window open while playing or practicing.")
     print("  Press Ctrl+C to stop.")
     print("=" * 64)
-
-    # Hook keyboard
-    keyboard.hook(on_keyboard_event)
 
     server = await asyncio.start_server(handle_client, WS_HOST, WS_PORT)
 
@@ -225,7 +297,7 @@ async def main():
         await asyncio.gather(
             server.serve_forever(),
             broadcaster_loop(),
-            mouse_polling_loop(),
+            input_task,
         )
 
 
