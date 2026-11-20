@@ -8,6 +8,7 @@ export const DEFAULT_KEY_MAP: TrainerKeyMap = {
   skill2: "q",
   heavy: "r",
   swap: "tab",
+  dual: "mclick",
   light: "lclick",
   varied: "e",
   mystic: "f",

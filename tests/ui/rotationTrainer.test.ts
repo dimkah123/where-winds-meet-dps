@@ -72,6 +72,24 @@ describe("Rotation Trainer Key Resolution", () => {
     })
 
     expect(resolveSkillKey("Heng Tab", DEFAULT_KEY_MAP)).toEqual({
+      key: "mclick",
+      label: "Wheel (MMB)",
+      isHold: false,
+    })
+
+    expect(resolveSkillKey("Heng Dual", DEFAULT_KEY_MAP)).toEqual({
+      key: "mclick",
+      label: "Wheel (MMB)",
+      isHold: false,
+    })
+
+    expect(resolveSkillKey("Mo Dual", DEFAULT_KEY_MAP)).toEqual({
+      key: "mclick",
+      label: "Wheel (MMB)",
+      isHold: false,
+    })
+
+    expect(resolveSkillKey("Weapon Swap", DEFAULT_KEY_MAP)).toEqual({
       key: "tab",
       label: "Tab",
       isHold: false,
@@ -105,7 +123,7 @@ describe("Rotation Trainer Key Resolution", () => {
   it("formats key display labels cleanly", () => {
     expect(formatKeyDisplay("lclick")).toBe("LClick")
     expect(formatKeyDisplay("rclick")).toBe("RClick")
-    expect(formatKeyDisplay("mclick")).toBe("MClick")
+    expect(formatKeyDisplay("mclick")).toBe("Wheel (MMB)")
     expect(formatKeyDisplay("tab")).toBe("Tab")
     expect(formatKeyDisplay("shift")).toBe("Shift")
     expect(formatKeyDisplay("space")).toBe("Space")
@@ -115,6 +133,7 @@ describe("Rotation Trainer Key Resolution", () => {
     // Russian locale display
     expect(formatKeyDisplay("lclick", true)).toBe("ЛКМ")
     expect(formatKeyDisplay("rclick", true)).toBe("ПКМ")
+    expect(formatKeyDisplay("mclick", true)).toBe("Колесико")
     expect(formatKeyDisplay("~", true)).toBe("~ (Ё)")
     expect(formatKeyDisplay("q", true)).toBe("Q (Й)")
     expect(formatKeyDisplay("r", true)).toBe("R (К)")
@@ -153,5 +172,6 @@ describe("Rotation Trainer Key Resolution", () => {
     expect(settings.keyMap.skill1).toBe("~")
     expect(settings.keyMap.skill2).toBe("q")
     expect(settings.keyMap.heavy).toBe("r")
+    expect(settings.keyMap.dual).toBe("mclick")
   })
 })

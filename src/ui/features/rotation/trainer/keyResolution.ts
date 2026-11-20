@@ -54,7 +54,7 @@ export function formatKeyDisplay(key: string, isRuLocale = false): string {
   const norm = normalizeKeyInput(key)
   if (norm === "lclick") return isRuLocale ? "ЛКМ" : "LClick"
   if (norm === "rclick") return isRuLocale ? "ПКМ" : "RClick"
-  if (norm === "mclick") return isRuLocale ? "СКМ" : "MClick"
+  if (norm === "mclick") return isRuLocale ? "Колесико" : "Wheel (MMB)"
   if (norm === "~") return isRuLocale ? "~ (Ё)" : "~"
   if (norm === "space") return isRuLocale ? "Пробел" : "Space"
   if (norm === "shift") return "Shift"
@@ -90,8 +90,19 @@ export function resolveSkillKey(
 ): { key: string; label: string; isHold?: boolean } {
   const norm = cleanName.toLowerCase()
 
-  // 1. Weapon swap (e.g. Heng Tab, Mo Tab, Weapon Swap) - do NOT match "Stab" (e.g. Heng Q Stab)
+  // 1. Dual weapon attack / switch without tab (e.g. Heng Dual, Mo Dual, Dual Blade)
+  if (norm.includes("dual") || norm.includes("парн")) {
+    const key = keyMap.dual ?? "mclick"
+    return { key, label: formatKeyDisplay(key, isRuLocale), isHold: false }
+  }
+
+  // 2. Weapon swap (e.g. Tab, Swap) - do NOT match "Stab" (e.g. Heng Q Stab)
   if (/\b(tab|swap)\b/i.test(cleanName)) {
+    // Legacy support for "Heng Tab" and "Mo Tab" which are actually Dual skills
+    if (norm.includes("heng") || norm.includes("mo")) {
+      const key = keyMap.dual ?? "mclick"
+      return { key, label: formatKeyDisplay(key, isRuLocale), isHold: false }
+    }
     return { key: keyMap.swap, label: formatKeyDisplay(keyMap.swap, isRuLocale), isHold: false }
   }
 

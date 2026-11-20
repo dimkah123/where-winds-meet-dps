@@ -50,6 +50,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   const [hits, setHits] = useState(0)
   const [misses, setMisses] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
+  const [hasStarted, setHasStarted] = useState(false)
   const [showRemap, setShowRemap] = useState(false)
   const [timingProgress, setTimingProgress] = useState(0)
   const [feedback, setFeedback] = useState<{
@@ -75,6 +76,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   const lastPressTimeRef = useRef<Record<string, number>>({})
   const lastWrongTimeRef = useRef<{ key: string; time: number }>({ key: "", time: 0 })
   const lastHoldKeyRef = useRef<{ key: string; expiresAt: number }>({ key: "", expiresAt: 0 })
+  const lastHitKeyRef = useRef<{ key: string; time: number }>({ key: "", time: 0 })
 
   const triggerFeedback = useCallback((text: string, tone: "perfect" | "good" | "wrong" | "hit") => {
     setFeedback({ text, tone, id: Date.now() })
@@ -93,18 +95,38 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       const isMatch =
         pressed === expected ||
         (expected === "lclick" && pressed === "lclick") ||
-        (expected === "rclick" && pressed === "rclick")
+        (expected === "rclick" && pressed === "rclick") ||
+        (expected === "mclick" && (pressed === "mclick" || pressed === "mouse3"))
 
+      // 1. Rotation has not started yet -> wait for the FIRST skill!
+      // Silently ignore any other keys (WASD, jumps, etc.) before the first skill is pressed.
+      if (!hasStarted) {
+        if (isMatch) {
+          setHasStarted(true)
+          setHits(1)
+          setCombo(1)
+          setMaxCombo((m) => Math.max(m, 1))
+          triggerFeedback("START!", "perfect")
+          if (settings.sound) playSynthTone(880, "triangle", 0.09) // A5
+          lastHitKeyRef.current = { key: expected, time: Date.now() }
+          setStepIndex(1)
+          setTimingProgress(0)
+        }
+        return
+      }
+
+      // 2. Active rotation:
       if (isMatch) {
-        // If this skill was a charge/hold attack, allow a 450ms grace window for releasing the key
+        // If this skill was a charge/hold attack, allow a 500ms grace window for releasing the key
         const skillLower = currentStep.cleanName.toLowerCase()
         if (
           skillLower.includes("charged") ||
           skillLower.includes("hold") ||
           skillLower.includes("heavy")
         ) {
-          lastHoldKeyRef.current = { key: expected, expiresAt: Date.now() + 450 }
+          lastHoldKeyRef.current = { key: expected, expiresAt: Date.now() + 500 }
         }
+        lastHitKeyRef.current = { key: expected, time: Date.now() }
 
         // Success
         if (remainingCount > 1) {
@@ -122,18 +144,47 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           if (settings.sound) playSynthTone(880, "triangle", 0.09) // A5
 
           // Advance step
-          setStepIndex((idx) => (idx + 1 < steps.length ? idx + 1 : 0))
+          setStepIndex((idx) => {
+            if (idx + 1 < steps.length) {
+              return idx + 1
+            }
+            setHasStarted(false)
+            return 0
+          })
           setTimingProgress(0)
         }
       } else {
+        // NON-MATCHING INPUT:
+        // A. Movement and utility keys -> NEVER penalize or drop combo!
+        const NON_COMBAT_KEYS = new Set([
+          "w", "a", "s", "d", "shift", "space", "ctrl", "alt", "escape", "caps",
+          "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+        ])
+        if (NON_COMBAT_KEYS.has(pressed)) {
+          return
+        }
+
         const now = Date.now()
-        // If user is just releasing the key from the previous hold attack, silently ignore
+
+        // B. Extra/buffer press of the key that was just hit -> SILENTLY IGNORE (game buffers it)
+        if (lastHitKeyRef.current.key === pressed && now - lastHitKeyRef.current.time < 500) {
+          return
+        }
+
+        // C. Grace window for releasing hold key -> SILENTLY IGNORE
         if (lastHoldKeyRef.current.key === pressed && now < lastHoldKeyRef.current.expiresAt) {
           return
         }
 
-        // Debounce repeated wrong inputs so holding down a key doesn't trigger multiple misses
-        if (lastWrongTimeRef.current.key === pressed && now - lastWrongTimeRef.current.time < 350) {
+        // D. In "strict" mode:
+        // User requested: "не регай лишние импуты, в целом то кнопка нажата значит игра её запишет"
+        // In Strict Order mode, extra key mashing or buffer inputs should NOT reduce accuracy or cause misses.
+        if (settings.mode === "strict") {
+          return
+        }
+
+        // E. In "timing" mode:
+        if (lastWrongTimeRef.current.key === pressed && now - lastWrongTimeRef.current.time < 450) {
           return
         }
         lastWrongTimeRef.current = { key: pressed, time: now }
@@ -146,7 +197,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         // NOTE: We do NOT advance stepIndex on wrong key!
       }
     },
-    [isPlaying, currentStep, remainingCount, steps.length, settings.sound, isRuLocale, triggerFeedback],
+    [isPlaying, hasStarted, currentStep, remainingCount, steps.length, settings.sound, settings.mode, isRuLocale, triggerFeedback],
   )
 
   // Listen to companion WebSocket events
@@ -212,9 +263,9 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     }
   }, [handleKeyHit, showRemap])
 
-  // Timing mode animation loop
+  // Timing mode animation loop (only runs after rotation has started)
   useEffect(() => {
-    if (!isPlaying || settings.mode !== "timing" || steps.length === 0) return
+    if (!isPlaying || !hasStarted || settings.mode !== "timing" || steps.length === 0) return
 
     const stepDurationMs = 1200 / settings.speed
     const interval = 30
@@ -237,9 +288,10 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     }, interval)
 
     return () => clearInterval(timer)
-  }, [isPlaying, settings.mode, settings.speed, settings.sound, steps.length, triggerFeedback])
+  }, [isPlaying, hasStarted, settings.mode, settings.speed, settings.sound, steps.length, triggerFeedback])
 
   function resetTrainer() {
+    setHasStarted(false)
     setStepIndex(0)
     setCombo(0)
     setHits(0)
@@ -430,7 +482,10 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
             >
               <div className={styles.cardHeader}>
                 <span className={styles.skillName}>{step.cleanName}</span>
-                {isTarget && remainingCount > 1 && (
+                {isTarget && !hasStarted && (
+                  <span className={styles.startBadge}>{isRuLocale ? "СТАРТ" : "START"}</span>
+                )}
+                {isTarget && hasStarted && remainingCount > 1 && (
                   <span className={styles.counterBadge}>×{remainingCount}</span>
                 )}
                 {!isTarget && step.multiplier > 1 && (

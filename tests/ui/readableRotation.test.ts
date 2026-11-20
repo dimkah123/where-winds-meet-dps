@@ -28,7 +28,7 @@ describe("readableRotation", () => {
     expect(text).toContain("Heng Special 6 Hit (start)")
     expect(text).toContain("Mo Charged")
     expect(text).toContain("Mo QQ")
-    expect(text).toContain("Heng Tab")
+    expect(text).toContain("Heng Dual")
     expect(text).toContain("Heng VC")
     expect(text).toContain("Heng LC")
     expect(text).toContain("Mo Charged (break)")

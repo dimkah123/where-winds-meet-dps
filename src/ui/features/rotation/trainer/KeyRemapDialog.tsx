@@ -42,10 +42,16 @@ const ACTIONS: ActionDef[] = [
     desc: "Mo Charged (x4/x5), Heavy attacks",
   },
   {
+    key: "dual",
+    labelKey: "trainer.keys.dual",
+    defaultLabel: "Dual Weapon Attack (Wheel / MMB)",
+    desc: "Heng Dual, Mo Dual (Парное оружие / Колесико)",
+  },
+  {
     key: "swap",
     labelKey: "trainer.keys.swap",
     defaultLabel: "Weapon Swap (Tab)",
-    desc: "Heng Tab, Mo Tab, Dual Weapon",
+    desc: "Weapon swap without attack",
   },
   {
     key: "light",
@@ -146,7 +152,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false 
         <div className={styles.grid}>
           {ACTIONS.map((action) => {
             const isRecording = recordingAction === action.key
-            const currentValue = draft[action.key]
+            const currentValue = draft[action.key] ?? DEFAULT_KEY_MAP[action.key] ?? ""
             return (
               <div key={action.key} className={styles.actionRow}>
                 <div className={styles.actionMeta}>
