@@ -104,28 +104,37 @@ RU_TO_EN = {
 }
 
 
-def normalize_key(name: str) -> str:
-    n = name.lower().strip()
+def normalize_key(name: str | None) -> str:
+    if not name:
+        return ""
+    n = str(name).lower().strip()
     if n in ("`", "~", "grave", "tilde", "ё"):
         return "~"
     return RU_TO_EN.get(n, n)
 
 
+main_loop = None
 held_keys = set()
+last_down_times = {}
 
 
 def on_keyboard_event(e):
     if not connected_clients:
         return
-    norm = normalize_key(e.name)
+    norm = normalize_key(getattr(e, "name", None))
+    if not norm:
+        return
     event_type = "down" if e.event_type == "down" else "up"
 
-    # Filter out OS auto-repeat for held keys
+    now = time.time()
+    last_t = last_down_times.get(norm, 0)
+    # Filter out rapid OS auto-repeats for held keys (under 100ms)
+    if event_type == "down" and norm in held_keys and (now - last_t) < 0.1:
+        return
     if event_type == "down":
-        if norm in held_keys:
-            return  # Auto-repeat dropped!
         held_keys.add(norm)
-    elif event_type == "up":
+        last_down_times[norm] = now
+    else:
         held_keys.discard(norm)
 
     event_data = {
@@ -133,12 +142,16 @@ def on_keyboard_event(e):
         "action": event_type,
         "key": norm,
         "device": "keyboard",
-        "time": time.time(),
+        "time": now,
     }
-    try:
-        event_queue.put_nowait(event_data)
-    except Exception:
-        pass
+
+    if main_loop and main_loop.is_running():
+        main_loop.call_soon_threadsafe(event_queue.put_nowait, event_data)
+    else:
+        try:
+            event_queue.put_nowait(event_data)
+        except Exception:
+            pass
 
 
 async def mouse_polling_loop():
@@ -294,6 +307,9 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
 
 
 async def main():
+    global main_loop
+    main_loop = asyncio.get_running_loop()
+
     print("=" * 64)
     print("  Where Winds Meet — Rotation Trainer Companion Service")
     print("=" * 64)

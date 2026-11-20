@@ -53,6 +53,12 @@ describe("Rotation Trainer Key Resolution", () => {
       isHold: false,
     })
 
+    expect(resolveSkillKey("Heng Q Stab", DEFAULT_KEY_MAP)).toEqual({
+      key: "q",
+      label: "Q",
+      isHold: false,
+    })
+
     expect(resolveSkillKey("Mo QQ", DEFAULT_KEY_MAP)).toEqual({
       key: "q",
       label: "Q",

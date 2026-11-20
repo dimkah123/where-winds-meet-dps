@@ -8,14 +8,19 @@ echo ==============================================================
 echo.
 
 :: 1. If standalone .exe is available, launch it directly (no Python needed)
-if exist "WWM-Companion.exe" (
+if exist "%~dp0WWM-Companion.exe" (
     echo Starting standalone WWM-Companion.exe...
-    start "" "WWM-Companion.exe"
+    start "" "%~dp0WWM-Companion.exe"
     exit /b
 )
-if exist "public\downloads\WWM-Companion.exe" (
+if exist "%~dp0dist\WWM-Companion.exe" (
     echo Starting standalone WWM-Companion.exe...
-    start "" "public\downloads\WWM-Companion.exe"
+    start "" "%~dp0dist\WWM-Companion.exe"
+    exit /b
+)
+if exist "%~dp0public\downloads\WWM-Companion.exe" (
+    echo Starting standalone WWM-Companion.exe...
+    start "" "%~dp0public\downloads\WWM-Companion.exe"
     exit /b
 )
 
@@ -23,16 +28,18 @@ if exist "public\downloads\WWM-Companion.exe" (
 echo Launching companion service via Python...
 set PYTHONUNBUFFERED=1
 
-py -3.14 "%~dp0companion\companion_server.py" 2>nul
-if %ERRORLEVEL% EQU 0 exit /b
-
-py -3 "%~dp0companion\companion_server.py" 2>nul
-if %ERRORLEVEL% EQU 0 exit /b
-
-python "%~dp0companion\companion_server.py"
+:: Auto-install dependencies if python is available
+python -c "import keyboard, websockets" 2>nul
 if %ERRORLEVEL% NEQ 0 (
-    echo.
-    echo [Notice] Python exited with error code %ERRORLEVEL%.
-    pause
+    echo Checking/installing required packages (websockets, keyboard)...
+    pip install --quiet websockets keyboard 2>nul
 )
 
+if exist "%~dp0companion\companion_server.py" (
+    python "%~dp0companion\companion_server.py"
+) else if exist "%~dp0companion_server.py" (
+    python "%~dp0companion_server.py"
+) else (
+    echo [Error] companion_server.py not found!
+    pause
+)

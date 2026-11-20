@@ -90,8 +90,8 @@ export function resolveSkillKey(
 ): { key: string; label: string; isHold?: boolean } {
   const norm = cleanName.toLowerCase()
 
-  // 1. Weapon swap
-  if (norm.includes("tab") || norm.includes("swap")) {
+  // 1. Weapon swap (e.g. Heng Tab, Mo Tab, Weapon Swap) - do NOT match "Stab" (e.g. Heng Q Stab)
+  if (/\b(tab|swap)\b/i.test(cleanName)) {
     return { key: keyMap.swap, label: formatKeyDisplay(keyMap.swap, isRuLocale), isHold: false }
   }
 

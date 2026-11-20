@@ -72,8 +72,9 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     }
   }, [stepIndex, currentStep])
 
-  const heldKeysRef = useRef<Set<string>>(new Set())
+  const lastPressTimeRef = useRef<Record<string, number>>({})
   const lastWrongTimeRef = useRef<{ key: string; time: number }>({ key: "", time: 0 })
+  const lastHoldKeyRef = useRef<{ key: string; expiresAt: number }>({ key: "", expiresAt: 0 })
 
   const triggerFeedback = useCallback((text: string, tone: "perfect" | "good" | "wrong" | "hit") => {
     setFeedback({ text, tone, id: Date.now() })
@@ -95,6 +96,16 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         (expected === "rclick" && pressed === "rclick")
 
       if (isMatch) {
+        // If this skill was a charge/hold attack, allow a 450ms grace window for releasing the key
+        const skillLower = currentStep.cleanName.toLowerCase()
+        if (
+          skillLower.includes("charged") ||
+          skillLower.includes("hold") ||
+          skillLower.includes("heavy")
+        ) {
+          lastHoldKeyRef.current = { key: expected, expiresAt: Date.now() + 450 }
+        }
+
         // Success
         if (remainingCount > 1) {
           setRemainingCount((prev) => prev - 1)
@@ -115,9 +126,14 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           setTimingProgress(0)
         }
       } else {
-        // Wrong key: Debounce repeated wrong inputs so holding down a key doesn't trigger 15 misses
         const now = Date.now()
-        if (lastWrongTimeRef.current.key === pressed && now - lastWrongTimeRef.current.time < 300) {
+        // If user is just releasing the key from the previous hold attack, silently ignore
+        if (lastHoldKeyRef.current.key === pressed && now < lastHoldKeyRef.current.expiresAt) {
+          return
+        }
+
+        // Debounce repeated wrong inputs so holding down a key doesn't trigger multiple misses
+        if (lastWrongTimeRef.current.key === pressed && now - lastWrongTimeRef.current.time < 350) {
           return
         }
         lastWrongTimeRef.current = { key: pressed, time: now }
@@ -128,7 +144,6 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         if (settings.sound) playSynthTone(220, "sawtooth", 0.12) // A3 buzz
 
         // NOTE: We do NOT advance stepIndex on wrong key!
-        // Advancing on wrong key caused held keys to skip and fail all subsequent skills in a cascade.
       }
     },
     [isPlaying, currentStep, remainingCount, steps.length, settings.sound, isRuLocale, triggerFeedback],
@@ -137,16 +152,20 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   // Listen to companion WebSocket events
   const handleCompanionInput = useCallback(
     (e: TrainerInputEvent) => {
+      if (e.action !== "down") return
+
       const norm = normalizeKeyInput(e.key)
-      if (e.action === "down") {
-        if (heldKeysRef.current.has(norm)) {
-          return // Drop OS auto-repeats while held
-        }
-        heldKeysRef.current.add(norm)
-        handleKeyHit(norm)
-      } else if (e.action === "up") {
-        heldKeysRef.current.delete(norm)
+      if (!norm) return
+
+      const now = Date.now()
+      const last = lastPressTimeRef.current[norm] || 0
+      // Drop rapid OS repeats under 80ms
+      if (now - last < 80) {
+        return
       }
+      lastPressTimeRef.current[norm] = now
+
+      handleKeyHit(norm)
     },
     [handleKeyHit],
   )
@@ -161,14 +180,14 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     function onKeyDown(e: KeyboardEvent) {
       if (showRemap || e.repeat) return
       const norm = normalizeKeyInput(e.key === " " ? "space" : e.key)
-      if (heldKeysRef.current.has(norm)) return
-      heldKeysRef.current.add(norm)
-      handleKeyHit(norm)
-    }
+      if (!norm) return
 
-    function onKeyUp(e: KeyboardEvent) {
-      const norm = normalizeKeyInput(e.key === " " ? "space" : e.key)
-      heldKeysRef.current.delete(norm)
+      const now = Date.now()
+      const last = lastPressTimeRef.current[norm] || 0
+      if (now - last < 80) return
+      lastPressTimeRef.current[norm] = now
+
+      handleKeyHit(norm)
     }
 
     function onMouseDown(e: MouseEvent) {
@@ -176,27 +195,20 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       let btn = "lclick"
       if (e.button === 2) btn = "rclick"
       else if (e.button === 1) btn = "mclick"
-      if (heldKeysRef.current.has(btn)) return
-      heldKeysRef.current.add(btn)
+
+      const now = Date.now()
+      const last = lastPressTimeRef.current[btn] || 0
+      if (now - last < 80) return
+      lastPressTimeRef.current[btn] = now
+
       handleKeyHit(btn)
     }
 
-    function onMouseUp(e: MouseEvent) {
-      let btn = "lclick"
-      if (e.button === 2) btn = "rclick"
-      else if (e.button === 1) btn = "mclick"
-      heldKeysRef.current.delete(btn)
-    }
-
     window.addEventListener("keydown", onKeyDown)
-    window.addEventListener("keyup", onKeyUp)
     window.addEventListener("mousedown", onMouseDown)
-    window.addEventListener("mouseup", onMouseUp)
     return () => {
       window.removeEventListener("keydown", onKeyDown)
-      window.removeEventListener("keyup", onKeyUp)
       window.removeEventListener("mousedown", onMouseDown)
-      window.removeEventListener("mouseup", onMouseUp)
     }
   }, [handleKeyHit, showRemap])
 
