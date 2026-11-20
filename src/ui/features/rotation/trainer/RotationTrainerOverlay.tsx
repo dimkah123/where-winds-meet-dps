@@ -52,6 +52,8 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   const [isPlaying, setIsPlaying] = useState(true)
   const [hasStarted, setHasStarted] = useState(false)
   const [showRemap, setShowRemap] = useState(false)
+  const [remapRecordedKey, setRemapRecordedKey] = useState<{ key: string; time: number } | null>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
   const [timingProgress, setTimingProgress] = useState(0)
   const [feedback, setFeedback] = useState<{
     text: string
@@ -210,6 +212,11 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       const norm = normalizeKeyInput(e.key)
       if (!norm) return
 
+      if (showRemap) {
+        setRemapRecordedKey({ key: norm, time: Date.now() })
+        return
+      }
+
       const now = Date.now()
       const last = lastPressTimeRef.current[norm] || 0
       // Drop rapid OS repeats under 80ms
@@ -220,7 +227,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
       handleKeyHit(norm)
     },
-    [handleKeyHit],
+    [handleKeyHit, showRemap],
   )
 
   const { isConnected, isAdmin } = useCompanionSocket({
@@ -228,12 +235,25 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     enabled: true,
   })
 
-  // Direct keyboard/mouse listeners inside the window (works when window has focus)
+  // Direct keyboard/mouse listeners inside the window (works in PiP & main window)
   useEffect(() => {
+    function getButtonName(button: number): string {
+      if (button === 2) return "rclick"
+      if (button === 1) return "mclick"
+      if (button === 3) return "mouse4"
+      if (button === 4) return "mouse5"
+      return "lclick"
+    }
+
     function onKeyDown(e: KeyboardEvent) {
-      if (showRemap || e.repeat) return
+      if (e.repeat) return
       const norm = normalizeKeyInput(e.key === " " ? "space" : e.key)
       if (!norm) return
+
+      if (showRemap) {
+        setRemapRecordedKey({ key: norm, time: Date.now() })
+        return
+      }
 
       const now = Date.now()
       const last = lastPressTimeRef.current[norm] || 0
@@ -244,15 +264,15 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     }
 
     function onMouseDown(e: MouseEvent) {
-      if (showRemap) return
-      let btn = "lclick"
-      if (e.button === 2) btn = "rclick"
-      else if (e.button === 1) btn = "mclick"
-      else if (e.button === 3) btn = "mouse4"
-      else if (e.button === 4) btn = "mouse5"
-
       if (e.button === 3 || e.button === 4) {
         e.preventDefault()
+      }
+
+      const btn = getButtonName(e.button)
+
+      if (showRemap) {
+        setRemapRecordedKey({ key: btn, time: Date.now() })
+        return
       }
 
       const now = Date.now()
@@ -269,13 +289,24 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       }
     }
 
-    window.addEventListener("keydown", onKeyDown)
-    window.addEventListener("mousedown", onMouseDown)
-    window.addEventListener("auxclick", onAuxClick)
+    const doc = rootRef.current?.ownerDocument || document
+    const win = doc.defaultView || window
+
+    const targets: (EventTarget | null)[] = [doc, win, document, window]
+    const cleanTargets = targets.filter((t, i, arr): t is EventTarget => Boolean(t) && arr.indexOf(t) === i)
+
+    for (const target of cleanTargets) {
+      target.addEventListener("keydown", onKeyDown as EventListener)
+      target.addEventListener("mousedown", onMouseDown as EventListener)
+      target.addEventListener("auxclick", onAuxClick as EventListener)
+    }
+
     return () => {
-      window.removeEventListener("keydown", onKeyDown)
-      window.removeEventListener("mousedown", onMouseDown)
-      window.removeEventListener("auxclick", onAuxClick)
+      for (const target of cleanTargets) {
+        target.removeEventListener("keydown", onKeyDown as EventListener)
+        target.removeEventListener("mousedown", onMouseDown as EventListener)
+        target.removeEventListener("auxclick", onAuxClick as EventListener)
+      }
     }
   }, [handleKeyHit, showRemap])
 
@@ -361,7 +392,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   }
 
   return (
-    <div className={styles.overlayRoot}>
+    <div ref={rootRef} className={styles.overlayRoot}>
       {/* Top Header Bar */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
@@ -553,8 +584,12 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         <KeyRemapDialog
           keyMap={settings.keyMap}
           onChange={handleKeyMapChange}
-          onClose={() => setShowRemap(false)}
+          onClose={() => {
+            setShowRemap(false)
+            setRemapRecordedKey(null)
+          }}
           isConnected={isConnected}
+          recordedKey={remapRecordedKey}
         />
       )}
     </div>

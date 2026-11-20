@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useI18n } from "../../../../i18n/i18nContext"
 import { Dialog, DialogBody, DialogFooter, DialogHeader } from "../../../components/dialog/Dialog"
 import { DEFAULT_KEY_MAP } from "./trainerStorage"
@@ -11,6 +11,7 @@ interface Props {
   onChange: (next: TrainerKeyMap) => void
   onClose: () => void
   isConnected?: boolean
+  recordedKey?: { key: string; time: number } | null
 }
 
 type KeyAction = keyof TrainerKeyMap
@@ -85,14 +86,50 @@ const ACTIONS: ActionDef[] = [
   },
 ]
 
-export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false }: Props) {
+export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false, recordedKey }: Props) {
   const { t, locale } = useI18n()
   const isRuLocale = locale === "ru"
   const [draft, setDraft] = useState<TrainerKeyMap>({ ...keyMap })
   const [recordingAction, setRecordingAction] = useState<KeyAction | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const justRecordedRef = useRef(0)
 
+  const applyKey = useCallback(
+    (actionKey: KeyAction, rawKey: string) => {
+      let keyName = normalizeKeyInput(rawKey)
+      if (!keyName) return
+      if (keyName === " ") keyName = "space"
+      if (keyName === "escape") {
+        setRecordingAction(null)
+        return
+      }
+
+      justRecordedRef.current = Date.now()
+      setDraft((prev) => ({ ...prev, [actionKey]: keyName }))
+      setRecordingAction(null)
+    },
+    [],
+  )
+
+  // 1. Companion / Global in-game inputs
+  useEffect(() => {
+    if (!recordingAction || !recordedKey) return
+    applyKey(recordingAction, recordedKey.key)
+  }, [recordingAction, recordedKey, applyKey])
+
+  // 2. Direct DOM keyboard & mouse inputs inside the dialog (works in PiP & main window)
   useEffect(() => {
     if (!recordingAction) return
+
+    const startTime = Date.now()
+
+    function getButtonName(button: number): string {
+      if (button === 2) return "rclick"
+      if (button === 1) return "mclick"
+      if (button === 3) return "mouse4"
+      if (button === 4) return "mouse5"
+      return "lclick"
+    }
 
     function handleKeyDown(e: KeyboardEvent) {
       e.preventDefault()
@@ -102,41 +139,54 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false 
         return
       }
 
-      let keyName = e.key.toLowerCase()
-      keyName = normalizeKeyInput(keyName)
-      if (keyName === " ") keyName = "space"
-
-      setDraft((prev) => ({ ...prev, [recordingAction!]: keyName }))
-      setRecordingAction(null)
+      applyKey(recordingAction!, e.key)
     }
 
     function handleMouseDown(e: MouseEvent) {
+      // Ignore click that started recording
+      if (Date.now() - startTime < 120) return
+
       e.preventDefault()
       e.stopPropagation()
-      let btn = "lclick"
-      if (e.button === 2) btn = "rclick"
-      else if (e.button === 1) btn = "mclick"
-      else if (e.button === 3) btn = "mouse4"
-      else if (e.button === 4) btn = "mouse5"
-
-      setDraft((prev) => ({ ...prev, [recordingAction!]: btn }))
-      setRecordingAction(null)
+      const btn = getButtonName(e.button)
+      applyKey(recordingAction!, btn)
     }
 
     function handleAuxClick(e: MouseEvent) {
       e.preventDefault()
       e.stopPropagation()
+      if (Date.now() - startTime < 120) return
+      const btn = getButtonName(e.button)
+      applyKey(recordingAction!, btn)
     }
 
-    window.addEventListener("keydown", handleKeyDown, { capture: true })
-    window.addEventListener("mousedown", handleMouseDown, { capture: true })
-    window.addEventListener("auxclick", handleAuxClick, { capture: true })
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown, { capture: true })
-      window.removeEventListener("mousedown", handleMouseDown, { capture: true })
-      window.removeEventListener("auxclick", handleAuxClick, { capture: true })
+    function handleContextMenu(e: MouseEvent) {
+      e.preventDefault()
+      e.stopPropagation()
     }
-  }, [recordingAction])
+
+    const doc = containerRef.current?.ownerDocument || document
+    const win = doc.defaultView || window
+
+    const targets: (EventTarget | null)[] = [doc, win, document, window]
+    const cleanTargets = targets.filter((t, i, arr): t is EventTarget => Boolean(t) && arr.indexOf(t) === i)
+
+    for (const target of cleanTargets) {
+      target.addEventListener("keydown", handleKeyDown as EventListener, { capture: true })
+      target.addEventListener("mousedown", handleMouseDown as EventListener, { capture: true })
+      target.addEventListener("auxclick", handleAuxClick as EventListener, { capture: true })
+      target.addEventListener("contextmenu", handleContextMenu as EventListener, { capture: true })
+    }
+
+    return () => {
+      for (const target of cleanTargets) {
+        target.removeEventListener("keydown", handleKeyDown as EventListener, { capture: true })
+        target.removeEventListener("mousedown", handleMouseDown as EventListener, { capture: true })
+        target.removeEventListener("auxclick", handleAuxClick as EventListener, { capture: true })
+        target.removeEventListener("contextmenu", handleContextMenu as EventListener, { capture: true })
+      }
+    }
+  }, [recordingAction, applyKey])
 
   function handleSave() {
     onChange(draft)
@@ -164,7 +214,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false 
       </DialogHeader>
 
       <DialogBody className={styles.body}>
-        <div className={styles.grid}>
+        <div ref={containerRef} className={styles.grid}>
           {ACTIONS.map((action) => {
             const isRecording = recordingAction === action.key
             const currentValue = draft[action.key] ?? DEFAULT_KEY_MAP[action.key] ?? ""
@@ -179,8 +229,13 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false 
 
                 <button
                   type="button"
+                  tabIndex={0}
                   className={`${styles.keyButton} ${isRecording ? styles.recording : ""}`}
-                  onClick={() => setRecordingAction(action.key)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (Date.now() - justRecordedRef.current < 250) return
+                    setRecordingAction((prev) => (prev === action.key ? null : action.key))
+                  }}
                 >
                   {isRecording ? (
                     <span className={styles.pressKeyHint}>

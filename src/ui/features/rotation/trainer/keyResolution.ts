@@ -43,7 +43,10 @@ export const RU_TO_EN_KEY_MAP: Record<string, string> = {
 }
 
 export function normalizeKeyInput(key: string): string {
+  if (!key) return ""
+  if (key === " ") return "space"
   const lower = key.toLowerCase().trim()
+  if (lower === "space") return "space"
   if (lower === "`" || lower === "~" || lower === "ё" || lower === "grave" || lower === "tilde") {
     return "~"
   }
@@ -63,6 +66,9 @@ export function formatKeyDisplay(key: string, isRuLocale = false): string {
   if (norm === "space") return isRuLocale ? "Пробел" : "Space"
   if (norm === "shift") return "Shift"
   if (norm === "tab") return "Tab"
+  if (norm === "ctrl" || norm === "control") return "Ctrl"
+  if (norm === "alt") return "Alt"
+  if (norm === "caps" || norm === "capslock") return "Caps"
 
   const EN_TO_RU: Record<string, string> = {
     q: "Й",

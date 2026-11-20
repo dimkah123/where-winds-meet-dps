@@ -1,4 +1,4 @@
-import { useEffect, useId, type ReactNode, type RefObject } from "react"
+import { useEffect, useId, useRef, type ReactNode, type RefObject } from "react"
 import styles from "./Dialog.module.scss"
 
 export type DialogLayer = "wizard" | "dialog" | "confirm"
@@ -31,6 +31,7 @@ export function Dialog({
   children,
 }: DialogProps) {
   const dialogId = useId()
+  const overlayRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     openDialogIds.push(dialogId)
@@ -53,12 +54,23 @@ export function Dialog({
       event.preventDefault()
       closeOnEscape()
     }
-    document.addEventListener("keydown", onKey)
-    return () => document.removeEventListener("keydown", onKey)
+
+    const doc = overlayRef.current?.ownerDocument || document
+    doc.addEventListener("keydown", onKey)
+    if (doc !== document) {
+      document.addEventListener("keydown", onKey)
+    }
+    return () => {
+      doc.removeEventListener("keydown", onKey)
+      if (doc !== document) {
+        document.removeEventListener("keydown", onKey)
+      }
+    }
   }, [onClose, dialogId])
 
   return (
     <div
+      ref={overlayRef}
       className={`${styles.overlay} ${LAYER_CLASS[layer]}`}
       role="dialog"
       aria-modal="true"
