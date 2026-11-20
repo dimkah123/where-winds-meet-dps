@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { useI18n } from "../../../../i18n/i18nContext"
 import type { RotationCast } from "../../../../engine/types"
 import type { ParsedRotationToken } from "../readableRotation"
-import { buildTrainerSteps, formatKeyDisplay } from "./keyResolution"
+import { buildTrainerSteps, formatKeyDisplay, normalizeKeyInput } from "./keyResolution"
 import { KeyRemapDialog } from "./KeyRemapDialog"
 import {
   loadTrainerSettings,
@@ -40,7 +40,8 @@ function playSynthTone(freq: number, type: OscillatorType = "sine", duration = 0
 }
 
 export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }: Props) {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
+  const isRuLocale = locale === "ru"
   const [settings, setSettings] = useState(() => loadTrainerSettings())
   const [stepIndex, setStepIndex] = useState(0)
   const [remainingCount, setRemainingCount] = useState(1)
@@ -58,8 +59,8 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   } | null>(null)
 
   const steps: TrainerStep[] = useMemo(
-    () => buildTrainerSteps(tokens, settings.keyMap, casts),
-    [tokens, settings.keyMap, casts],
+    () => buildTrainerSteps(tokens, settings.keyMap, casts, isRuLocale),
+    [tokens, settings.keyMap, casts, isRuLocale],
   )
 
   const currentStep = steps[stepIndex] ?? steps[0]
@@ -82,12 +83,11 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     (pressedKey: string) => {
       if (!isPlaying || !currentStep) return
 
-      const expected = currentStep.expectedKey.toLowerCase()
-      const pressed = pressedKey.toLowerCase()
+      const expected = normalizeKeyInput(currentStep.expectedKey)
+      const pressed = normalizeKeyInput(pressedKey)
 
       const isMatch =
         pressed === expected ||
-        (expected === "~" && (pressed === "`" || pressed === "ё")) ||
         (expected === "lclick" && pressed === "lclick") ||
         (expected === "rclick" && pressed === "rclick")
 
@@ -232,7 +232,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   const visibleSteps = useMemo(() => {
     if (!steps.length) return []
     const list: Array<{ step: TrainerStep; relativeIdx: number; realIdx: number }> = []
-    for (let r = -1; r <= 4; r++) {
+    for (let r = -1; r <= 14; r++) {
       const idx = stepIndex + r
       if (idx >= 0 && idx < steps.length) {
         list.push({ step: steps[idx], relativeIdx: r, realIdx: idx })

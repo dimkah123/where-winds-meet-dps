@@ -2,47 +2,120 @@ import type { TrainerKeyMap, TrainerStep } from "./types"
 import type { ParsedRotationToken } from "../readableRotation"
 import type { RotationCast } from "../../../../engine/types"
 
-export function formatKeyDisplay(key: string): string {
-  const norm = key.toLowerCase()
-  if (norm === "lclick") return "LClick"
-  if (norm === "rclick") return "RClick"
-  if (norm === "mclick") return "MClick"
-  if (norm === "~" || norm === "`") return "~"
-  if (norm === "space") return "Space"
+/**
+ * Maps Russian keyboard layout keys (ЙЦУКЕН) to standard English physical keys (QWERTY).
+ */
+export const RU_TO_EN_KEY_MAP: Record<string, string> = {
+  й: "q",
+  ц: "w",
+  у: "e",
+  к: "r",
+  е: "t",
+  н: "y",
+  г: "u",
+  ш: "i",
+  щ: "o",
+  з: "p",
+  х: "[",
+  ъ: "]",
+  ф: "a",
+  ы: "s",
+  в: "d",
+  а: "f",
+  п: "g",
+  р: "h",
+  о: "j",
+  л: "k",
+  д: "l",
+  ж: ";",
+  э: "'",
+  я: "z",
+  ч: "x",
+  с: "c",
+  м: "v",
+  и: "b",
+  т: "n",
+  ь: "m",
+  б: ",",
+  ю: ".",
+  ё: "~",
+  "`": "~",
+}
+
+export function normalizeKeyInput(key: string): string {
+  const lower = key.toLowerCase().trim()
+  if (lower === "`" || lower === "~" || lower === "ё" || lower === "grave" || lower === "tilde") {
+    return "~"
+  }
+  return RU_TO_EN_KEY_MAP[lower] ?? lower
+}
+
+export function formatKeyDisplay(key: string, isRuLocale = false): string {
+  const norm = normalizeKeyInput(key)
+  if (norm === "lclick") return isRuLocale ? "ЛКМ" : "LClick"
+  if (norm === "rclick") return isRuLocale ? "ПКМ" : "RClick"
+  if (norm === "mclick") return isRuLocale ? "СКМ" : "MClick"
+  if (norm === "~") return isRuLocale ? "~ (Ё)" : "~"
+  if (norm === "space") return isRuLocale ? "Пробел" : "Space"
   if (norm === "shift") return "Shift"
   if (norm === "tab") return "Tab"
-  return norm.toUpperCase()
+
+  const EN_TO_RU: Record<string, string> = {
+    q: "Й",
+    w: "Ц",
+    e: "У",
+    r: "К",
+    t: "Е",
+    a: "Ф",
+    s: "Ы",
+    d: "В",
+    f: "А",
+    z: "Я",
+    x: "Ч",
+    c: "С",
+    v: "М",
+  }
+
+  const upper = norm.toUpperCase()
+  if (isRuLocale && EN_TO_RU[norm]) {
+    return `${upper} (${EN_TO_RU[norm]})`
+  }
+  return upper
 }
 
 export function resolveSkillKey(
   cleanName: string,
   keyMap: TrainerKeyMap,
+  isRuLocale = false,
 ): { key: string; label: string } {
   const norm = cleanName.toLowerCase()
 
   // 1. Weapon swap
   if (norm.includes("tab") || norm.includes("swap")) {
-    return { key: keyMap.swap, label: formatKeyDisplay(keyMap.swap) }
+    return { key: keyMap.swap, label: formatKeyDisplay(keyMap.swap, isRuLocale) }
   }
 
   // 2. Heavy / Charged attack
   if (norm.includes("charged") || norm.includes("heavy") || norm.includes("hold")) {
-    return { key: keyMap.heavy, label: `${formatKeyDisplay(keyMap.heavy)} (Hold)` }
+    return {
+      key: keyMap.heavy,
+      label: `${formatKeyDisplay(keyMap.heavy, isRuLocale)} ${isRuLocale ? "(Удерж.)" : "(Hold)"}`,
+    }
   }
 
   // 3. Stance / Special skill (e.g. Mo Special, Heng Special) -> '~'
   if (norm.includes("special") || norm.includes("stance")) {
-    return { key: keyMap.skill1, label: formatKeyDisplay(keyMap.skill1) }
+    return { key: keyMap.skill1, label: formatKeyDisplay(keyMap.skill1, isRuLocale) }
   }
 
   // 4. Varied combo (e.g. Heng VC, Mo VC)
   if (norm.includes("vc") || norm.includes("varied")) {
-    return { key: keyMap.varied, label: formatKeyDisplay(keyMap.varied) }
+    return { key: keyMap.varied, label: formatKeyDisplay(keyMap.varied, isRuLocale) }
   }
 
   // 5. Light combo / attack (e.g. Heng LC, Mo LC)
   if (norm.includes("lc") || norm.includes("light") || norm.includes("slash")) {
-    return { key: keyMap.light, label: formatKeyDisplay(keyMap.light) }
+    return { key: keyMap.light, label: formatKeyDisplay(keyMap.light, isRuLocale) }
   }
 
   // 6. Mystic / Flute skills
@@ -52,31 +125,32 @@ export function resolveSkillKey(
     norm.includes("mystic") ||
     norm.includes("cancel")
   ) {
-    return { key: keyMap.mystic, label: formatKeyDisplay(keyMap.mystic) }
+    return { key: keyMap.mystic, label: formatKeyDisplay(keyMap.mystic, isRuLocale) }
   }
 
   // 7. Q skills (e.g. Heng Q, Heng Q2, Heng Q Stab, Mo QQ)
   if (norm.includes("q")) {
-    return { key: keyMap.skill2, label: formatKeyDisplay(keyMap.skill2) }
+    return { key: keyMap.skill2, label: formatKeyDisplay(keyMap.skill2, isRuLocale) }
   }
 
   // Default fallback to skill 2 (Q)
-  return { key: keyMap.skill2, label: formatKeyDisplay(keyMap.skill2) }
+  return { key: keyMap.skill2, label: formatKeyDisplay(keyMap.skill2, isRuLocale) }
 }
 
 export function buildTrainerSteps(
   tokens: ParsedRotationToken[],
   keyMap: TrainerKeyMap,
   casts?: RotationCast[],
+  isRuLocale = false,
 ): TrainerStep[] {
   return tokens.map((token, index) => {
-    const keyInfo = resolveSkillKey(token.cleanName, keyMap)
+    const keyInfo = resolveSkillKey(token.cleanName, keyMap, isRuLocale)
     const matchingCast = casts ? casts.find((c) => c.stepIndex === index || c.skillName === token.skillName) : undefined
     return {
       id: `${index}-${token.cleanName}`,
       rawName: token.raw,
       cleanName: token.cleanName,
-      expectedKey: keyInfo.key.toLowerCase(),
+      expectedKey: normalizeKeyInput(keyInfo.key),
       expectedKeyLabel: keyInfo.label,
       multiplier: Math.max(1, token.multiplier || 1),
       remainingCount: Math.max(1, token.multiplier || 1),

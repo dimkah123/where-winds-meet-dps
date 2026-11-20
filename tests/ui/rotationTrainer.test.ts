@@ -3,6 +3,7 @@ import {
   formatKeyDisplay,
   resolveSkillKey,
   buildTrainerSteps,
+  normalizeKeyInput,
 } from "../../src/ui/features/rotation/trainer/keyResolution"
 import {
   DEFAULT_KEY_MAP,
@@ -10,6 +11,23 @@ import {
 } from "../../src/ui/features/rotation/trainer/trainerStorage"
 
 describe("Rotation Trainer Key Resolution", () => {
+  it("normalizes Russian keyboard layout keys to English physical keys", () => {
+    expect(normalizeKeyInput("й")).toBe("q")
+    expect(normalizeKeyInput("Й")).toBe("q")
+    expect(normalizeKeyInput("к")).toBe("r")
+    expect(normalizeKeyInput("К")).toBe("r")
+    expect(normalizeKeyInput("у")).toBe("e")
+    expect(normalizeKeyInput("У")).toBe("e")
+    expect(normalizeKeyInput("а")).toBe("f")
+    expect(normalizeKeyInput("А")).toBe("f")
+    expect(normalizeKeyInput("ё")).toBe("~")
+    expect(normalizeKeyInput("Ё")).toBe("~")
+    expect(normalizeKeyInput("`")).toBe("~")
+    expect(normalizeKeyInput("~")).toBe("~")
+    expect(normalizeKeyInput("q")).toBe("q")
+    expect(normalizeKeyInput("r")).toBe("r")
+  })
+
   it("resolves default user keys for skills accurately", () => {
     expect(resolveSkillKey("Mo Special", DEFAULT_KEY_MAP)).toEqual({
       key: "~",
@@ -76,6 +94,15 @@ describe("Rotation Trainer Key Resolution", () => {
     expect(formatKeyDisplay("space")).toBe("Space")
     expect(formatKeyDisplay("~")).toBe("~")
     expect(formatKeyDisplay("q")).toBe("Q")
+
+    // Russian locale display
+    expect(formatKeyDisplay("lclick", true)).toBe("ЛКМ")
+    expect(formatKeyDisplay("rclick", true)).toBe("ПКМ")
+    expect(formatKeyDisplay("~", true)).toBe("~ (Ё)")
+    expect(formatKeyDisplay("q", true)).toBe("Q (Й)")
+    expect(formatKeyDisplay("r", true)).toBe("R (К)")
+    expect(formatKeyDisplay("e", true)).toBe("E (У)")
+    expect(formatKeyDisplay("f", true)).toBe("F (А)")
   })
 
   it("builds trainer steps with multipliers and remaining counts", () => {

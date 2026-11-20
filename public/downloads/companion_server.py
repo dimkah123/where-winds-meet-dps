@@ -96,11 +96,19 @@ def frame_ws_message(payload_str: str) -> bytes:
     return header + data
 
 
+RU_TO_EN = {
+    "й": "q", "ц": "w", "у": "e", "к": "r", "е": "t", "н": "y", "г": "u", "ш": "i", "щ": "o", "з": "p",
+    "х": "[", "ъ": "]", "ф": "a", "ы": "s", "в": "d", "а": "f", "п": "g", "р": "h", "о": "j", "л": "k",
+    "д": "l", "ж": ";", "э": "'", "я": "z", "ч": "x", "с": "c", "м": "v", "и": "b", "т": "n", "ь": "m",
+    "б": ",", "ю": ".", "ё": "~", "`": "~",
+}
+
+
 def normalize_key(name: str) -> str:
     n = name.lower().strip()
     if n in ("`", "~", "grave", "tilde", "ё"):
         return "~"
-    return n
+    return RU_TO_EN.get(n, n)
 
 
 def on_keyboard_event(e):

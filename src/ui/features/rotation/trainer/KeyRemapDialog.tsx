@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { useI18n } from "../../../../i18n/i18nContext"
 import { Dialog, DialogBody, DialogFooter, DialogHeader } from "../../../components/dialog/Dialog"
 import { DEFAULT_KEY_MAP } from "./trainerStorage"
-import { formatKeyDisplay } from "./keyResolution"
+import { formatKeyDisplay, normalizeKeyInput } from "./keyResolution"
 import type { TrainerKeyMap } from "./types"
 import styles from "./KeyRemapDialog.module.scss"
 
@@ -74,7 +74,8 @@ const ACTIONS: ActionDef[] = [
 ]
 
 export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false }: Props) {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
+  const isRuLocale = locale === "ru"
   const [draft, setDraft] = useState<TrainerKeyMap>({ ...keyMap })
   const [recordingAction, setRecordingAction] = useState<KeyAction | null>(null)
 
@@ -90,7 +91,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false 
       }
 
       let keyName = e.key.toLowerCase()
-      if (keyName === "`" || keyName === "~" || keyName === "ё") keyName = "~"
+      keyName = normalizeKeyInput(keyName)
       if (keyName === " ") keyName = "space"
 
       setDraft((prev) => ({ ...prev, [recordingAction!]: keyName }))
@@ -165,7 +166,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false 
                       {t("trainer.settings.pressKey", "Press any key...")}
                     </span>
                   ) : (
-                    <span className={styles.keyBadge}>{formatKeyDisplay(currentValue)}</span>
+                    <span className={styles.keyBadge}>{formatKeyDisplay(currentValue, isRuLocale)}</span>
                   )}
                 </button>
               </div>
