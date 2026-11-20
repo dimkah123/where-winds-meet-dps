@@ -16,4 +16,6 @@ scripts/*
 public/ocr/
 eng.traineddata
 _worker.bundle
+__pycache__/
+*.pyc
 
