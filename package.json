@@ -8,6 +8,7 @@
   },
   "packageManager": "pnpm@10.33.0",
   "scripts": {
+    "companion": "python companion/companion_server.py",
     "dev": "node scripts/generateVersion.mjs && node scripts/copyOcrAssets.mjs && vite",
     "build": "node scripts/generateVersion.mjs && node scripts/copyOcrAssets.mjs && tsc -b && vite build",
     "preview": "vite preview",

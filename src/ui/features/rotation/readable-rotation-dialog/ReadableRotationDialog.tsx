@@ -1,4 +1,5 @@
 import { useId, useMemo, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { Dialog, DialogBody, DialogFooter, DialogHeader } from "../../../components/dialog/Dialog"
 import { useI18n } from "../../../../i18n/i18nContext"
 import type { Skill } from "../../../../engine/skill"
@@ -10,6 +11,8 @@ import {
   parseReadableRotation,
   type SkillSuggestion,
 } from "../readableRotation"
+import { useDocumentPictureInPicture } from "../trainer/useDocumentPictureInPicture"
+import { RotationTrainerOverlay } from "../trainer/RotationTrainerOverlay"
 import styles from "./ReadableRotationDialog.module.scss"
 
 interface Props {
@@ -37,6 +40,7 @@ export function ReadableRotationDialog({
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [activeSuggestionIdx, setActiveSuggestionIdx] = useState(0)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const { pipWindow, openPip, closePip } = useDocumentPictureInPicture()
 
   const availableSuggestions = useMemo(
     () => getAvailableSkillSuggestions(classId, skillsById),
@@ -414,6 +418,21 @@ export function ReadableRotationDialog({
         <button type="button" className="btn" onClick={handleCopy}>
           {t("common.copy")}
         </button>
+        <button
+          type="button"
+          className="btn"
+          disabled={parsed.totalSteps === 0}
+          onClick={() =>
+            openPip({
+              width: 620,
+              height: 220,
+              title: `WWM Trainer — ${title}`,
+            })
+          }
+          title={t("trainer.openPipTooltip")}
+        >
+          🎮 {t("trainer.pipButton")}
+        </button>
         {onApply && (
           <button
             type="button"
@@ -425,6 +444,16 @@ export function ReadableRotationDialog({
           </button>
         )}
       </DialogFooter>
+
+      {pipWindow &&
+        createPortal(
+          <RotationTrainerOverlay
+            tokens={parsed.tokens.filter((tok) => tok.valid)}
+            rotationTitle={title}
+            onClose={closePip}
+          />,
+          pipWindow.document.body,
+        )}
     </Dialog>
   )
 }
