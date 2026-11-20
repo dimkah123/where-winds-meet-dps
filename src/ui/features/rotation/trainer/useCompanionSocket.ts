@@ -10,6 +10,7 @@ interface UseCompanionSocketOptions {
 
 export function useCompanionSocket({ onInput, enabled = true }: UseCompanionSocketOptions = {}) {
   const [isConnected, setIsConnected] = useState(false)
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
   const [lastEvent, setLastEvent] = useState<TrainerInputEvent | null>(null)
   const wsRef = useRef<WebSocket | null>(null)
   const onInputRef = useRef(onInput)
@@ -33,7 +34,11 @@ export function useCompanionSocket({ onInput, enabled = true }: UseCompanionSock
       socket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data)
-          if (data && data.type === "input") {
+          if (data && data.type === "status") {
+            if (typeof data.isAdmin === "boolean") {
+              setIsAdmin(data.isAdmin)
+            }
+          } else if (data && data.type === "input") {
             const inputEvent = data as TrainerInputEvent
             setLastEvent(inputEvent)
             onInputRef.current?.(inputEvent)
@@ -45,14 +50,17 @@ export function useCompanionSocket({ onInput, enabled = true }: UseCompanionSock
 
       socket.onclose = () => {
         setIsConnected(false)
+        setIsAdmin(null)
         wsRef.current = null
       }
 
       socket.onerror = () => {
         setIsConnected(false)
+        setIsAdmin(null)
       }
     } catch {
       setIsConnected(false)
+      setIsAdmin(null)
     }
   }, [enabled])
 
@@ -84,6 +92,7 @@ export function useCompanionSocket({ onInput, enabled = true }: UseCompanionSock
 
   return {
     isConnected,
+    isAdmin,
     lastEvent,
     reconnect: connect,
   }

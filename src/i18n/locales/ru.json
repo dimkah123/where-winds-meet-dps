@@ -2993,6 +2993,8 @@
   "talents.talentPoints.soloModeLevel": "Ур. одиночного режима",
   "talents.talentPoints.talentPoints": "Очки талантов",
   "trainer.companionConnected": "Локальный компаньон подключен: глобальный перехват клавиш из игры активен!",
+  "trainer.companionNoAdmin": "Компаньон запущен без прав Администратора: Windows блокирует ввод из окна игры. Перезапустите компаньон от имени Администратора!",
+  "trainer.companionNoAdminShort": "НУЖНЫ ПРАВА АДМИНА",
   "trainer.companionNotRunning": "Компаньон не запущен. Скачайте и запустите его перед тренировкой в игре.",
   "trainer.companionOffline": "Компаньон не подключен. Запустите start-companion.bat для захвата из игры или кликните по окну для ручного ввода.",
   "trainer.companionOfflineShort": "КОМПАНЬОН НЕ ЗАПУЩЕН",

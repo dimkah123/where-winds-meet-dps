@@ -2993,6 +2993,8 @@
   "talents.talentPoints.soloModeLevel": "Solo Mode Lv",
   "talents.talentPoints.talentPoints": "Talent Points",
   "trainer.companionConnected": "Companion connected: Global game input active!",
+  "trainer.companionNoAdmin": "Companion running without Administrator rights: Windows UIPI blocks input from elevated game windows. Run WWM-Companion as Administrator!",
+  "trainer.companionNoAdminShort": "NEED ADMIN RIGHTS",
   "trainer.companionNotRunning": "Companion offline. Download and run it before training in-game.",
   "trainer.companionOffline": "Companion offline. Run start-companion.bat for in-game capture, or focus window for direct typing.",
   "trainer.companionOfflineShort": "COMPANION OFFLINE",

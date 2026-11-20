@@ -170,7 +170,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     [handleKeyHit],
   )
 
-  const { isConnected } = useCompanionSocket({
+  const { isConnected, isAdmin } = useCompanionSocket({
     onInput: handleCompanionInput,
     enabled: true,
   })
@@ -298,21 +298,30 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <div
-            className={`${styles.companionBadge} ${isConnected ? styles.connected : styles.offline}`}
+            className={`${styles.companionBadge} ${
+              !isConnected ? styles.offline : isAdmin === false ? styles.warning : styles.connected
+            }`}
             title={
-              isConnected
-                ? t("trainer.companionConnected", "Companion connected: Global game input active!")
-                : t(
+              !isConnected
+                ? t(
                     "trainer.companionOffline",
                     "Companion offline: Run WWM-Companion.exe or start-companion.bat for in-game capture.",
                   )
+                : isAdmin === false
+                  ? t(
+                      "trainer.companionNoAdmin",
+                      "Companion running without Administrator rights: Windows UIPI blocks input from elevated game windows. Run WWM-Companion as Administrator!",
+                    )
+                  : t("trainer.companionConnected", "Companion connected: Global game input active!")
             }
           >
             <span className={styles.dot} />
             <span className={styles.badgeText}>
-              {isConnected
-                ? t("trainer.inGameHook", "IN-GAME HOOK")
-                : t("trainer.companionOfflineShort", "LOCAL COMPANION OFF")}
+              {!isConnected
+                ? t("trainer.companionOfflineShort", "LOCAL COMPANION OFF")
+                : isAdmin === false
+                  ? t("trainer.companionNoAdminShort", "NEED ADMIN")
+                  : t("trainer.inGameHook", "IN-GAME HOOK")}
             </span>
           </div>
 
