@@ -100,10 +100,7 @@ export function OverviewTab({
 
       <div className={styles.lift}>
         <div className="panel">
-          <div className="panel-head">
-            <h2>{t("overview.gearStatLift")}</h2>
-            <span className="panel-head-meta">{rankingRows.length}</span>
-          </div>
+          <h2>{t("overview.gearStatLift")}</h2>
           <div style={{ opacity: rankingPending ? 0.6 : 1 }}>
             <ItemRankingTable rows={rankingRows} />
           </div>

@@ -72,7 +72,7 @@ export function ItemRankingTable({ rows }: Props) {
 
   return (
     <div className={styles.tableWrapper}>
-      <table className={`ranking-table ranking-table-spaced ${styles.rankingTable}`}>
+      <table className={`ranking-table ${styles.rankingTable}`}>
         <thead>
           <tr>
             <th>{t("overview.itemRankingTable.statLine")}</th>

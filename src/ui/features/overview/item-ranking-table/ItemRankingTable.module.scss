@@ -1,3 +1,7 @@
+.rankingTable {
+  margin-top: 4px;
+}
+
 .rankingTable th:first-child,
 .rankingTable td:first-child {
   text-align: left;
@@ -11,6 +15,9 @@
   font-variant-numeric: tabular-nums;
   text-align: right;
   width: 1%;
+  padding-left: 10px;
+  padding-right: 8px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .rankingTable tbody tr {
