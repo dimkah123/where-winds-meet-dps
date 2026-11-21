@@ -37,7 +37,11 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   const isRuLocale = locale === "ru"
   const [settings, setSettings] = useState(() => loadTrainerSettings())
   const [stepIndex, setStepIndex] = useState(0)
+  const stepIndexRef = useRef(0)
+  stepIndexRef.current = stepIndex
+
   const [remainingCount, setRemainingCount] = useState(1)
+  const remainingCountRef = useRef(1)
   const [combo, setCombo] = useState(0)
   const [maxCombo, setMaxCombo] = useState(0)
   const [hits, setHits] = useState(0)
@@ -119,12 +123,15 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
   const currentStep = steps[stepIndex] ?? steps[0]
 
-  // Sync remainingCount when stepIndex changes
+  // Sync remainingCount when steps change
   useEffect(() => {
-    if (currentStep) {
-      setRemainingCount(currentStep.remainingCount ?? currentStep.multiplier)
+    const step = steps[stepIndexRef.current] ?? steps[0]
+    if (step) {
+      const count = step.remainingCount ?? step.multiplier ?? 1
+      remainingCountRef.current = count
+      setRemainingCount(count)
     }
-  }, [stepIndex, currentStep])
+  }, [steps])
 
   const lastPressTimeRef = useRef<Record<string, number>>({})
   const lastWrongTimeRef = useRef<{ key: string; time: number }>({ key: "", time: 0 })
@@ -168,6 +175,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
   const resetTrainer = useCallback(() => {
     setHasStarted(false)
+    stepIndexRef.current = 0
     setStepIndex(0)
     setCombo(0)
     setHits(0)
@@ -181,7 +189,9 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     bufferedInputRef.current = null
     triggerFeedback(t("trainer.feedback.reset", isRuLocale ? "СБРОС" : "RESET"), "perfect")
     if (settings.sound) playSwitchSound("reset")
-    if (steps[0]) setRemainingCount(steps[0].remainingCount ?? steps[0].multiplier)
+    const firstCount = steps[0]?.remainingCount ?? steps[0]?.multiplier ?? 1
+    remainingCountRef.current = firstCount
+    setRemainingCount(firstCount)
   }, [settings.sound, steps, triggerFeedback, t, isRuLocale])
 
   const handleKeyHit = useCallback(
@@ -233,6 +243,11 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           triggerFeedback(t("trainer.feedback.start", isRuLocale ? "СТАРТ!" : "START!"), "perfect")
           if (settings.sound) playSwitchSound("start")
           lastHitKeyRef.current = { key: expected, time: Date.now() }
+          const nextStep = steps[1]
+          const nextCount = nextStep?.remainingCount ?? nextStep?.multiplier ?? 1
+          remainingCountRef.current = nextCount
+          setRemainingCount(nextCount)
+          stepIndexRef.current = 1
           setStepIndex(1)
           setTimingProgress(0)
         }
@@ -245,7 +260,11 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       const elapsed = now - castStartTime
       const remainingCastMs = castDurationMs - elapsed
 
-      if (!fromBuffer && isCasting && remainingCastMs > 350) {
+      // Only buffer when transitioning from a previous casting skill to a new one.
+      // For multi-hit repetitions of the CURRENT skill (e.g. Mo Charged x4), every hit registers immediately!
+      const isMultiHitRepetition = remainingCountRef.current > 1
+
+      if (!fromBuffer && isCasting && remainingCastMs > 350 && !isMultiHitRepetition) {
         if (isMatch) {
           // User pressed the correct next key, but the character is still mid-cast!
           // Buffer it so it fires right when the cancel window opens!
@@ -272,10 +291,12 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         // Start cast timer & cooldown for the newly executed skill
         startSkillCast(currentStep)
 
-        // Success
-        if (remainingCount > 1) {
-          setRemainingCount((prev) => prev - 1)
-          triggerFeedback(`${remainingCount - 1} ${t("trainer.feedback.left", isRuLocale ? "ост." : "left")}`, "hit")
+        // Success: check synchronous remaining count
+        if (remainingCountRef.current > 1) {
+          remainingCountRef.current -= 1
+          const left = remainingCountRef.current
+          setRemainingCount(left)
+          triggerFeedback(`${left} ${t("trainer.feedback.left", isRuLocale ? "ост." : "left")}`, "hit")
           if (settings.sound) playSwitchSound("subhit")
         } else {
           setHits((h) => h + 1)
@@ -287,14 +308,24 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           triggerFeedback(t("trainer.feedback.perfect", isRuLocale ? "ОТЛИЧНО" : "PERFECT"), "perfect")
           if (settings.sound) playSwitchSound("perfect")
 
-          // Advance step
-          setStepIndex((idx) => {
-            if (idx + 1 < steps.length) {
-              return idx + 1
-            }
+          // Advance step synchronously
+          const currentIdx = stepIndexRef.current
+          const nextIdx = currentIdx + 1
+          if (nextIdx < steps.length) {
+            const nextStep = steps[nextIdx]
+            const nextCount = nextStep?.remainingCount ?? nextStep?.multiplier ?? 1
+            remainingCountRef.current = nextCount
+            setRemainingCount(nextCount)
+            stepIndexRef.current = nextIdx
+            setStepIndex(nextIdx)
+          } else {
             setHasStarted(false)
-            return 0
-          })
+            const firstCount = steps[0]?.remainingCount ?? steps[0]?.multiplier ?? 1
+            remainingCountRef.current = firstCount
+            setRemainingCount(firstCount)
+            stepIndexRef.current = 0
+            setStepIndex(0)
+          }
           setTimingProgress(0)
         }
       } else {
@@ -576,7 +607,14 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           setCombo(0)
           triggerFeedback(t("trainer.feedback.miss", isRuLocale ? "ПРОМАХ" : "MISS"), "wrong")
           if (settings.sound) playSwitchSound("miss")
-          setStepIndex((idx) => (idx + 1 < steps.length ? idx + 1 : 0))
+          setStepIndex((idx) => {
+            const nextIdx = idx + 1 < steps.length ? idx + 1 : 0
+            stepIndexRef.current = nextIdx
+            const count = steps[nextIdx]?.remainingCount ?? steps[nextIdx]?.multiplier ?? 1
+            remainingCountRef.current = count
+            setRemainingCount(count)
+            return nextIdx
+          })
           return 0
         }
         return next
