@@ -6,7 +6,7 @@ export interface PipOptions {
   title?: string
 }
 
-function copyStylesheetsToWindow(targetWin: Window, title: string) {
+export function copyStylesheetsToWindow(targetWin: Window, title: string) {
   try {
     targetWin.document.title = title
     targetWin.document.body.style.margin = "0"

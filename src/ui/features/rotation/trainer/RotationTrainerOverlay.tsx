@@ -53,7 +53,41 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   const [hasStarted, setHasStarted] = useState(false)
   const [showRemap, setShowRemap] = useState(false)
   const [remapRecordedKey, setRemapRecordedKey] = useState<{ key: string; time: number } | null>(null)
+  const prevWindowSizeRef = useRef<{ width: number; height: number } | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
+
+  const openRemapSettings = useCallback(() => {
+    const currentWin = rootRef.current?.ownerDocument?.defaultView || window
+    try {
+      const currentW = currentWin.outerWidth || currentWin.innerWidth || 800
+      const currentH = currentWin.outerHeight || currentWin.innerHeight || 260
+      prevWindowSizeRef.current = { width: currentW, height: currentH }
+
+      // Automatically expand window height if compact (< 500px) so settings fit cleanly
+      if (currentH < 500 && typeof currentWin.resizeTo === "function") {
+        const targetW = Math.max(currentW, 820)
+        currentWin.resizeTo(targetW, 540)
+      }
+    } catch (err) {
+      console.warn("Could not auto-expand trainer window", err)
+    }
+    setShowRemap(true)
+  }, [])
+
+  const closeRemapSettings = useCallback(() => {
+    setShowRemap(false)
+    setRemapRecordedKey(null)
+
+    const currentWin = rootRef.current?.ownerDocument?.defaultView || window
+    try {
+      if (prevWindowSizeRef.current && typeof currentWin.resizeTo === "function") {
+        const { width, height } = prevWindowSizeRef.current
+        currentWin.resizeTo(width, height)
+      }
+    } catch (err) {
+      console.warn("Could not restore trainer window size", err)
+    }
+  }, [])
   const [timingProgress, setTimingProgress] = useState(0)
   const [feedback, setFeedback] = useState<{
     text: string
@@ -480,7 +514,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           <button
             type="button"
             className={styles.iconBtn}
-            onClick={() => setShowRemap(true)}
+            onClick={openRemapSettings}
             title={t("trainer.remapTitle", "Key Remap & Settings")}
           >
             ⚙
@@ -582,10 +616,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         <KeyRemapDialog
           keyMap={settings.keyMap}
           onChange={handleKeyMapChange}
-          onClose={() => {
-            setShowRemap(false)
-            setRemapRecordedKey(null)
-          }}
+          onClose={closeRemapSettings}
           isConnected={isConnected}
           recordedKey={remapRecordedKey}
         />
