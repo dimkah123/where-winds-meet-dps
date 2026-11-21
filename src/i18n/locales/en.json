@@ -3046,7 +3046,7 @@
   "trainer.keys.varied": "Varied Combo (E)",
   "trainer.openPipTooltip": "Launch rotation trainer in Picture-in-Picture floating overlay over the game",
   "trainer.pipButton": "Trainer (PiP)",
-  "trainer.settings.popout": "↗ Pop out",
+  "trainer.settings.popout": "Pop out",
   "trainer.settings.poppedOutHint": "Settings dialog is open in a separate window. You can move it to another monitor.",
   "trainer.settings.pressKey": "Press any key...",
   "trainer.settings.restoreInline": "Dock back",

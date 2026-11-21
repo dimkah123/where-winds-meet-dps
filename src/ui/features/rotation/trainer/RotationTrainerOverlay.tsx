@@ -8,6 +8,17 @@ import {
   loadTrainerSettings,
   saveTrainerSettings,
 } from "./trainerStorage"
+import {
+  CloseIcon,
+  DownloadIcon,
+  FlameIcon,
+  GearIcon,
+  PauseIcon,
+  PlayIcon,
+  ResetIcon,
+  StopwatchIcon,
+  TargetIcon,
+} from "./TrainerIcons"
 import type { TrainerInputEvent, TrainerKeyMap, TrainerMode, TrainerStep } from "./types"
 import { useCompanionSocket } from "./useCompanionSocket"
 import styles from "./RotationTrainerOverlay.module.scss"
@@ -466,7 +477,8 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
                 "Download WWM-Companion.exe to track keys in-game",
               )}
             >
-              📥 {t("trainer.downloadExeShort", "Download .exe")}
+              <DownloadIcon className={styles.btnIcon} />
+              <span>{t("trainer.downloadExeShort", "Download .exe")}</span>
             </a>
           )}
 
@@ -484,7 +496,8 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
               onClick={() => handleModeChange("strict")}
               title={t("trainer.strictDesc", "Strict Order: Waits for correct button to advance")}
             >
-              🎯 {t("trainer.strict", "Strict")}
+              <TargetIcon className={styles.btnIcon} />
+              <span>{t("trainer.strict", "Strict")}</span>
             </button>
             <button
               type="button"
@@ -492,7 +505,8 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
               onClick={() => handleModeChange("timing")}
               title={t("trainer.timingDesc", "Timing Window: Cast rhythm with prompter")}
             >
-              ⏱ {t("trainer.timing", "Timing")}
+              <StopwatchIcon className={styles.btnIcon} />
+              <span>{t("trainer.timing", "Timing")}</span>
             </button>
           </div>
 
@@ -510,41 +524,47 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
             ))}
           </div>
 
-          {/* Settings & Reset */}
-          <button
-            type="button"
-            className={styles.iconBtn}
-            onClick={openRemapSettings}
-            title={t("trainer.remapTitle", "Key Remap & Settings")}
-          >
-            ⚙
-          </button>
-          <button
-            type="button"
-            className={styles.iconBtn}
-            onClick={resetTrainer}
-            title={t("common.reset", "Reset")}
-          >
-            ↺
-          </button>
-          <button
-            type="button"
-            className={styles.iconBtn}
-            onClick={() => setIsPlaying((p) => !p)}
-            title={isPlaying ? t("common.pause", "Pause") : t("common.play", "Play")}
-          >
-            {isPlaying ? "⏸" : "▶"}
-          </button>
-          {onClose && (
+          {/* Action Group */}
+          <div className={styles.actionGroup}>
             <button
               type="button"
-              className={styles.closeBtn}
-              onClick={onClose}
-              title={t("common.close", "Close")}
+              className={styles.iconBtn}
+              onClick={openRemapSettings}
+              title={t("trainer.remapTitle", "Key Remap & Settings")}
             >
-              ×
+              <GearIcon className={styles.btnIcon} />
             </button>
-          )}
+            <button
+              type="button"
+              className={styles.iconBtn}
+              onClick={resetTrainer}
+              title={t("common.reset", "Reset")}
+            >
+              <ResetIcon className={styles.btnIcon} />
+            </button>
+            <button
+              type="button"
+              className={styles.iconBtn}
+              onClick={() => setIsPlaying((p) => !p)}
+              title={isPlaying ? t("common.pause", "Pause") : t("common.play", "Play")}
+            >
+              {isPlaying ? (
+                <PauseIcon className={styles.btnIcon} />
+              ) : (
+                <PlayIcon className={styles.btnIcon} />
+              )}
+            </button>
+            {onClose && (
+              <button
+                type="button"
+                className={styles.closeBtn}
+                onClick={onClose}
+                title={t("common.close", "Close")}
+              >
+                <CloseIcon className={styles.btnIcon} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -597,10 +617,13 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       <div className={styles.footer}>
         <div className={styles.statsLeft}>
           <span className={styles.comboStat}>
-            🔥 {combo} <small>COMBO</small> {maxCombo > 0 && <small>({maxCombo} max)</small>}
+            <FlameIcon className={styles.statIcon} />
+            <span>{combo}</span> <small>COMBO</small>{" "}
+            {maxCombo > 0 && <small>({maxCombo} max)</small>}
           </span>
           <span className={styles.accStat}>
-            🎯 {accuracy}% <small>ACC</small>
+            <TargetIcon className={styles.statIcon} />
+            <span>{accuracy}%</span> <small>ACC</small>
           </span>
         </div>
 

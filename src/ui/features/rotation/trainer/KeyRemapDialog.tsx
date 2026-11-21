@@ -4,6 +4,15 @@ import { useI18n } from "../../../../i18n/i18nContext"
 import { Dialog, DialogBody, DialogFooter, DialogHeader } from "../../../components/dialog/Dialog"
 import { DEFAULT_KEY_MAP } from "./trainerStorage"
 import { formatKeyDisplay, normalizeKeyInput } from "./keyResolution"
+import {
+  ArchiveIcon,
+  DocumentIcon,
+  DownloadIcon,
+  GearIcon,
+  KeyboardIcon,
+  PlugIcon,
+  PopoutIcon,
+} from "./TrainerIcons"
 import { copyStylesheetsToWindow } from "./useDocumentPictureInPicture"
 import type { TrainerKeyMap } from "./types"
 import styles from "./KeyRemapDialog.module.scss"
@@ -246,7 +255,8 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
         <div className={styles.header}>
           <div className={styles.headerTop}>
             <h2 id="trainer-keymap-title" className={styles.title}>
-              ⚙ {t("trainer.settings.title", "Trainer Keybindings & Remap")}
+              <GearIcon className={styles.titleIcon} size={18} />
+              <span>{t("trainer.settings.title", "Trainer Keybindings & Remap")}</span>
             </h2>
 
             <div className={styles.headerActions}>
@@ -257,7 +267,8 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
                   onClick={handlePopout}
                   title={t("trainer.settings.popout", "Open in separate window")}
                 >
-                  {t("trainer.settings.popout", "↗ В отдельном окне")}
+                  <PopoutIcon className={styles.btnIcon} />
+                  <span>{t("trainer.settings.popout", "В отдельном окне")}</span>
                 </button>
               )}
             </div>
@@ -269,14 +280,16 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
               className={`${styles.tabBtn} ${activeTab === "keys" ? styles.tabActive : ""}`}
               onClick={() => setActiveTab("keys")}
             >
-              ⌨ {t("trainer.settings.tabKeys", "Назначение клавиш")} ({ACTIONS.length})
+              <KeyboardIcon className={styles.tabIcon} />
+              <span>{t("trainer.settings.tabKeys", "Назначение клавиш")} ({ACTIONS.length})</span>
             </button>
             <button
               type="button"
               className={`${styles.tabBtn} ${activeTab === "companion" ? styles.tabActive : ""}`}
               onClick={() => setActiveTab("companion")}
             >
-              🔌 {t("trainer.settings.tabCompanion", "In-Game Компаньон")}
+              <PlugIcon className={styles.tabIcon} />
+              <span>{t("trainer.settings.tabCompanion", "In-Game Компаньон")}</span>
               <span className={isConnected ? styles.tabBadgeActive : styles.tabBadgeOffline} />
             </button>
           </div>
@@ -348,7 +361,9 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
           <div className={styles.companionSection}>
             <div className={styles.companionHeader}>
               <div className={styles.companionTitleGroup}>
-                <span className={styles.companionIcon}>🔌</span>
+                <span className={styles.companionIcon}>
+                  <PlugIcon className={styles.sectionIcon} size={22} />
+                </span>
                 <div>
                   <div className={styles.companionTitle}>
                     {t("trainer.companionSectionTitle", "In-Game Companion (Windows)")}
@@ -381,7 +396,8 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
                 download="WWM-Companion.exe"
                 className={styles.downloadBtnPrimary}
               >
-                📥 {t("trainer.downloadExe", "Download WWM-Companion.exe (9 MB, no Python needed)")}
+                <DownloadIcon className={styles.btnIcon} size={16} />
+                <span>{t("trainer.downloadExe", "Download WWM-Companion.exe (9 MB, no Python needed)")}</span>
               </a>
               <div className={styles.downloadSubGroup}>
                 <a
@@ -389,14 +405,16 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
                   download="WWM-Companion.zip"
                   className={styles.downloadBtnSecondary}
                 >
-                  📦 {t("trainer.downloadZip", "Download ZIP archive")}
+                  <ArchiveIcon className={styles.btnIcon} />
+                  <span>{t("trainer.downloadZip", "Download ZIP archive")}</span>
                 </a>
                 <a
                   href="/downloads/start-companion.bat"
                   download="start-companion.bat"
                   className={styles.downloadBtnSecondary}
                 >
-                  📄 {t("trainer.downloadBat", "Download start-companion.bat")}
+                  <DocumentIcon className={styles.btnIcon} />
+                  <span>{t("trainer.downloadBat", "Download start-companion.bat")}</span>
                 </a>
               </div>
             </div>
@@ -436,7 +454,9 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
         {/* Notice in the overlay */}
         <Dialog labelledBy="trainer-keymap-title" onClose={onClose} surfaceClassName={styles.surfaceCompact}>
           <div className={styles.poppedOutNotice}>
-            <div style={{ fontSize: "2rem" }}>↗</div>
+            <div className={styles.poppedOutIcon}>
+              <PopoutIcon size={36} />
+            </div>
             <p>{t("trainer.settings.poppedOutHint", "Настройки открыты в отдельном окне.")}</p>
             <div style={{ display: "flex", gap: "10px" }}>
               <button type="button" className="btn primary" onClick={handleClosePopout}>

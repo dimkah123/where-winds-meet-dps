@@ -41,6 +41,27 @@
   font-size: 1.15rem;
   color: var(--color-accent, #c0a060);
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.titleIcon {
+  color: var(--color-accent, #c0a060);
+  flex-shrink: 0;
+}
+
+.tabIcon {
+  flex-shrink: 0;
+}
+
+.btnIcon {
+  flex-shrink: 0;
+}
+
+.sectionIcon {
+  color: var(--color-accent, #c0a060);
+  flex-shrink: 0;
 }
 
 .headerActions {
@@ -439,4 +460,11 @@
     color: var(--color-text-muted, #aaa);
     margin: 0;
   }
+}
+
+.poppedOutIcon {
+  color: var(--color-accent, #c0a060);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

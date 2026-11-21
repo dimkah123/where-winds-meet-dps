@@ -3046,7 +3046,7 @@
   "trainer.keys.varied": "Вариативная атака (E)",
   "trainer.openPipTooltip": "Запустить тренажёр ротации в плавающем окне Picture-in-Picture поверх игры",
   "trainer.pipButton": "Тренажёр (PiP)",
-  "trainer.settings.popout": "↗ В отдельном окне",
+  "trainer.settings.popout": "В отдельном окне",
   "trainer.settings.poppedOutHint": "Окно настроек открыто отдельно. Вы можете перетащить его на второй монитор или свернуть.",
   "trainer.settings.pressKey": "Нажмите любую клавишу...",
   "trainer.settings.restoreInline": "Вернуть в оверлей",
