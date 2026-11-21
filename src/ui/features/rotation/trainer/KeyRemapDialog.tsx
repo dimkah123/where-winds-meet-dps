@@ -54,16 +54,16 @@ const ACTIONS: ActionDef[] = [
     desc: "Mo Charged (x4/x5), Heavy attacks",
   },
   {
+    key: "swap",
+    labelKey: "trainer.keys.swap",
+    defaultLabel: "Dual Skill / Tab Swap (Tab)",
+    desc: "Heng Dual, Mo Dual (Навык парного оружия / Tab)",
+  },
+  {
     key: "dual",
     labelKey: "trainer.keys.dual",
     defaultLabel: "Weapon Switch (Wheel Down)",
-    desc: "Heng Dual, Mo Dual (Смена оружия / Колесико вниз)",
-  },
-  {
-    key: "swap",
-    labelKey: "trainer.keys.swap",
-    defaultLabel: "Weapon Swap / Stance (Tab)",
-    desc: "Смена оружия / стойки без атаки (Tab)",
+    desc: "Mo Swap, Heng Swap (Смена оружия колесиком)",
   },
   {
     key: "light",

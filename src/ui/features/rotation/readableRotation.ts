@@ -1,6 +1,20 @@
 import type { Result } from "../../../engine/types"
 import { newStepId, type Rotation, type RotationStep } from "../../../engine/rotation"
-import type { Skill } from "../../../engine/skill"
+import { isPrePullSkill, type Skill } from "../../../engine/skill"
+import { weaponTagOf } from "../../../engine/buffs/tags"
+
+export function getWeaponSwapShortName(weapon: string): string {
+  const w = weapon.toLowerCase()
+  if (w.includes("mo") || w.includes("phalanx")) return "Mo Swap"
+  if (w.includes("heng") || w.includes("snowparting")) return "Heng Swap"
+  if (w.includes("sword")) return "Sword Swap"
+  if (w.includes("spear")) return "Spear Swap"
+  if (w.includes("umbrella")) return "Umbrella Swap"
+  if (w.includes("fan")) return "Fan Swap"
+  if (w.includes("gauntlet")) return "Gauntlet Swap"
+  if (w.includes("gourd")) return "Gourd Swap"
+  return `${w.charAt(0).toUpperCase() + w.slice(1)} Swap`
+}
 
 export const SKILL_SHORT_NAMES: Record<string, string> = {
   // Stonesplit Strength — Phalanx
@@ -53,6 +67,24 @@ export const SKILL_SHORT_NAMES: Record<string, string> = {
   "stonesplitStrength-break-defense": "Break Defense",
   "stonesplitStrength-deflect": "Deflect",
   "stonesplitStrength-deflect-cancel": "Deflect",
+
+  // Direct Weapon Swaps
+  "Weapon Swap (phalanx)": "Mo Swap",
+  "Weapon Swap (phalanx) Prepull": "Mo Swap",
+  "Weapon Swap (snowparting)": "Heng Swap",
+  "Weapon Swap (snowparting) Prepull": "Heng Swap",
+  "Weapon Swap (sword)": "Sword Swap",
+  "Weapon Swap (sword) Prepull": "Sword Swap",
+  "Weapon Swap (spear)": "Spear Swap",
+  "Weapon Swap (spear) Prepull": "Spear Swap",
+  "Weapon Swap (umbrella)": "Umbrella Swap",
+  "Weapon Swap (umbrella) Prepull": "Umbrella Swap",
+  "Weapon Swap (fan)": "Fan Swap",
+  "Weapon Swap (fan) Prepull": "Fan Swap",
+  "Weapon Swap (gauntlet)": "Gauntlet Swap",
+  "Weapon Swap (gauntlet) Prepull": "Gauntlet Swap",
+  "Weapon Swap (gourd)": "Gourd Swap",
+  "Weapon Swap (gourd) Prepull": "Gourd Swap",
 
   // Bellstrike Umbra
   "Deflect Cancel": "Deflect",
@@ -162,6 +194,10 @@ export function getSkillShortName(skill: Skill | undefined, skillId?: string): s
   if (skill?.name && SKILL_SHORT_NAMES[skill.name]) return SKILL_SHORT_NAMES[skill.name]
 
   if (skill?.name) {
+    const swapMatch = skill.name.match(/Weapon Swap \(([^)]+)\)/i)
+    if (swapMatch) {
+      return getWeaponSwapShortName(swapMatch[1])
+    }
     const rawName = skill.name
       .replace(/\s*(prepull|pre-pull|\[prepull\]|\[pre-pull\])/gi, "")
       .replace(/\[.*?\]/g, "")
@@ -170,6 +206,12 @@ export function getSkillShortName(skill: Skill | undefined, skillId?: string): s
     if (SKILL_SHORT_NAMES[rawName]) return SKILL_SHORT_NAMES[rawName]
     return rawName || skill.name
   }
+
+  const idSwapMatch = key.match(/direct-swap-[^-]+-([^-]+)/i)
+  if (idSwapMatch) {
+    return getWeaponSwapShortName(idSwapMatch[1])
+  }
+
   return key
 }
 
@@ -193,9 +235,15 @@ export function readableRotationText(
   skillsById: Map<string, Skill>,
 ): string {
   const steps = rotation?.steps ?? []
-  const casts = (result?.casts ?? []).filter(
-    (c) => !c.stepId || (!c.stepId.startsWith("swap-") && !c.stepId.startsWith("direct-swap-")),
-  )
+  const casts = (result?.casts ?? []).filter((c) => {
+    if (!c.stepId) return true
+    const isDirectSwap = c.stepId.startsWith("swap-") || c.stepId.startsWith("direct-swap-")
+    // Keep active in-combat direct weapon swaps (e.g. Heng -> Mo, Mo -> Heng)
+    if (isDirectSwap) {
+      return !c.prePull && c.stepId.includes("-active")
+    }
+    return true
+  })
 
   if (casts.length === 0) {
     return readableRotationFromSteps(steps, skillsById)
@@ -238,11 +286,16 @@ export function readableRotationText(
 
   for (let i = 0; i < casts.length; i++) {
     const cast = casts[i]
-    const skillId =
-      stepSkillIdMap.get(cast.stepId) ||
-      (cast.stepIndex !== undefined && steps[cast.stepIndex]?.skillId) ||
-      cast.fallbackFromSkillId ||
-      ""
+    const isDirectSwap = Boolean(
+      cast.stepId && (cast.stepId.startsWith("swap-") || cast.stepId.startsWith("direct-swap-")),
+    )
+
+    const skillId = isDirectSwap
+      ? cast.stepId
+      : (stepSkillIdMap.get(cast.stepId) ||
+        (cast.stepIndex !== undefined && steps[cast.stepIndex]?.skillId) ||
+        cast.fallbackFromSkillId ||
+        "")
 
     const skill =
       skillsById.get(skillId) ||
@@ -300,11 +353,25 @@ export function readableRotationFromSteps(
 ): string {
   const filteredSteps = steps.filter((step) => Boolean(step.skillId))
   const entries: string[] = []
+  let drawnWeapon: string | null = null
 
   for (let i = 0; i < filteredSteps.length; i++) {
     const step = filteredSteps[i]
     const skillId = step.skillId
     const skill = skillsById.get(skillId)
+
+    const weapon = skill ? weaponTagOf(skill) : ""
+    const isPrepull = skill ? isPrePullSkill(skill) : false
+
+    if (weapon && drawnWeapon && weapon !== drawnWeapon && !skill?.isWeaponSwap) {
+      if (!isPrepull) {
+        entries.push(getWeaponSwapShortName(weapon))
+      }
+      drawnWeapon = weapon
+    } else if (weapon) {
+      drawnWeapon = weapon
+    }
+
     const baseName = getSkillShortName(skill, skillId)
     const text =
       step.distanceMeters !== undefined ? `${baseName} (${step.distanceMeters}m)` : baseName
@@ -735,6 +802,19 @@ export function parseReadableRotation(
 
     const normKey = cleanName.toLowerCase().replace(/\s+/g, " ")
     const isPrepull = startIndex >= 0 ? i < startIndex : i <= 4
+
+    // Weapon swap token (e.g. Mo Swap, Heng Swap, Sword Swap, Weapon Swap)
+    if (normKey.endsWith(" swap") || normKey === "weapon swap") {
+      tokens.push({
+        raw,
+        cleanName,
+        multiplier,
+        skillId: `direct-swap-${classId}-${normKey.replace(" swap", "")}-active`,
+        skillName: cleanName,
+        valid: true,
+      })
+      continue
+    }
 
     // Match resolution:
     let resolvedSkillId: string | undefined

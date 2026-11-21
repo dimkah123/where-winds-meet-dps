@@ -139,6 +139,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   const lastWrongTimeRef = useRef<{ key: string; time: number }>({ key: "", time: 0 })
   const lastHoldKeyRef = useRef<{ key: string; expiresAt: number }>({ key: "", expiresAt: 0 })
   const lastHitKeyRef = useRef<{ key: string; time: number }>({ key: "", time: 0 })
+  const altHeldRef = useRef(false)
 
   const triggerFeedback = useCallback((text: string, tone: "perfect" | "good" | "wrong" | "hit") => {
     setFeedback({ text, tone, id: Date.now() })
@@ -146,6 +147,19 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       setFeedback((prev) => (prev?.text === text ? null : prev))
     }, 700)
   }, [])
+
+  const resetTrainer = useCallback(() => {
+    setHasStarted(false)
+    setStepIndex(0)
+    setCombo(0)
+    setHits(0)
+    setMisses(0)
+    setTimingProgress(0)
+    setFeedback(null)
+    triggerFeedback("RESET", "perfect")
+    if (settings.sound) playSynthTone(440, "sine", 0.08)
+    if (steps[0]) setRemainingCount(steps[0].multiplier)
+  }, [settings.sound, steps, triggerFeedback])
 
   const handleKeyHit = useCallback(
     (pressedKey: string) => {
@@ -272,7 +286,22 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   // Listen to companion WebSocket events
   const handleCompanionInput = useCallback(
     (e: TrainerInputEvent) => {
+      if (e.key === "alt") {
+        altHeldRef.current = e.action === "down"
+        return
+      }
+
       if (e.action !== "down") return
+
+      // Alt+R hotkey to reset combo to beginning
+      if (
+        e.key === "alt+r" ||
+        e.key === "reset" ||
+        ((e.key === "r" || e.key === "к") && altHeldRef.current)
+      ) {
+        resetTrainer()
+        return
+      }
 
       const norm = normalizeKeyInput(e.key)
       if (!norm) return
@@ -292,7 +321,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
       handleKeyHit(norm)
     },
-    [handleKeyHit, showRemap],
+    [handleKeyHit, resetTrainer, showRemap],
   )
 
   const { isConnected, isAdmin } = useCompanionSocket({
@@ -312,6 +341,17 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
     function onKeyDown(e: KeyboardEvent) {
       if (e.repeat) return
+
+      // Alt+R hotkey to reset combo to beginning
+      if (
+        e.altKey &&
+        (e.code === "KeyR" || e.key.toLowerCase() === "r" || e.key.toLowerCase() === "к")
+      ) {
+        e.preventDefault()
+        resetTrainer()
+        return
+      }
+
       const norm = normalizeKeyInput(e.key === " " ? "space" : e.key)
       if (!norm) return
 
@@ -413,17 +453,6 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
     return () => clearInterval(timer)
   }, [isPlaying, hasStarted, settings.mode, settings.speed, settings.sound, steps.length, triggerFeedback])
-
-  function resetTrainer() {
-    setHasStarted(false)
-    setStepIndex(0)
-    setCombo(0)
-    setHits(0)
-    setMisses(0)
-    setTimingProgress(0)
-    setFeedback(null)
-    if (steps[0]) setRemainingCount(steps[0].multiplier)
-  }
 
   function handleModeChange(mode: TrainerMode) {
     const next = { ...settings, mode }
@@ -572,7 +601,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
               type="button"
               className={styles.iconBtn}
               onClick={resetTrainer}
-              title={t("common.reset", "Reset")}
+              title={`${t("common.reset", "Reset")} (Alt+R)`}
             >
               <ResetIcon className={styles.btnIcon} />
             </button>

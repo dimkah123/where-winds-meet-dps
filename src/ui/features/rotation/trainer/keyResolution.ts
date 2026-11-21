@@ -104,20 +104,16 @@ export function resolveSkillKey(
 ): { key: string; label: string; isHold?: boolean } {
   const norm = cleanName.toLowerCase()
 
-  // 1. Dual weapon attack / switch without tab (e.g. Heng Dual, Mo Dual, Dual Blade)
-  if (norm.includes("dual") || norm.includes("парн")) {
-    const key = keyMap.dual ?? "wheeldown"
+  // 1. Dual weapon attack / Tab swap (e.g. Heng Dual, Mo Dual, Dual Blade, Tab)
+  if (norm.includes("dual") || norm.includes("парн") || /\btab\b/i.test(cleanName)) {
+    const key = keyMap.swap ?? "tab"
     return { key, label: formatKeyDisplay(key, isRuLocale), isHold: false }
   }
 
-  // 2. Weapon swap (e.g. Tab, Swap) - do NOT match "Stab" (e.g. Heng Q Stab)
-  if (/\b(tab|swap)\b/i.test(cleanName)) {
-    // Legacy support for "Heng Tab" and "Mo Tab" which are actually Dual skills
-    if (norm.includes("heng") || norm.includes("mo")) {
-      const key = keyMap.dual ?? "wheeldown"
-      return { key, label: formatKeyDisplay(key, isRuLocale), isHold: false }
-    }
-    return { key: keyMap.swap, label: formatKeyDisplay(keyMap.swap, isRuLocale), isHold: false }
+  // 2. Direct weapon swap / switch via wheel (e.g. Mo Swap, Heng Swap, Weapon Swap, Switch) - do NOT match "Stab" (e.g. Heng Q Stab)
+  if (/\b(swap|switch)\b/i.test(cleanName) || norm.includes("смен") || norm.includes("переключ") || norm.includes("wheel")) {
+    const key = keyMap.dual ?? "wheeldown"
+    return { key, label: formatKeyDisplay(key, isRuLocale), isHold: false }
   }
 
   // 2. Heavy / Charged attack

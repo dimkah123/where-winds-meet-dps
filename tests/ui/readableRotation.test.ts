@@ -58,4 +58,21 @@ describe("readableRotation", () => {
     const inputWithMultipliers = "Mo Charged x2 > Mo Charged x3 > Heng Tab > Heng Tab"
     expect(collapseConsecutiveSkills(inputWithMultipliers)).toBe("Mo Charged x5 > Heng Tab x2")
   })
+
+  it("includes in-combat direct weapon swaps (Mo Swap / Heng Swap) when switching weapons without dual skills", () => {
+    const inputs = {
+      ...defaultInputs,
+      classId: "stonesplitStrength",
+      selectedBuiltinRotationId: "builtin-stonesplitStrength-3-heng-bow",
+    }
+    const result = runEngine(inputs)
+    const skills = builtinSkillsForClass("stonesplitStrength")
+    const skillsById = new Map(skills.map((s) => [s.id, s]))
+    const rotation = builtinRotationsForClass("stonesplitStrength").find(
+      (r) => r.id === "builtin-stonesplitStrength-3-heng-bow",
+    )
+
+    const text = readableRotationText(rotation, result, skillsById)
+    expect(text).toContain("Heng Q Stab > Mo Swap > Mo QQ")
+  })
 })

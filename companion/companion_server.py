@@ -256,7 +256,22 @@ async def unified_input_polling_loop():
 
             now = time.time()
             if connected_clients:
+                is_alt_pressed = bool(
+                    user32.GetAsyncKeyState(0x12) & 0x8000
+                    or user32.GetAsyncKeyState(0xA4) & 0x8000
+                    or user32.GetAsyncKeyState(0xA5) & 0x8000
+                )
                 for name, device in pressed:
+                    if is_alt_pressed and name == "r":
+                        await event_queue.put({
+                            "type": "input",
+                            "action": "down",
+                            "key": "alt+r",
+                            "device": "keyboard",
+                            "time": now,
+                        })
+                        continue
+
                     await event_queue.put({
                         "type": "input",
                         "action": "down",

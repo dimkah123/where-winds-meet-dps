@@ -78,26 +78,38 @@ describe("Rotation Trainer Key Resolution", () => {
     })
 
     expect(resolveSkillKey("Heng Tab", DEFAULT_KEY_MAP)).toEqual({
-      key: "wheeldown",
-      label: "Wheel Down",
+      key: "tab",
+      label: "Tab",
       isHold: false,
     })
 
     expect(resolveSkillKey("Heng Dual", DEFAULT_KEY_MAP)).toEqual({
+      key: "tab",
+      label: "Tab",
+      isHold: false,
+    })
+
+    expect(resolveSkillKey("Mo Dual", DEFAULT_KEY_MAP)).toEqual({
+      key: "tab",
+      label: "Tab",
+      isHold: false,
+    })
+
+    expect(resolveSkillKey("Mo Swap", DEFAULT_KEY_MAP)).toEqual({
       key: "wheeldown",
       label: "Wheel Down",
       isHold: false,
     })
 
-    expect(resolveSkillKey("Mo Dual", DEFAULT_KEY_MAP)).toEqual({
+    expect(resolveSkillKey("Heng Swap", DEFAULT_KEY_MAP)).toEqual({
       key: "wheeldown",
       label: "Wheel Down",
       isHold: false,
     })
 
     expect(resolveSkillKey("Weapon Swap", DEFAULT_KEY_MAP)).toEqual({
-      key: "tab",
-      label: "Tab",
+      key: "wheeldown",
+      label: "Wheel Down",
       isHold: false,
     })
 
