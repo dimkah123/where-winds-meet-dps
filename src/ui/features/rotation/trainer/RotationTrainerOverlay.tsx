@@ -19,6 +19,7 @@ import {
   StopwatchIcon,
   TargetIcon,
 } from "./TrainerIcons"
+import { playSwitchSound } from "./trainerAudio"
 import { getSavedPipDimensions } from "./useDocumentPictureInPicture"
 import type { TrainerInputEvent, TrainerKeyMap, TrainerMode, TrainerStep } from "./types"
 import { useCompanionSocket } from "./useCompanionSocket"
@@ -29,26 +30,6 @@ interface Props {
   casts?: RotationCast[]
   rotationTitle?: string
   onClose?: () => void
-}
-
-function playSynthTone(freq: number, type: OscillatorType = "sine", duration = 0.08) {
-  try {
-    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
-    if (!AudioCtx) return
-    const ctx = new AudioCtx()
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-    osc.type = type
-    osc.frequency.setValueAtTime(freq, ctx.currentTime)
-    gain.gain.setValueAtTime(0.08, ctx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration)
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-    osc.start()
-    osc.stop(ctx.currentTime + duration)
-  } catch {
-    // Audio unavailable or blocked
-  }
 }
 
 export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }: Props) {
@@ -193,7 +174,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     setActiveCooldowns({})
     bufferedInputRef.current = null
     triggerFeedback(t("trainer.feedback.reset", isRuLocale ? "СБРОС" : "RESET"), "perfect")
-    if (settings.sound) playSynthTone(440, "sine", 0.08)
+    if (settings.sound) playSwitchSound("reset")
     if (steps[0]) setRemainingCount(steps[0].multiplier)
   }, [settings.sound, steps, triggerFeedback, t, isRuLocale])
 
@@ -239,7 +220,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           setCombo(1)
           setMaxCombo((m) => Math.max(m, 1))
           triggerFeedback(t("trainer.feedback.start", isRuLocale ? "СТАРТ!" : "START!"), "perfect")
-          if (settings.sound) playSynthTone(880, "triangle", 0.09) // A5
+          if (settings.sound) playSwitchSound("start")
           lastHitKeyRef.current = { key: expected, time: Date.now() }
           setStepIndex(1)
           setTimingProgress(0)
@@ -284,7 +265,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         if (remainingCount > 1) {
           setRemainingCount((prev) => prev - 1)
           triggerFeedback(`${remainingCount - 1} ${t("trainer.feedback.left", isRuLocale ? "ост." : "left")}`, "hit")
-          if (settings.sound) playSynthTone(587.33, "sine", 0.05) // D5
+          if (settings.sound) playSwitchSound("subhit")
         } else {
           setHits((h) => h + 1)
           setCombo((c) => {
@@ -293,7 +274,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
             return next
           })
           triggerFeedback(t("trainer.feedback.perfect", isRuLocale ? "ОТЛИЧНО" : "PERFECT"), "perfect")
-          if (settings.sound) playSynthTone(880, "triangle", 0.09) // A5
+          if (settings.sound) playSwitchSound("perfect")
 
           // Advance step
           setStepIndex((idx) => {
@@ -341,7 +322,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         setMisses((m) => m + 1)
         setCombo(0)
         triggerFeedback(`✕ ${formatKeyDisplay(pressed, isRuLocale)}`, "wrong")
-        if (settings.sound) playSynthTone(220, "sawtooth", 0.12) // A3 buzz
+        if (settings.sound) playSwitchSound("miss")
 
         // NOTE: We do NOT advance stepIndex on wrong key!
       }
@@ -570,7 +551,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           setMisses((m) => m + 1)
           setCombo(0)
           triggerFeedback(t("trainer.feedback.miss", isRuLocale ? "ПРОМАХ" : "MISS"), "wrong")
-          if (settings.sound) playSynthTone(180, "sawtooth", 0.1)
+          if (settings.sound) playSwitchSound("miss")
           setStepIndex((idx) => (idx + 1 < steps.length ? idx + 1 : 0))
           return 0
         }
