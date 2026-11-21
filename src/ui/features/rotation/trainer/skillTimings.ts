@@ -43,7 +43,7 @@ const CANONICAL_TIMING_RULES: Array<{
   { match: /\bmo\s*qq\b/i, castTime: 0.7, cooldown: 15.0, group: "MoQQ" },
   { match: /\bmo\s*charged\b/i, castTime: 0.85, isCharged: true, group: "MoCharged" },
   { match: /\bmo\s*dual\b/i, castTime: 0.6, cooldown: 3.0, group: "WeaponDual" },
-  { match: /\bmo\s*swap\b/i, castTime: 0.35, group: "WeaponSwap" },
+  { match: /\bmo\s*swap\b/i, castTime: 0, cooldown: 0.6, group: "WeaponSwap" },
   { match: /\bmo\s*vc\b/i, castTime: 0.8, group: "MoVC" },
   { match: /\bmo\s*lc\b|\bmo\s*a1\b/i, castTime: 0.936, cooldown: 0.1, group: "MoLC" },
 
@@ -53,7 +53,7 @@ const CANONICAL_TIMING_RULES: Array<{
   { match: /\bheng\s*q2\b/i, castTime: 0.708, cooldown: 12.0, group: "HengQ" },
   { match: /\bheng\s*q\b/i, castTime: 0.615, cooldown: 12.0, group: "HengQ" },
   { match: /\bheng\s*dual\b|\bheng\s*tab\b/i, castTime: 0.56, cooldown: 3.0, group: "WeaponDual" },
-  { match: /\bheng\s*swap\b/i, castTime: 0.35, group: "WeaponSwap" },
+  { match: /\bheng\s*swap\b/i, castTime: 0, cooldown: 0.6, group: "WeaponSwap" },
   { match: /\bheng\s*vc\b/i, castTime: 0.857, group: "HengVC" },
   { match: /\bheng\s*lc\b/i, castTime: 1.605, group: "HengLC" },
 
@@ -74,7 +74,7 @@ const CANONICAL_TIMING_RULES: Array<{
   // General & Utility
   { match: /\bdeflect\b/i, castTime: 0.25, group: "Deflect" },
   { match: /\bslide\b|\bdash\b|\bdodge\b|\bshift\b/i, castTime: 0.4, group: "Dodge" },
-  { match: /\bswap\b|\bswitch\b/i, castTime: 0.35, group: "WeaponSwap" },
+  { match: /\b(weapon\s*)?(swap|switch)\b/i, castTime: 0, cooldown: 0.6, group: "WeaponSwap" },
 ]
 
 /**
@@ -103,7 +103,8 @@ export function resolveSkillTiming(
       }
 
       // If simulation engine provided a precise simulated duration between casts, prefer it for execution
-      if (simulatedDurationSec && simulatedDurationSec > 0.1 && simulatedDurationSec < 25) {
+      // Note: for instant actions (rule.castTime === 0, e.g. weapon swap), keep 0s cast time
+      if (rule.castTime > 0 && simulatedDurationSec && simulatedDurationSec > 0.1 && simulatedDurationSec < 25) {
         if (isCharged && multiplier > 1 && simulatedDurationSec < 1.5) {
           finalCast = simulatedDurationSec * multiplier
         } else if (multiplier > 1 && !rule.cooldown && simulatedDurationSec < rule.castTime * 1.2) {

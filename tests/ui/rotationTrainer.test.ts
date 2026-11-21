@@ -219,10 +219,11 @@ describe("Rotation Trainer Key Resolution", () => {
       { raw: "Heng Special 6 Hit", cleanName: "Heng Special 6 Hit", multiplier: 1, valid: true },
       { raw: "Flute Cancel", cleanName: "Flute Cancel", multiplier: 1, valid: true },
       { raw: "Bursting Nine", cleanName: "Bursting Nine", multiplier: 1, valid: true },
+      { raw: "Mo Swap", cleanName: "Mo Swap", multiplier: 1, valid: true },
     ]
 
     const steps = buildTrainerSteps(tokens, DEFAULT_KEY_MAP)
-    expect(steps).toHaveLength(6)
+    expect(steps).toHaveLength(7)
     expect(steps[0].expectedKey).toBe("~")
     expect(steps[0].multiplier).toBe(1)
     expect(steps[0].remainingCount).toBe(1)
@@ -252,6 +253,11 @@ describe("Rotation Trainer Key Resolution", () => {
     // Bursting Nine (1.4s cast, 30s cooldown)
     expect(steps[5].durationSec).toBe(1.4)
     expect(steps[5].cooldownSec).toBe(30)
+
+    // Mo Swap via wheel (instant cast 0s, 0.6s cooldown)
+    expect(steps[6].expectedKey).toBe("wheeldown")
+    expect(steps[6].durationSec).toBe(0)
+    expect(steps[6].cooldownSec).toBe(0.6)
   })
 
   it("loads default settings correctly", () => {

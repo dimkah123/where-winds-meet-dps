@@ -141,12 +141,18 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
   const startSkillCast = useCallback(
     (step: TrainerStep) => {
-      const durMs = Math.max(250, (step.durationSec * 1000) / settings.speed)
       const now = Date.now()
-      setCastStartTime(now)
-      setCastDurationMs(durMs)
-      setIsCasting(true)
-      setCastProgress(0)
+      if (step.durationSec > 0) {
+        const durMs = Math.max(100, (step.durationSec * 1000) / settings.speed)
+        setCastStartTime(now)
+        setCastDurationMs(durMs)
+        setIsCasting(true)
+        setCastProgress(0)
+      } else {
+        setIsCasting(false)
+        setCastDurationMs(0)
+        setCastProgress(0)
+      }
 
       // Put skill on cooldown if it has one
       if (step.cooldownSec && step.cooldownGroup) {
