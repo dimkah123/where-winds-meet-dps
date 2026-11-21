@@ -32,9 +32,33 @@ WS_PORT = 47999
 
 user32 = ctypes.windll.user32
 shell32 = ctypes.windll.shell32
+kernel32 = ctypes.windll.kernel32
 
 connected_clients = set()
 event_queue = asyncio.Queue()
+
+# Configure 64-bit safe Win32 API signatures
+HOOKPROC = ctypes.WINFUNCTYPE(ctypes.c_ssize_t, ctypes.c_int, ctypes.wintypes.WPARAM, ctypes.wintypes.LPARAM)
+WNDPROC = ctypes.WINFUNCTYPE(ctypes.c_ssize_t, ctypes.c_void_p, ctypes.c_uint, ctypes.wintypes.WPARAM, ctypes.wintypes.LPARAM)
+
+user32.DefWindowProcW.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.wintypes.WPARAM, ctypes.wintypes.LPARAM]
+user32.DefWindowProcW.restype = ctypes.c_ssize_t
+
+user32.CallNextHookEx.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.wintypes.WPARAM, ctypes.wintypes.LPARAM]
+user32.CallNextHookEx.restype = ctypes.c_ssize_t
+
+user32.SetWindowsHookExW.argtypes = [ctypes.c_int, HOOKPROC, ctypes.c_void_p, ctypes.wintypes.DWORD]
+user32.SetWindowsHookExW.restype = ctypes.c_void_p
+
+user32.CreateWindowExW.argtypes = [
+    ctypes.wintypes.DWORD, ctypes.c_wchar_p, ctypes.c_wchar_p, ctypes.wintypes.DWORD,
+    ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int,
+    ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p
+]
+user32.CreateWindowExW.restype = ctypes.c_void_p
+
+kernel32.GetModuleHandleW.argtypes = [ctypes.c_wchar_p]
+kernel32.GetModuleHandleW.restype = ctypes.c_void_p
 
 
 def is_admin() -> bool:
@@ -177,11 +201,66 @@ def frame_ws_message(payload_str: str) -> bytes:
     return header + data
 
 
-# Low-level mouse hook to capture mouse wheel scrolling (wheeldown / wheelup)
+# Dual-engine Mouse Wheel Capture:
+# 1) Windows RawInput with RIDEV_INPUTSINK (captures mouse wheel even in exclusive DirectX/Vulkan/Unreal full-screen)
+# 2) WH_MOUSE_LL low-level Windows hook (captures standard desktop and windowed wheel messages)
+# Both feed emit_wheel_input with a 40ms debounce to prevent duplicates.
+RID_INPUT = 0x10000003
+RIDEV_INPUTSINK = 0x00000100
+RI_MOUSE_WHEEL = 0x0400
+WM_INPUT = 0x00FF
 WH_MOUSE_LL = 14
 WM_MOUSEWHEEL = 0x020A
 
-HOOKPROC = ctypes.WINFUNCTYPE(ctypes.c_long, ctypes.c_int, ctypes.wintypes.WPARAM, ctypes.wintypes.LPARAM)
+
+class RAWINPUTHEADER(ctypes.Structure):
+    _fields_ = [
+        ("dwType", ctypes.wintypes.DWORD),
+        ("dwSize", ctypes.wintypes.DWORD),
+        ("hDevice", ctypes.c_void_p),
+        ("wParam", ctypes.wintypes.WPARAM),
+    ]
+
+
+class RAWMOUSE_BUTTONS(ctypes.Structure):
+    _fields_ = [
+        ("usButtonFlags", ctypes.c_ushort),
+        ("usButtonData", ctypes.c_short),
+    ]
+
+
+class RAWMOUSE_UNION(ctypes.Union):
+    _fields_ = [
+        ("ulButtons", ctypes.wintypes.ULONG),
+        ("buttons", RAWMOUSE_BUTTONS),
+    ]
+
+
+class RAWMOUSE(ctypes.Structure):
+    _fields_ = [
+        ("usFlags", ctypes.c_ushort),
+        ("u", RAWMOUSE_UNION),
+        ("ulRawButtons", ctypes.wintypes.ULONG),
+        ("lLastX", ctypes.c_long),
+        ("lLastY", ctypes.c_long),
+        ("ulExtraInformation", ctypes.wintypes.ULONG),
+    ]
+
+
+class RAWINPUT(ctypes.Structure):
+    _fields_ = [
+        ("header", RAWINPUTHEADER),
+        ("mouse", RAWMOUSE),
+    ]
+
+
+class RAWINPUTDEVICE(ctypes.Structure):
+    _fields_ = [
+        ("usUsagePage", ctypes.c_ushort),
+        ("usUsage", ctypes.c_ushort),
+        ("dwFlags", ctypes.wintypes.DWORD),
+        ("hwndTarget", ctypes.c_void_p),
+    ]
 
 
 class MSLLHOOKSTRUCT(ctypes.Structure):
@@ -194,42 +273,155 @@ class MSLLHOOKSTRUCT(ctypes.Structure):
     ]
 
 
+user32.GetRawInputData.argtypes = [
+    ctypes.c_void_p,
+    ctypes.c_uint,
+    ctypes.c_void_p,
+    ctypes.POINTER(ctypes.c_uint),
+    ctypes.c_uint,
+]
+user32.GetRawInputData.restype = ctypes.c_uint
+
+user32.RegisterRawInputDevices.argtypes = [
+    ctypes.POINTER(RAWINPUTDEVICE),
+    ctypes.c_uint,
+    ctypes.c_uint,
+]
+user32.RegisterRawInputDevices.restype = ctypes.wintypes.BOOL
+
+
+class WNDCLASSW(ctypes.Structure):
+    _fields_ = [
+        ("style", ctypes.c_uint),
+        ("lpfnWndProc", WNDPROC),
+        ("cbClsExtra", ctypes.c_int),
+        ("cbWndExtra", ctypes.c_int),
+        ("hInstance", ctypes.c_void_p),
+        ("hIcon", ctypes.c_void_p),
+        ("hCursor", ctypes.c_void_p),
+        ("hbrBackground", ctypes.c_void_p),
+        ("lpszMenuName", ctypes.c_wchar_p),
+        ("lpszClassName", ctypes.c_wchar_p),
+    ]
+
+
+_last_wheel_time = 0.0
+_last_wheel_dir = ""
+
+
+def emit_wheel_input(direction: str, loop: asyncio.AbstractEventLoop):
+    global _last_wheel_time, _last_wheel_dir
+    now = time.time()
+    if _last_wheel_dir == direction and (now - _last_wheel_time) < 0.040:
+        return
+    _last_wheel_dir = direction
+    _last_wheel_time = now
+
+    if connected_clients:
+        loop.call_soon_threadsafe(
+            event_queue.put_nowait,
+            {
+                "type": "input",
+                "action": "down",
+                "key": direction,
+                "device": "mouse",
+                "time": now,
+            },
+        )
+
+
 _mouse_hook_handle = None
 _mouse_hook_proc_ref = None
+_wnd_proc_ref = None
 
 
-def mouse_wheel_hook_thread(loop: asyncio.AbstractEventLoop):
-    global _mouse_hook_handle, _mouse_hook_proc_ref
+def mouse_wheel_listener_thread(loop: asyncio.AbstractEventLoop):
+    global _mouse_hook_handle, _mouse_hook_proc_ref, _wnd_proc_ref
 
+    hinst = kernel32.GetModuleHandleW(None)
+
+    # 1. Low-level mouse hook (WH_MOUSE_LL)
     def low_level_mouse_proc(nCode, wParam, lParam):
         if nCode >= 0 and wParam == WM_MOUSEWHEEL:
             try:
                 ms = MSLLHOOKSTRUCT.from_address(lParam)
-                # High word of mouseData contains wheel delta (signed 16-bit short)
                 delta = ctypes.c_short((ms.mouseData >> 16) & 0xFFFF).value
                 direction = "wheeldown" if delta < 0 else "wheelup"
-                now = time.time()
-                if connected_clients:
-                    asyncio.run_coroutine_threadsafe(
-                        event_queue.put({
-                            "type": "input",
-                            "action": "down",
-                            "key": direction,
-                            "device": "mouse",
-                            "time": now,
-                        }),
-                        loop,
-                    )
+                emit_wheel_input(direction, loop)
             except Exception:
                 pass
         return user32.CallNextHookEx(_mouse_hook_handle, nCode, wParam, lParam)
 
-    _mouse_hook_proc_ref = HOOKPROC(low_level_mouse_proc)
-    _mouse_hook_handle = user32.SetWindowsHookExW(WH_MOUSE_LL, _mouse_hook_proc_ref, None, 0)
-    if not _mouse_hook_handle:
-        print("  [Notice] Could not register low-level mouse wheel hook.")
-        return
+    # 2. RawInput sink window procedure (captures mouse wheel even in exclusive DirectX/Vulkan fullscreen)
+    def wnd_proc(hwnd, msg, wparam, lparam):
+        if msg == WM_INPUT:
+            try:
+                size = ctypes.c_uint(ctypes.sizeof(RAWINPUT))
+                raw = RAWINPUT()
+                if (
+                    user32.GetRawInputData(
+                        lparam,
+                        RID_INPUT,
+                        ctypes.byref(raw),
+                        ctypes.byref(size),
+                        ctypes.sizeof(RAWINPUTHEADER),
+                    )
+                    != 0xFFFFFFFF
+                ):
+                    if raw.header.dwType == 0:  # RIM_TYPEMOUSE
+                        flags = raw.mouse.u.buttons.usButtonFlags
+                        delta = raw.mouse.u.buttons.usButtonData
+                        if flags & RI_MOUSE_WHEEL:
+                            direction = "wheeldown" if delta < 0 else "wheelup"
+                            emit_wheel_input(direction, loop)
+            except Exception:
+                pass
+        return user32.DefWindowProcW(hwnd, msg, wparam, lparam)
 
+    _mouse_hook_proc_ref = HOOKPROC(low_level_mouse_proc)
+    _wnd_proc_ref = WNDPROC(wnd_proc)
+
+    # Register message window for RawInput
+    try:
+        wc = WNDCLASSW()
+        wc.lpfnWndProc = _wnd_proc_ref
+        wc.lpszClassName = "WWM_Companion_WheelListener"
+        wc.hInstance = hinst
+        user32.RegisterClassW(ctypes.byref(wc))
+
+        hwnd = user32.CreateWindowExW(
+            0,
+            "WWM_Companion_WheelListener",
+            "WWM_Companion_WheelListener",
+            0,
+            0,
+            0,
+            0,
+            0,
+            ctypes.c_void_p(-3),
+            None,
+            hinst,
+            None,
+        )
+        if hwnd:
+            rid = RAWINPUTDEVICE()
+            rid.usUsagePage = 1  # Generic Desktop Controls
+            rid.usUsage = 2  # Mouse
+            rid.dwFlags = RIDEV_INPUTSINK
+            rid.hwndTarget = hwnd
+            user32.RegisterRawInputDevices(ctypes.byref(rid), 1, ctypes.sizeof(RAWINPUTDEVICE))
+    except Exception as e:
+        print(f"  [Notice] RawInput registration: {e}")
+
+    # Install WH_MOUSE_LL hook
+    try:
+        _mouse_hook_handle = user32.SetWindowsHookExW(
+            WH_MOUSE_LL, _mouse_hook_proc_ref, hinst, 0
+        )
+    except Exception as e:
+        print(f"  [Notice] WH_MOUSE_LL installation: {e}")
+
+    # Process Windows message queue for both hooks
     msg = ctypes.wintypes.MSG()
     while user32.GetMessageW(ctypes.byref(msg), 0, 0, 0) > 0:
         user32.TranslateMessage(ctypes.byref(msg))
@@ -418,7 +610,7 @@ async def main():
     server = await asyncio.start_server(handle_client, WS_HOST, WS_PORT)
 
     loop = asyncio.get_running_loop()
-    wheel_thread = threading.Thread(target=mouse_wheel_hook_thread, args=(loop,), daemon=True)
+    wheel_thread = threading.Thread(target=mouse_wheel_listener_thread, args=(loop,), daemon=True)
     wheel_thread.start()
 
     async with server:

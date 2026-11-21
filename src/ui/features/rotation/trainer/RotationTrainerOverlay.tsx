@@ -173,11 +173,23 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         (expected === "lclick" && pressed === "lclick") ||
         (expected === "rclick" && pressed === "rclick") ||
         (expected === "wheeldown" &&
-          (pressed === "wheeldown" || pressed === "wheel" || pressed === "mclick" || pressed === "mouse3")) ||
+          (pressed === "wheeldown" ||
+            pressed === "wheelup" ||
+            pressed === "wheel" ||
+            pressed === "mclick" ||
+            pressed === "mouse3")) ||
         (expected === "wheelup" &&
-          (pressed === "wheelup" || pressed === "wheel")) ||
+          (pressed === "wheelup" ||
+            pressed === "wheeldown" ||
+            pressed === "wheel" ||
+            pressed === "mclick" ||
+            pressed === "mouse3")) ||
         (expected === "mclick" &&
-          (pressed === "mclick" || pressed === "mouse3" || pressed === "wheeldown" || pressed === "wheel")) ||
+          (pressed === "mclick" ||
+            pressed === "mouse3" ||
+            pressed === "wheeldown" ||
+            pressed === "wheelup" ||
+            pressed === "wheel")) ||
         (expected === "mouse4" && (pressed === "mouse4" || pressed === "xbutton1")) ||
         (expected === "mouse5" && (pressed === "mouse5" || pressed === "xbutton2"))
 
@@ -393,9 +405,12 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     }
 
     function onWheel(e: WheelEvent) {
-      if (showRemap) return
       e.preventDefault()
       const direction = e.deltaY > 0 ? "wheeldown" : "wheelup"
+      if (showRemap) {
+        setRemapRecordedKey({ key: direction, time: Date.now() })
+        return
+      }
       const now = Date.now()
       const last = lastPressTimeRef.current[direction] || 0
       if (now - last < 80) return
