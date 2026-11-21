@@ -1,0 +1,2578 @@
+{
+  "BoltBlueCharged": {
+    "name": "挑龍劈馬",
+    "shortName": "藍蓄力",
+    "castTime": 1.2,
+    "cooldown": null,
+    "cooldownGroup": "BoltBlueCharged"
+  },
+  "BoltBlueQ": {
+    "name": "英布列甲",
+    "shortName": "藍Q",
+    "castTime": 1.1,
+    "cooldown": 15.0,
+    "cooldownGroup": "BoltBlueQ"
+  },
+  "BoltBlueQFollowup": {
+    "name": "霸王沉舟",
+    "shortName": "藍Q追擊",
+    "castTime": 0.933,
+    "cooldown": null,
+    "cooldownGroup": "BoltBlueQFollowup"
+  },
+  "BoltBlueSpecial": {
+    "name": "龍膽巡坡",
+    "shortName": "藍特殊",
+    "castTime": 1.214,
+    "cooldown": 10.0,
+    "cooldownGroup": "BoltBlueSpecial"
+  },
+  "BoltBlueTab": {
+    "name": "盜跖踏梁",
+    "shortName": "切藍",
+    "castTime": 0.85,
+    "cooldown": 3.0,
+    "cooldownGroup": "BoltBlueTab"
+  },
+  "BoltBlueCounter": {
+    "name": "霸王破虜",
+    "shortName": "藍反擊",
+    "castTime": 2.273,
+    "cooldown": null,
+    "cooldownGroup": "BoltBlueCounter"
+  },
+  "BoltBlueVCBase": {
+    "name": "平風掃寶",
+    "shortName": "藍派生",
+    "castTime": 1.0,
+    "cooldown": null,
+    "cooldownGroup": "BoltBlueVCBase"
+  },
+  "BoltBlueVCSharp": {
+    "name": "平風掃寶·鋒銳",
+    "shortName": "藍派生",
+    "castTime": 1.2,
+    "cooldown": null,
+    "cooldownGroup": "BoltBlueVCSharp"
+  },
+  "BoltBlueVC": {
+    "name": "平風掃寶",
+    "shortName": "藍派生",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "BoltBlueVC"
+  },
+  "BoltEnterFengRui": {
+    "name": "鋒銳啟動",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "BoltEnterFengRui"
+  },
+  "BoltEndFengRui": {
+    "name": "鋒銳結束",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "BoltEndFengRui"
+  },
+  "BoltEarlyMingGe": {
+    "name": "鳴戈引爆",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "BoltEarlyMingGe"
+  },
+  "BoltZaige": {
+    "name": "載戈",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "BoltZaige"
+  },
+  "BoltMingGe": {
+    "name": "鳴戈",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "BoltMingGe"
+  },
+  "BoltBlueLight1": {
+    "name": "撥山輕擊1",
+    "shortName": "藍輕1",
+    "castTime": 0.89,
+    "cooldown": null,
+    "cooldownGroup": "BoltBlueLight1"
+  },
+  "BoltBlueLight2": {
+    "name": "撥山輕擊2",
+    "shortName": "藍輕2",
+    "castTime": 0.4,
+    "cooldown": null,
+    "cooldownGroup": "BoltBlueLight2"
+  },
+  "BoltBlueLight3": {
+    "name": "撥山輕擊3",
+    "shortName": "藍輕3",
+    "castTime": 0.704,
+    "cooldown": null,
+    "cooldownGroup": "BoltBlueLight3"
+  },
+  "BoltBlueLight4": {
+    "name": "撥山輕擊4",
+    "shortName": "藍輕4",
+    "castTime": 0.991,
+    "cooldown": null,
+    "cooldownGroup": "BoltBlueLight4"
+  },
+  "BoltBlueHeavy1": {
+    "name": "撥山重擊1",
+    "shortName": "藍重1",
+    "castTime": 0.8,
+    "cooldown": null,
+    "cooldownGroup": "BoltBlueHeavy1"
+  },
+  "BoltBlueHeavy2": {
+    "name": "撥山重擊2",
+    "shortName": "藍重2",
+    "castTime": 0.71,
+    "cooldown": null,
+    "cooldownGroup": "BoltBlueHeavy2"
+  },
+  "BoltBlueHeavy3": {
+    "name": "撥山重擊3",
+    "shortName": "藍重3",
+    "castTime": 1.197,
+    "cooldown": null,
+    "cooldownGroup": "BoltBlueHeavy3"
+  },
+  "BoltBlueParrySuccess": {
+    "name": "英布列甲·招架成功",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "BoltBlueParrySuccess"
+  },
+  "BoltQuanWeiExtend": {
+    "name": "泉威延長",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "BoltQuanWeiExtend"
+  },
+  "BoltMoonTide": {
+    "name": "潮湧",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "BoltMoonTide"
+  },
+  "BoltMoonBurst": {
+    "name": "洪波萬仞",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "BoltMoonBurst"
+  },
+  "DreamwroughtBubbles": {
+    "name": "Dreamwrought Bubbles",
+    "shortName": "Umbrella Heavy Charged",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "DreamwroughtBubbles"
+  },
+  "ScarletSpin": {
+    "name": "Scarlet Spin",
+    "shortName": "Umbrella Q",
+    "castTime": 12.0,
+    "cooldown": 20.0,
+    "cooldownGroup": "ScarletSpin"
+  },
+  "ScarletSpinStage1": {
+    "name": "Scarlet Spin Stage 1",
+    "shortName": "Umbrella Q1",
+    "castTime": 2.001,
+    "cooldown": null,
+    "cooldownGroup": "ScarletSpinStage1"
+  },
+  "ScarletSpinStage2": {
+    "name": "Scarlet Spin Stage 2",
+    "shortName": "Umbrella Q2",
+    "castTime": 1.667,
+    "cooldown": null,
+    "cooldownGroup": "ScarletSpinStage2"
+  },
+  "ScarletSpinStage3": {
+    "name": "Scarlet Spin Stage 3",
+    "shortName": "Umbrella Q3",
+    "castTime": 1.909,
+    "cooldown": null,
+    "cooldownGroup": "ScarletSpinStage3"
+  },
+  "ScarletSpinStage4": {
+    "name": "Scarlet Spin Stage 4",
+    "shortName": "Umbrella Q4",
+    "castTime": 1.576,
+    "cooldown": null,
+    "cooldownGroup": "ScarletSpinStage4"
+  },
+  "Resonance": {
+    "name": "Resonance (Scarlet Spin)",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "Resonance"
+  },
+  "PhantomUmbrellaSummon": {
+    "name": "Summon Phantom Umbrella",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "PhantomUmbrellaSummon"
+  },
+  "FragrantSongGrant": {
+    "name": "Fragrant Song",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "FragrantSongGrant"
+  },
+  "EverspringPerfectCatch": {
+    "name": "Perfect Catch",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "EverspringPerfectCatch"
+  },
+  "DreamwroughtBubblesCharge": {
+    "name": "Dreamwrought Bubbles [Charge]",
+    "shortName": "Umbrella Charge",
+    "castTime": 0.603,
+    "cooldown": null,
+    "cooldownGroup": "DreamwroughtBubblesCharge"
+  },
+  "DreamwroughtBubblesRelease": {
+    "name": "Dreamwrought Bubbles [Release]",
+    "shortName": "",
+    "castTime": 1.0,
+    "cooldown": null,
+    "cooldownGroup": "DreamwroughtBubblesRelease"
+  },
+  "BubblesResonance": {
+    "name": "Resonance (Dreamwrought Bubbles)",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "BubblesResonance"
+  },
+  "BubblesPhantomUmbrellaSummon": {
+    "name": "Summon Phantom Umbrella (Dreamwrought Bubbles)",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "BubblesPhantomUmbrellaSummon"
+  },
+  "CycloneWaltz": {
+    "name": "Cyclone Waltz",
+    "shortName": "Umbrella Special",
+    "castTime": 3.95,
+    "cooldown": 10.0,
+    "cooldownGroup": "CycloneWaltz"
+  },
+  "CycloneWaltzReturn": {
+    "name": "Cyclone Waltz [Return]",
+    "shortName": "Umbrella Special Return",
+    "castTime": 0.65,
+    "cooldown": null,
+    "cooldownGroup": "CycloneWaltzReturn"
+  },
+  "CycloneChimeConvert": {
+    "name": "Cyclone Waltz Phantom Chime Conversion",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "CycloneChimeConvert"
+  },
+  "CycloneChimeBonus": {
+    "name": "Cyclone Waltz [Phantom Chime]",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": 0.4,
+    "cooldownGroup": "CycloneChimeBonus"
+  },
+  "PiercingDamage": {
+    "name": "Piercing Damage",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "PiercingDamage"
+  },
+  "Defense": {
+    "name": "Defense",
+    "shortName": "",
+    "castTime": 0.3,
+    "cooldown": null,
+    "cooldownGroup": "Defense"
+  },
+  "RiposteTrigger": {
+    "name": "Riposte Trigger",
+    "shortName": "",
+    "castTime": 10.0,
+    "cooldown": null,
+    "cooldownGroup": "RiposteTrigger"
+  },
+  "AoRT4Shield": {
+    "name": "AoR T4 Shield",
+    "shortName": "",
+    "castTime": 3.0,
+    "cooldown": null,
+    "cooldownGroup": "AoRT4Shield"
+  },
+  "Deflect": {
+    "name": "Deflect",
+    "shortName": "",
+    "castTime": 0.3,
+    "cooldown": null,
+    "cooldownGroup": "Deflect"
+  },
+  "DeflectSuccessful": {
+    "name": "Deflect (Successful)",
+    "shortName": "",
+    "castTime": 0.3,
+    "cooldown": null,
+    "cooldownGroup": "DeflectSuccessful"
+  },
+  "MoraleChant": {
+    "name": "Morale Chant",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": 10.0,
+    "cooldownGroup": "MoraleChant"
+  },
+  "BreakingPointT6Dodge": {
+    "name": "Disintegration",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": 15.0,
+    "cooldownGroup": "BreakingPointT6Dodge"
+  },
+  "PerfectDodgeCancel": {
+    "name": "Perfect Dodge [Cancel]",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "PerfectDodgeCancel"
+  },
+  "PerfectDodge": {
+    "name": "Perfect Dodge",
+    "shortName": "",
+    "castTime": 0.4,
+    "cooldown": null,
+    "cooldownGroup": "PerfectDodge"
+  },
+  "Dodge": {
+    "name": "Dodge",
+    "shortName": "",
+    "castTime": 0.4,
+    "cooldown": null,
+    "cooldownGroup": "Dodge"
+  },
+  "PerfectDodgeSuccess": {
+    "name": "Perfect Dodge",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "PerfectDodgeSuccess"
+  },
+  "DeflectSuccess": {
+    "name": "Deflect (Successful)",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "DeflectSuccess"
+  },
+  "DivinecraftSolidFoundationGrant": {
+    "name": "Solid Foundation (Grant)",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "DivinecraftSolidFoundationGrant"
+  },
+  "DivinecraftSolidFoundationStrike": {
+    "name": "Solid Foundation",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "DivinecraftSolidFoundationStrike"
+  },
+  "DefenseSuccess": {
+    "name": "Defense (Successful)",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "DefenseSuccess"
+  },
+  "MoraleChantHealing": {
+    "name": "Morale Chant Healing",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": 10.0,
+    "cooldownGroup": "MoraleChant"
+  },
+  "PurewrathStack": {
+    "name": "Purewrath Script",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "PurewrathStack"
+  },
+  "SoberSorrow5Hits": {
+    "name": "Sober Sorrow [5 Hits]",
+    "shortName": "",
+    "castTime": 1.374,
+    "cooldown": null,
+    "cooldownGroup": "SoberSorrow5Hits"
+  },
+  "SoberSorrow": {
+    "name": "Sober Sorrow",
+    "shortName": "",
+    "castTime": 1.996,
+    "cooldown": null,
+    "cooldownGroup": "SoberSorrow"
+  },
+  "SweepAll": {
+    "name": "Sweep All [1 Hit]",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "SweepAll"
+  },
+  "SweepAllWaterDrop": {
+    "name": "Sweep All - WaterDrop",
+    "shortName": "",
+    "castTime": 0.304,
+    "cooldown": null,
+    "cooldownGroup": "SweepAllWaterDrop"
+  },
+  "SweepAllSpringSurge": {
+    "name": "Sweep All - SpringSurge",
+    "shortName": "",
+    "castTime": 0.304,
+    "cooldown": null,
+    "cooldownGroup": "SweepAllSpringSurge"
+  },
+  "SweepAllRiverFlow": {
+    "name": "Sweep All - RiverFlow",
+    "shortName": "",
+    "castTime": 0.304,
+    "cooldown": null,
+    "cooldownGroup": "SweepAllRiverFlow"
+  },
+  "SoberSorrow5Hits10Combos": {
+    "name": "Sober Sorrow [5 Hits][10 Combos]",
+    "shortName": "",
+    "castTime": 1.374,
+    "cooldown": null,
+    "cooldownGroup": "SoberSorrow5Hits10Combos"
+  },
+  "SoberSorrowResolve": {
+    "name": "Sober Sorrow (Combo Buff)",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "SoberSorrowResolve"
+  },
+  "HeavenwillDeclared": {
+    "name": "Heavenwill Declared",
+    "shortName": "Gauntlet Q1",
+    "castTime": 0.625,
+    "cooldown": 15.0,
+    "cooldownGroup": "HeavenwillDeclared"
+  },
+  "CelestialMandate": {
+    "name": "Celestial Mandate",
+    "shortName": "Gauntlet Q2",
+    "castTime": 1.4,
+    "cooldown": 2.0,
+    "cooldownGroup": "CelestialMandate"
+  },
+  "VirtuousEnthroned1stHit": {
+    "name": "Virtuous Enthroned 1st Hit",
+    "shortName": "Gauntlet H1",
+    "castTime": 0.412,
+    "cooldown": null,
+    "cooldownGroup": "VirtuousEnthroned1stHit"
+  },
+  "VirtuousEnthroned2ndHit": {
+    "name": "Virtuous Enthroned 2nd Hit",
+    "shortName": "Gauntlet H2",
+    "castTime": 0.438,
+    "cooldown": null,
+    "cooldownGroup": "VirtuousEnthroned2ndHit"
+  },
+  "VirtuousEnthroned3rdHit": {
+    "name": "Virtuous Enthroned 3rd Hit",
+    "shortName": "Gauntlet H3",
+    "castTime": 0.963,
+    "cooldown": null,
+    "cooldownGroup": "VirtuousEnthroned3rdHit"
+  },
+  "WickedDefiance": {
+    "name": "Wicked Defiance",
+    "shortName": "Gauntlet VC",
+    "castTime": 0.9,
+    "cooldown": null,
+    "cooldownGroup": "WickedDefiance"
+  },
+  "RighteousReign1stHit": {
+    "name": "Righteous Reign 1st Hit",
+    "shortName": "Gauntlet A1",
+    "castTime": 0.466,
+    "cooldown": null,
+    "cooldownGroup": "RighteousReign1stHit"
+  },
+  "RighteousReign2ndHit": {
+    "name": "Righteous Reign 2nd Hit",
+    "shortName": "Gauntlet A2",
+    "castTime": 0.462,
+    "cooldown": null,
+    "cooldownGroup": "RighteousReign2ndHit"
+  },
+  "RighteousReign3rdHit": {
+    "name": "Righteous Reign 3rd Hit",
+    "shortName": "Gauntlet A3",
+    "castTime": 0.333,
+    "cooldown": null,
+    "cooldownGroup": "RighteousReign3rdHit"
+  },
+  "RighteousReign4thHit": {
+    "name": "Righteous Reign 4th Hit",
+    "shortName": "Gauntlet A4",
+    "castTime": 0.417,
+    "cooldown": null,
+    "cooldownGroup": "RighteousReign4thHit"
+  },
+  "RighteousReign5thHit": {
+    "name": "Righteous Reign 5th Hit",
+    "shortName": "Gauntlet A5",
+    "castTime": 0.512,
+    "cooldown": null,
+    "cooldownGroup": "RighteousReign5thHit"
+  },
+  "RighteousReign6thHit": {
+    "name": "Righteous Reign 6th Hit",
+    "shortName": "Gauntlet A6",
+    "castTime": 0.923,
+    "cooldown": null,
+    "cooldownGroup": "RighteousReign6thHit"
+  },
+  "RighteousReign6thHitCancel": {
+    "name": "Righteous Reign 6th Hit [Cancel]",
+    "shortName": "Gauntlet A6",
+    "castTime": 0.256,
+    "cooldown": null,
+    "cooldownGroup": "RighteousReign6thHitCancel"
+  },
+  "LightAttackFalcon": {
+    "name": "Light Attack Falcon",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "LightAttackFalcon"
+  },
+  "AllUnderJustice": {
+    "name": "All Under Justice",
+    "shortName": "Gauntlet Special",
+    "castTime": 1.018,
+    "cooldown": 6.0,
+    "cooldownGroup": "AllUnderJustice"
+  },
+  "VileCondemned": {
+    "name": "Vile Condemned",
+    "shortName": "Gauntlet Charged",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "VileCondemned"
+  },
+  "VileCondemnedCharge": {
+    "name": "Vile Condemned Charge",
+    "shortName": "",
+    "castTime": 0.775,
+    "cooldown": null,
+    "cooldownGroup": "VileCondemnedCharge"
+  },
+  "VileCondemnedHit": {
+    "name": "Vile Condemned Hit",
+    "shortName": "",
+    "castTime": 2.837,
+    "cooldown": null,
+    "cooldownGroup": "VileCondemnedHit"
+  },
+  "VileCondemnedEndHit": {
+    "name": "Vile Condemned End Hit",
+    "shortName": "",
+    "castTime": 2.837,
+    "cooldown": null,
+    "cooldownGroup": "VileCondemnedEndHit"
+  },
+  "SoaringHighT6Refund": {
+    "name": "Soaring High T6 Refund",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": 0.0,
+    "cooldownGroup": "SoaringHighT6Refund"
+  },
+  "SkyGrippedReplay": {
+    "name": "Heaven's Might Damage",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "SkyGrippedReplay"
+  },
+  "VileCondemnedEnd": {
+    "name": "Vile Condemned End",
+    "shortName": "Gauntlet End",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "VileCondemnedEnd"
+  },
+  "VileCondemnedEnd4": {
+    "name": "Vile Condemned End [4 HW]",
+    "shortName": "Gauntlet End [4 HW]",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "VileCondemnedEnd4"
+  },
+  "VirtuousEnthroned4thHit": {
+    "name": "Virtuous Enthroned 4th Hit",
+    "shortName": "Gauntlet H4",
+    "castTime": 0.75,
+    "cooldown": null,
+    "cooldownGroup": "VirtuousEnthroned4thHit"
+  },
+  "VileCondemnedEndFastCharge": {
+    "name": "Vile Condemned End [Fast Charge]",
+    "shortName": "",
+    "castTime": 0.775,
+    "cooldown": null,
+    "cooldownGroup": "VileCondemnedEndFastCharge"
+  },
+  "Flamelash": {
+    "name": "Flamelash",
+    "shortName": "Flamelash",
+    "castTime": 0.85,
+    "cooldown": null,
+    "cooldownGroup": "Flamelash"
+  },
+  "AddledMind": {
+    "name": "Addled Mind",
+    "shortName": "DB Q",
+    "castTime": 0.744,
+    "cooldown": 15.0,
+    "cooldownGroup": "AddledMind"
+  },
+  "InfernalLight1": {
+    "name": "Light Attack 1",
+    "shortName": "A1",
+    "castTime": 0.43,
+    "cooldown": null,
+    "cooldownGroup": "InfernalLight1"
+  },
+  "InfernalLight1Rodent": {
+    "name": "Light Attack 1 [Rodent]",
+    "shortName": "A1 [Rodent]",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "InfernalLight1Rodent"
+  },
+  "InfernalLight2": {
+    "name": "Light Attack 2",
+    "shortName": "A2",
+    "castTime": 0.47,
+    "cooldown": null,
+    "cooldownGroup": "InfernalLight2"
+  },
+  "InfernalLight3": {
+    "name": "Light Attack 3",
+    "shortName": "A3",
+    "castTime": 0.6,
+    "cooldown": null,
+    "cooldownGroup": "InfernalLight3"
+  },
+  "InfernalLight3Cancel": {
+    "name": "Light Attack 3 [Cancel]",
+    "shortName": "A3 [Cancel]",
+    "castTime": 0.419,
+    "cooldown": null,
+    "cooldownGroup": "InfernalLight3Cancel"
+  },
+  "InfernalLight3Rodent": {
+    "name": "Light Attack 3 [Rodent]",
+    "shortName": "A3 [Rodent]",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "InfernalLight3Rodent"
+  },
+  "InfernalLight4": {
+    "name": "Light Attack 4",
+    "shortName": "A4",
+    "castTime": 0.529,
+    "cooldown": null,
+    "cooldownGroup": "InfernalLight4"
+  },
+  "InfernalLight4Cancel": {
+    "name": "Light Attack 4 [Cancel]",
+    "shortName": "A4 [Cancel]",
+    "castTime": 0.167,
+    "cooldown": null,
+    "cooldownGroup": "InfernalLight4Cancel"
+  },
+  "InfernalLight4Rodent": {
+    "name": "Light Attack 4 [Rodent]",
+    "shortName": "A4 [Rodent]",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "InfernalLight4Rodent"
+  },
+  "InfernalFlamelashLight1": {
+    "name": "Blade of Heaven's Wrath 1",
+    "shortName": "FA1",
+    "castTime": 0.357,
+    "cooldown": null,
+    "cooldownGroup": "InfernalFlamelashLight1"
+  },
+  "InfernalFlamelashLight2": {
+    "name": "Blade of Heaven's Wrath 2",
+    "shortName": "FA2",
+    "castTime": 0.466,
+    "cooldown": null,
+    "cooldownGroup": "InfernalFlamelashLight2"
+  },
+  "InfernalFlamelashLight2Rodent": {
+    "name": "Blade of Heaven's Wrath 2 [Rodent]",
+    "shortName": "FA2 [Rodent]",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "InfernalFlamelashLight2Rodent"
+  },
+  "InfernalFlamelashLight3": {
+    "name": "Blade of Heaven's Wrath 3",
+    "shortName": "FA3",
+    "castTime": 0.667,
+    "cooldown": null,
+    "cooldownGroup": "InfernalFlamelashLight3"
+  },
+  "InfernalFlamelashLight4": {
+    "name": "Blade of Heaven's Wrath 4",
+    "shortName": "FA4",
+    "castTime": 0.866,
+    "cooldown": null,
+    "cooldownGroup": "InfernalFlamelashLight4"
+  },
+  "InfernalFlamelashLight4Rodent": {
+    "name": "Blade of Heaven's Wrath 4 [Rodent]",
+    "shortName": "FA4 [Rodent]",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "InfernalFlamelashLight4Rodent"
+  },
+  "InfernalFlamelashLight5": {
+    "name": "Blade of Heaven's Wrath 5",
+    "shortName": "FA5",
+    "castTime": 1.401,
+    "cooldown": null,
+    "cooldownGroup": "InfernalFlamelashLight5"
+  },
+  "InfernalFlamelashLight5Cancel": {
+    "name": "Blade of Heaven's Wrath 5 [Cancel]",
+    "shortName": "FA5 [Cancel]",
+    "castTime": 1.023,
+    "cooldown": null,
+    "cooldownGroup": "InfernalFlamelashLight5Cancel"
+  },
+  "InfernalLight2Rodent": {
+    "name": "Light Attack 2 [Rodent]",
+    "shortName": "A2 [Rodent]",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "InfernalLight2Rodent"
+  },
+  "InfernalFlamelashLight1Rodent": {
+    "name": "Blade of Heaven's Wrath 1 [Rodent]",
+    "shortName": "FA1 [Rodent]",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "InfernalFlamelashLight1Rodent"
+  },
+  "InfernalFlamelashLight5Rodent": {
+    "name": "Blade of Heaven's Wrath 5 [Rodent]",
+    "shortName": "FA5 [Rodent]",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "InfernalFlamelashLight5Rodent"
+  },
+  "InfernalFlamelashLight3Rodent": {
+    "name": "Blade of Heaven's Wrath 3 [Rodent]",
+    "shortName": "FA3 [Rodent]",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "InfernalFlamelashLight3Rodent"
+  },
+  "InfernalFlamelashLight1Combo": {
+    "name": "Blade of Heaven's Wrath 1 [Combo]",
+    "shortName": "FA1 [Combo]",
+    "castTime": 0.186,
+    "cooldown": null,
+    "cooldownGroup": "InfernalFlamelashLight1Combo"
+  },
+  "InfernalFlamelashLight2Combo": {
+    "name": "Blade of Heaven's Wrath 2 [Combo]",
+    "shortName": "FA2 [Combo]",
+    "castTime": 0.26,
+    "cooldown": null,
+    "cooldownGroup": "InfernalFlamelashLight2Combo"
+  },
+  "InfernalFlamelashLight3Combo": {
+    "name": "Blade of Heaven's Wrath 3 [Combo]",
+    "shortName": "FA3 [Combo]",
+    "castTime": 0.217,
+    "cooldown": null,
+    "cooldownGroup": "InfernalFlamelashLight3Combo"
+  },
+  "InfernalFlamelashLight4Combo": {
+    "name": "Blade of Heaven's Wrath 4 [Combo]",
+    "shortName": "FA4 [Combo]",
+    "castTime": 0.26,
+    "cooldown": null,
+    "cooldownGroup": "InfernalFlamelashLight4Combo"
+  },
+  "InfernalLight1Combo": {
+    "name": "Light Attack 1 [Combo]",
+    "shortName": "A1 [Combo]",
+    "castTime": 0.23,
+    "cooldown": null,
+    "cooldownGroup": "InfernalLight1Combo"
+  },
+  "InfernalLight2Combo": {
+    "name": "Light Attack 2 [Combo]",
+    "shortName": "A2 [Combo]",
+    "castTime": 0.23,
+    "cooldown": null,
+    "cooldownGroup": "InfernalLight2Combo"
+  },
+  "InfernalLight3Combo": {
+    "name": "Light Attack 3 [Combo]",
+    "shortName": "A3 [Combo]",
+    "castTime": 0.26,
+    "cooldown": null,
+    "cooldownGroup": "InfernalLight3Combo"
+  },
+  "InfernalLight1Cancel": {
+    "name": "Light Attack 1 [Cancel]",
+    "shortName": "A1 [Cancel]",
+    "castTime": 0.339,
+    "cooldown": null,
+    "cooldownGroup": "InfernalLight1Cancel"
+  },
+  "InfernalLight2Cancel": {
+    "name": "Light Attack 2 [Cancel]",
+    "shortName": "A2 [Cancel]",
+    "castTime": 0.343,
+    "cooldown": null,
+    "cooldownGroup": "InfernalLight2Cancel"
+  },
+  "EmeraldBarrier": {
+    "name": "Emerald Barrier",
+    "shortName": "Fan Q",
+    "castTime": 1.02,
+    "cooldown": 15.0,
+    "cooldownGroup": "EmeraldBarrier"
+  },
+  "EmeraldBarrierMiss": {
+    "name": "Emerald Barrier [Miss]",
+    "shortName": "Fan Q Miss",
+    "castTime": 1.02,
+    "cooldown": 15.0,
+    "cooldownGroup": "EmeraldBarrier"
+  },
+  "ForsakenFame": {
+    "name": "Forsaken Fame",
+    "shortName": "Fan Light Charged",
+    "castTime": 1.63,
+    "cooldown": null,
+    "cooldownGroup": "ForsakenFame"
+  },
+  "ForsakenFameCancel": {
+    "name": "Forsaken Fame [Cancel]",
+    "shortName": "Fan Light Charged [Cancel]",
+    "castTime": 1.19,
+    "cooldown": null,
+    "cooldownGroup": "ForsakenFameCancel"
+  },
+  "StarReacherGrant": {
+    "name": "Star Reacher",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": 1.0,
+    "cooldownGroup": "StarReacherGrant"
+  },
+  "EmeraldBarrierCancel": {
+    "name": "Emerald Barrier [Cancel]",
+    "shortName": "Fan Q [Cancel]",
+    "castTime": 0.167,
+    "cooldown": 15.0,
+    "cooldownGroup": "EmeraldBarrier"
+  },
+  "MoonShatterSpring": {
+    "name": "Moon Shatter Spring",
+    "shortName": "Fan Heavy Pursuit",
+    "castTime": 0.0,
+    "cooldown": 6.0,
+    "cooldownGroup": "MoonShatterSpring"
+  },
+  "MoonShatterSpringNormal": {
+    "name": "Moon Shatter Spring",
+    "shortName": "Fan Heavy Pursuit [3 hits]",
+    "castTime": 1.557,
+    "cooldown": null,
+    "cooldownGroup": "MoonShatterSpringNormal"
+  },
+  "MoonShatterSpringWindrider": {
+    "name": "Moon Shatter Spring [Windrider]",
+    "shortName": "Fan Heavy Pursuit [5 hits]",
+    "castTime": 2.433,
+    "cooldown": null,
+    "cooldownGroup": "MoonShatterSpringWindrider"
+  },
+  "MoonShatterSpringDispatch": {
+    "name": "Moon Shatter Spring",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "MoonShatterSpringDispatch"
+  },
+  "PeaksSpringlessSilence": {
+    "name": "Peak's Springless Silence",
+    "shortName": "Fan Special",
+    "castTime": 1.113,
+    "cooldown": 12.0,
+    "cooldownGroup": "PeaksSpringlessSilence"
+  },
+  "PeaksSpringlessSilenceCancel": {
+    "name": "Peak's Springless Silence [Cancel]",
+    "shortName": "Fan Special [Cancel]",
+    "castTime": 0.558,
+    "cooldown": 12.0,
+    "cooldownGroup": "PeaksSpringlessSilence"
+  },
+  "StarReacherAirborneGrant": {
+    "name": "Star Reacher",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": 1.0,
+    "cooldownGroup": "StarReacherGrant"
+  },
+  "BoltRedCharged": {
+    "name": "星馳秋野",
+    "shortName": "紅蓄力",
+    "castTime": 2.4,
+    "cooldown": null,
+    "cooldownGroup": "BoltRedCharged"
+  },
+  "BoltRedQ": {
+    "name": "金科盡詔",
+    "shortName": "紅Q",
+    "castTime": 0.63,
+    "cooldown": 12.0,
+    "cooldownGroup": "BoltRedQ"
+  },
+  "BoltRedSpecial": {
+    "name": "玉京崩騰",
+    "shortName": "紅特殊",
+    "castTime": 1.4,
+    "cooldown": 10.0,
+    "cooldownGroup": "BoltRedSpecial"
+  },
+  "BoltRedTab": {
+    "name": "直貫其鋒",
+    "shortName": "切紅",
+    "castTime": 0.625,
+    "cooldown": 3.0,
+    "cooldownGroup": "BoltRedTab"
+  },
+  "BoltRedLight1": {
+    "name": "決獄輕擊1",
+    "shortName": "紅輕1",
+    "castTime": 0.5,
+    "cooldown": null,
+    "cooldownGroup": "BoltRedLight1"
+  },
+  "BoltRedHeavy1": {
+    "name": "決獄重擊1",
+    "shortName": "紅重1",
+    "castTime": 0.36,
+    "cooldown": null,
+    "cooldownGroup": "BoltRedHeavy1"
+  },
+  "BoltRedVC": {
+    "name": "聽雨斷罪",
+    "shortName": "紅派生",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "BoltRedVC"
+  },
+  "BoltRedVCBase": {
+    "name": "聽雨斷罪",
+    "shortName": "紅派生",
+    "castTime": 1.3,
+    "cooldown": null,
+    "cooldownGroup": "BoltRedVCBase"
+  },
+  "BoltRedVCSharp": {
+    "name": "聽雨斷罪·鋒銳",
+    "shortName": "紅派生",
+    "castTime": 1.7,
+    "cooldown": null,
+    "cooldownGroup": "BoltRedVCSharp"
+  },
+  "SummonLightning": {
+    "name": "Summon Lightning",
+    "shortName": "",
+    "castTime": 1.179,
+    "cooldown": null,
+    "cooldownGroup": "SummonLightning"
+  },
+  "RodentsResilienceCharge": {
+    "name": "Rodent's Resilience [1.5s Charge]",
+    "shortName": "RD Charge",
+    "castTime": 1.5,
+    "cooldown": null,
+    "cooldownGroup": "RodentsResilienceCharge"
+  },
+  "RodentRampage": {
+    "name": "Rodent Rampage",
+    "shortName": "RD Special",
+    "castTime": 0.541,
+    "cooldown": 0.0,
+    "cooldownGroup": "RodentRampage"
+  },
+  "Rodent": {
+    "name": "Rodent",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "Rodent"
+  },
+  "BladeboundThreadCancel": {
+    "name": "Bladebound Thread [Cancel]",
+    "shortName": "RD Q",
+    "castTime": 0.385,
+    "cooldown": 8.0,
+    "cooldownGroup": "BladeboundThread"
+  },
+  "RodentHuntDamage": {
+    "name": "Rodent Hunt",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "RodentHuntDamage"
+  },
+  "CraneWings": {
+    "name": "Plumage Sweep",
+    "shortName": "Drum Q1",
+    "castTime": 1.0,
+    "cooldown": 15.0,
+    "cooldownGroup": "CraneWings"
+  },
+  "CranesCry": {
+    "name": "Crane's Cry",
+    "shortName": "Drum Q2",
+    "castTime": 0.952,
+    "cooldown": null,
+    "cooldownGroup": "CranesCry"
+  },
+  "RhythmOfAccord": {
+    "name": "Rhythm of Accord",
+    "shortName": "Drum VC",
+    "castTime": 1.179,
+    "cooldown": null,
+    "cooldownGroup": "RhythmOfAccord"
+  },
+  "RibbonHeavy1": {
+    "name": "Waist Drum: Heavy Attack 1",
+    "shortName": "Drum Heavy 1",
+    "castTime": 0.694,
+    "cooldown": null,
+    "cooldownGroup": "RibbonHeavy1"
+  },
+  "RibbonHeavy2": {
+    "name": "Waist Drum: Heavy Attack 2",
+    "shortName": "Drum Heavy 2",
+    "castTime": 0.462,
+    "cooldown": null,
+    "cooldownGroup": "RibbonHeavy2"
+  },
+  "RibbonHeavy3": {
+    "name": "Waist Drum: Heavy Attack 3",
+    "shortName": "Drum Heavy 3",
+    "castTime": 0.833,
+    "cooldown": null,
+    "cooldownGroup": "RibbonHeavy3"
+  },
+  "RippleJadebreaker": {
+    "name": "Ripple: Jadebreaker",
+    "shortName": "Drum Special (Jadebreaker)",
+    "castTime": 5.852,
+    "cooldown": 20.0,
+    "cooldownGroup": "RipplingDew"
+  },
+  "RippleDawnsun": {
+    "name": "Ripple: Dawnsun",
+    "shortName": "Drum Special (Dawnsun)",
+    "castTime": 5.92,
+    "cooldown": 20.0,
+    "cooldownGroup": "RipplingDew"
+  },
+  "JadebreakerEnhanced": {
+    "name": "Ripple: Jadebreaker · Enhanced Sound Wave",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "JadebreakerEnhanced"
+  },
+  "RibbonLightCharged": {
+    "name": "Sleeve Dance",
+    "shortName": "Drum Light Charged",
+    "castTime": 2.033,
+    "cooldown": null,
+    "cooldownGroup": "RibbonLightCharged"
+  },
+  "RibbonHeavy3PreVC": {
+    "name": "Waist Drum: Heavy Attack 3 · Follow-up Setup",
+    "shortName": "Drum Heavy 3 Pre-VC",
+    "castTime": 0.583,
+    "cooldown": null,
+    "cooldownGroup": "RibbonHeavy3PreVC"
+  },
+  "RibbonLightChargedVC": {
+    "name": "Sleeve Dance → Rhythm of Accord",
+    "shortName": "Drum Light Charged → VC",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "RibbonLightChargedVC"
+  },
+  "RibbonHeavyComboVC": {
+    "name": "Waist Drum: Heavy Attack 1–3 → Rhythm of Accord",
+    "shortName": "Drum Heavy 123 → VC",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "RibbonHeavyComboVC"
+  },
+  "RippleFlourishingNotes": {
+    "name": "Ripple: Toneflux",
+    "shortName": "Drum Special (Toneflux)",
+    "castTime": 0.0,
+    "cooldown": 20.0,
+    "cooldownGroup": "RipplingDew"
+  },
+  "FlourishingNotesField": {
+    "name": "Ripple: Toneflux · Sound Field",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "FlourishingNotesField"
+  },
+  "GoldenBodyCancel": {
+    "name": "Golden Body [Cancel]",
+    "shortName": "",
+    "castTime": 0.5,
+    "cooldown": 20.0,
+    "cooldownGroup": "GoldenBody"
+  },
+  "SoaringSpin1": {
+    "name": "Soaring Spin 1-Hit",
+    "shortName": "Soaring 1 Hit",
+    "castTime": 1.182,
+    "cooldown": 12.0,
+    "cooldownGroup": "SoaringSpin"
+  },
+  "SoaringSpin2": {
+    "name": "Soaring Spin",
+    "shortName": "Soaring",
+    "castTime": 2.025,
+    "cooldown": 12.0,
+    "cooldownGroup": "SoaringSpin"
+  },
+  "LeapingToad": {
+    "name": "Leaping Toad [Cancel]",
+    "shortName": "Toad",
+    "castTime": 1.15,
+    "cooldown": 8.0,
+    "cooldownGroup": "LeapingToad"
+  },
+  "DrunkenPoetDrink": {
+    "name": "Drunken Poet Drink",
+    "shortName": "Drink",
+    "castTime": 0.626,
+    "cooldown": null,
+    "cooldownGroup": "DrunkenPoetDrink"
+  },
+  "DrunkenPoetDrinkCancel": {
+    "name": "Drunken Poet Drink [Cancel]",
+    "shortName": "Drink",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "DrunkenPoetDrinkCancel"
+  },
+  "DrunkenPoet1Hit": {
+    "name": "Drunken Poet 1 Hit",
+    "shortName": "Poet x1",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "DrunkenPoet1Hit"
+  },
+  "DrunkenPoet2Hits": {
+    "name": "Drunken Poet 2 Hits",
+    "shortName": "Poet x2",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "DrunkenPoet2Hits"
+  },
+  "DrunkenPoet3Hits": {
+    "name": "Drunken Poet 3 Hits",
+    "shortName": "Poet x3",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "DrunkenPoet3Hits"
+  },
+  "DrunkenPoet4Hits": {
+    "name": "Drunken Poet 4 Hits",
+    "shortName": "Poet x4",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "DrunkenPoet4Hits"
+  },
+  "DrunkenPoet5HitsCancel": {
+    "name": "Drunken Poet 5 Hits [Cancel]",
+    "shortName": "Poet x5",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "DrunkenPoet5HitsCancel"
+  },
+  "DrunkenPoet1": {
+    "name": "Drunken Poet 1st Hit",
+    "shortName": "Poet",
+    "castTime": 0.58,
+    "cooldown": null,
+    "cooldownGroup": "DrunkenPoet1"
+  },
+  "DrunkenPoet2": {
+    "name": "Drunken Poet 2nd Hit",
+    "shortName": "Poet",
+    "castTime": 0.436,
+    "cooldown": null,
+    "cooldownGroup": "DrunkenPoet2"
+  },
+  "DrunkenPoet3": {
+    "name": "Drunken Poet 3rd Hit",
+    "shortName": "Poet",
+    "castTime": 0.55,
+    "cooldown": null,
+    "cooldownGroup": "DrunkenPoet3"
+  },
+  "DrunkenPoet4": {
+    "name": "Drunken Poet 4th Hit",
+    "shortName": "Poet",
+    "castTime": 0.6,
+    "cooldown": null,
+    "cooldownGroup": "DrunkenPoet4"
+  },
+  "DrunkenPoet5": {
+    "name": "Drunken Poet 5th Hit [Cancel]",
+    "shortName": "Poet",
+    "castTime": 0.538,
+    "cooldown": null,
+    "cooldownGroup": "DrunkenPoet5"
+  },
+  "CombustionExplosion": {
+    "name": "Combustion Explosion",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "CombustionExplosion"
+  },
+  "SmolderExplosion": {
+    "name": "Smolder Explosion",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "SmolderExplosion"
+  },
+  "DragonsBreath1": {
+    "name": "Dragon's Breath 1-Hit [Cancel]",
+    "shortName": "Breath 1 Hit",
+    "castTime": 1.273,
+    "cooldown": 6.0,
+    "cooldownGroup": "DragonBreath"
+  },
+  "DragonsBreathSmolder1": {
+    "name": "Dragon's Breath - Smolder 1-Hit [Cancel]",
+    "shortName": "Smolder 1 Hit",
+    "castTime": 1.273,
+    "cooldown": 12.0,
+    "cooldownGroup": "DragonBreathSmolder"
+  },
+  "DragonsBreath2": {
+    "name": "Dragon's Breath 2-Hit [Cancel]",
+    "shortName": "Breath Full",
+    "castTime": 2.728,
+    "cooldown": 6.0,
+    "cooldownGroup": "DragonBreath"
+  },
+  "DragonsBreathSmolder2": {
+    "name": "Dragon's Breath - Smolder 2-Hit [Cancel]",
+    "shortName": "Smolder Full",
+    "castTime": 2.728,
+    "cooldown": 12.0,
+    "cooldownGroup": "DragonBreathSmolder"
+  },
+  "FluteOfTheTidesCancel": {
+    "name": "Flute of the Tides [Cancel]",
+    "shortName": "Flute Cancel",
+    "castTime": 0.8,
+    "cooldown": 25.0,
+    "cooldownGroup": "FluteOfTheTides"
+  },
+  "FluteOfTheTides": {
+    "name": "Flute of the Tides Full",
+    "shortName": "Flute Full",
+    "castTime": 3.3,
+    "cooldown": 25.0,
+    "cooldownGroup": "FluteOfTheTides"
+  },
+  "FluteRipple": {
+    "name": "Flute Chanting a thousand Waves",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "FluteRipple"
+  },
+  "GhostlySteps": {
+    "name": "Ghostly Step",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": 60.0,
+    "cooldownGroup": "GhostlySteps"
+  },
+  "GhostlyStepsUmbra": {
+    "name": "Ghostly Step - Umbra",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": 60.0,
+    "cooldownGroup": "GhostlyStepsUmbra"
+  },
+  "DragonHeadTide": {
+    "name": "Dragon Head - Tide",
+    "shortName": "",
+    "castTime": 5.8,
+    "cooldown": 120.0,
+    "cooldownGroup": "DragonHeadTide"
+  },
+  "SereneBreeze": {
+    "name": "Serene Breeze",
+    "shortName": "",
+    "castTime": 0.475,
+    "cooldown": 30.0,
+    "cooldownGroup": "SereneBreeze"
+  },
+  "BurstingNine": {
+    "name": "Bursting Nine",
+    "shortName": "",
+    "castTime": 1.4,
+    "cooldown": 30.0,
+    "cooldownGroup": "BurstingNine"
+  },
+  "BurstingNine7Hits": {
+    "name": "Bursting Nine [7 hits]",
+    "shortName": "",
+    "castTime": 1.4,
+    "cooldown": 30.0,
+    "cooldownGroup": "BurstingNine"
+  },
+  "BurstingNine2Shots": {
+    "name": "Bursting Nine 2 Shots",
+    "shortName": "",
+    "castTime": 1.925,
+    "cooldown": 30.0,
+    "cooldownGroup": "BurstingNine"
+  },
+  "BurstingNine2Shots7Hits": {
+    "name": "Bursting Nine 2 Shots [7 hits]",
+    "shortName": "",
+    "castTime": 1.925,
+    "cooldown": 30.0,
+    "cooldownGroup": "BurstingNine"
+  },
+  "GhostlyStepsUmbraDodgeHengBlade": {
+    "name": "Ghostly Step - Umbra Dodge (Heng Blade)",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "GhostlyStepsUmbraDodgeHengBlade"
+  },
+  "GhostlyStepsUmbraDodgeMoBlade": {
+    "name": "Ghostly Step - Umbra Dodge (Mo Blade)",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "GhostlyStepsUmbraDodgeMoBlade"
+  },
+  "GhostlyStepsUmbraDodgeSpear": {
+    "name": "Ghostly Step - Umbra Dodge (Spear)",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "GhostlyStepsUmbraDodgeSpear"
+  },
+  "GhostlyStepsUmbraDodgeUmbrella": {
+    "name": "Ghostly Step - Umbra Dodge (Umbrella)",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "GhostlyStepsUmbraDodgeUmbrella"
+  },
+  "GhostlyStepsUmbraDodgeRopeDart": {
+    "name": "Ghostly Step - Umbra Dodge (Rope Dart)",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "GhostlyStepsUmbraDodgeRopeDart"
+  },
+  "GhostlyStepsUmbraDodgeGauntlet": {
+    "name": "Ghostly Step - Umbra Dodge (Gauntlet)",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "GhostlyStepsUmbraDodgeGauntlet"
+  },
+  "GhostlyStepsUmbraDodgeDualBlades": {
+    "name": "Ghostly Step - Umbra Dodge (Dual Blades)",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "GhostlyStepsUmbraDodgeDualBlades"
+  },
+  "WorldToSword": {
+    "name": "World to Sword",
+    "shortName": "WTS",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "WorldToSword"
+  },
+  "QiBlade": {
+    "name": "Qi Blade",
+    "shortName": "Qi Blade",
+    "castTime": 0.0,
+    "cooldown": 0.3,
+    "cooldownGroup": "QiBlade"
+  },
+  "YakshaRush": {
+    "name": "Yaksha Rush",
+    "shortName": "",
+    "castTime": 1.888,
+    "cooldown": 2.0,
+    "cooldownGroup": "YakshaRush"
+  },
+  "QiankunsLockCancel": {
+    "name": "Qiankun's Lock [Cancel]",
+    "shortName": "Spear Q [Cancel]",
+    "castTime": 0.0,
+    "cooldown": 12.0,
+    "cooldownGroup": "QiankunsLock"
+  },
+  "QiankunsLock": {
+    "name": "Qiankun's Lock",
+    "shortName": "Spear Q",
+    "castTime": 0.7,
+    "cooldown": 12.0,
+    "cooldownGroup": "QiankunsLock"
+  },
+  "VagrantSword2": {
+    "name": "Vagrant Sword",
+    "shortName": "Sword Charged",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "VagrantSword2"
+  },
+  "VagrantSwordPreCharge": {
+    "name": "Vagrant Sword [Pre-charge]",
+    "shortName": "Sword Pre-charge",
+    "castTime": 0.2,
+    "cooldown": null,
+    "cooldownGroup": "VagrantSwordPreCharge"
+  },
+  "VagrantSwordCharge": {
+    "name": "Vagrant Sword [Charging]",
+    "shortName": "Sword Charging",
+    "castTime": 1.2,
+    "cooldown": null,
+    "cooldownGroup": "VagrantSwordCharge"
+  },
+  "VagrantSwordShootSingle": {
+    "name": "Vagrant Sword [Single Wave]",
+    "shortName": "Sword Single Wave",
+    "castTime": 0.85,
+    "cooldown": null,
+    "cooldownGroup": "VagrantSwordShootSingle"
+  },
+  "VagrantSwordShootThree": {
+    "name": "Vagrant Sword [Three Waves]",
+    "shortName": "Sword Three Waves",
+    "castTime": 0.85,
+    "cooldown": null,
+    "cooldownGroup": "VagrantSwordShootThree"
+  },
+  "DauntingStrikeCancel": {
+    "name": "Daunting Strike [Cancel]",
+    "shortName": "Sword Q",
+    "castTime": 0.293,
+    "cooldown": 12.0,
+    "cooldownGroup": "DauntingStrikeCancel"
+  },
+  "SwordMorphEnergySurge": {
+    "name": "Energy Surge",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": 20.0,
+    "cooldownGroup": "SwordMorphEnergySurge"
+  },
+  "ShadowStepCancel": {
+    "name": "Shadow Step [Cancel]",
+    "shortName": "Sword E",
+    "castTime": 0.287,
+    "cooldown": null,
+    "cooldownGroup": "ShadowStepCancel"
+  },
+  "MorningDrizzle": {
+    "name": "Morning Drizzle",
+    "shortName": "Fan Special",
+    "castTime": 0.762,
+    "cooldown": null,
+    "cooldownGroup": "MorningDrizzle"
+  },
+  "CloudburstHealing": {
+    "name": "Cloudburst Healing",
+    "shortName": "Fan Q",
+    "castTime": 0.912,
+    "cooldown": null,
+    "cooldownGroup": "CloudburstHealing"
+  },
+  "CloudburstHealingCancel": {
+    "name": "Cloudburst Healing [Cancel]",
+    "shortName": "Fan Q [Cancel]",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "CloudburstHealingCancel"
+  },
+  "EndlessCloud": {
+    "name": "Endless Cloud",
+    "shortName": "Fan QQ",
+    "castTime": 0.938,
+    "cooldown": null,
+    "cooldownGroup": "EndlessCloud"
+  },
+  "EndlessCloudCancel": {
+    "name": "Endless Cloud [Cancel]",
+    "shortName": "Fan QQ [Cancel]",
+    "castTime": 0.312,
+    "cooldown": null,
+    "cooldownGroup": "EndlessCloudCancel"
+  },
+  "FourfoldInquiry1": {
+    "name": "Fourfold Inquiry 1st Hit",
+    "shortName": "Fan A1",
+    "castTime": 0.562,
+    "cooldown": null,
+    "cooldownGroup": "FourfoldInquiry1"
+  },
+  "FourfoldInquiry2": {
+    "name": "Fourfold Inquiry 2nd Hit",
+    "shortName": "Fan A2",
+    "castTime": 0.45,
+    "cooldown": null,
+    "cooldownGroup": "FourfoldInquiry2"
+  },
+  "FourfoldInquiry3": {
+    "name": "Fourfold Inquiry 3rd Hit",
+    "shortName": "Fan A3",
+    "castTime": 0.487,
+    "cooldown": null,
+    "cooldownGroup": "FourfoldInquiry3"
+  },
+  "FourfoldInquiry4": {
+    "name": "Fourfold Inquiry 4th Hit",
+    "shortName": "Fan A4",
+    "castTime": 0.463,
+    "cooldown": null,
+    "cooldownGroup": "FourfoldInquiry4"
+  },
+  "EmeraldDewtouch1": {
+    "name": "Emerald Dewtouch 1st Hit",
+    "shortName": "Fan H1",
+    "castTime": 0.4,
+    "cooldown": null,
+    "cooldownGroup": "EmeraldDewtouch1"
+  },
+  "EmeraldDewtouch2": {
+    "name": "Emerald Dewtouch 2nd Hit",
+    "shortName": "Fan H2",
+    "castTime": 0.8,
+    "cooldown": null,
+    "cooldownGroup": "EmeraldDewtouch2"
+  },
+  "EmeraldDewtouch2Cancel": {
+    "name": "Emerald Dewtouch 2nd Hit [Cancel]",
+    "shortName": "Fan H2 [Cancel]",
+    "castTime": 0.25,
+    "cooldown": null,
+    "cooldownGroup": "EmeraldDewtouch2Cancel"
+  },
+  "EmeraldDewtouch3Cancel": {
+    "name": "Emerald Dewtouch 3rd Hit [Cancel]",
+    "shortName": "Fan H3 [Cancel]",
+    "castTime": 0.338,
+    "cooldown": null,
+    "cooldownGroup": "EmeraldDewtouch3Cancel"
+  },
+  "JumpHeavy": {
+    "name": "Jump Heavy",
+    "shortName": "",
+    "castTime": 1.312,
+    "cooldown": null,
+    "cooldownGroup": "JumpHeavy"
+  },
+  "PhalanxbaneLight1": {
+    "name": "Mo Blade A1",
+    "shortName": "Mo A1",
+    "castTime": 0.936,
+    "cooldown": 0.1,
+    "cooldownGroup": "PhalanxbaneLight1"
+  },
+  "PhalanxbaneHeavyPreCharge": {
+    "name": "Burning Heart Pre Charge",
+    "shortName": "",
+    "castTime": 0.4,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneHeavyPreCharge"
+  },
+  "PhalanxbaneHeavySlam1": {
+    "name": "Burning Heart Slam 1",
+    "shortName": "",
+    "castTime": 1.038,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneHeavySlam1"
+  },
+  "PhalanxbaneHeavyFastSlam1": {
+    "name": "Burning Heart Fast Slam 1",
+    "shortName": "",
+    "castTime": 1.038,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneHeavyFastSlam1"
+  },
+  "PhalanxbaneHeavyCharge2": {
+    "name": "Burning Heart Charge 2",
+    "shortName": "",
+    "castTime": 0.95,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneHeavyCharge2"
+  },
+  "PhalanxbaneHeavyFastCharge2": {
+    "name": "Burning Heart Fast Charge 2",
+    "shortName": "",
+    "castTime": 0.633,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneHeavyFastCharge2"
+  },
+  "PhalanxbaneHeavySlam2": {
+    "name": "Burning Heart Slam 2",
+    "shortName": "",
+    "castTime": 1.05,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneHeavySlam2"
+  },
+  "PhalanxbaneHeavyFastSlam2": {
+    "name": "Burning Heart Fast Slam 2",
+    "shortName": "",
+    "castTime": 1.05,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneHeavyFastSlam2"
+  },
+  "PhalanxbaneHeavyCharge3": {
+    "name": "Burning Heart Charge 3",
+    "shortName": "",
+    "castTime": 1.55,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneHeavyCharge3"
+  },
+  "PhalanxbaneHeavyFastCharge3": {
+    "name": "Burning Heart Fast Charge 3",
+    "shortName": "",
+    "castTime": 1.033,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneHeavyFastCharge3"
+  },
+  "PhalanxbaneHeavySlam3": {
+    "name": "Burning Heart Slam 3",
+    "shortName": "",
+    "castTime": 0.988,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneHeavySlam3"
+  },
+  "PhalanxbaneHeavyFastSlam3": {
+    "name": "Burning Heart Fast Slam 3",
+    "shortName": "",
+    "castTime": 0.988,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneHeavyFastSlam3"
+  },
+  "PhalanxbaneHeavyCharged1": {
+    "name": "Burning Heart 1st Stage",
+    "shortName": "Mo Charged",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneHeavyCharged1"
+  },
+  "PhalanxbaneHeavyCharged2": {
+    "name": "Burning Heart 2nd Stage",
+    "shortName": "Mo Charged",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneHeavyCharged2"
+  },
+  "PhalanxbaneHeavyCharged3": {
+    "name": "Burning Heart 3rd Stage",
+    "shortName": "Mo Charged",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneHeavyCharged3"
+  },
+  "PhalanxbaneSpecial": {
+    "name": "Legion Summon",
+    "shortName": "Mo Special",
+    "castTime": 1.167,
+    "cooldown": 20.0,
+    "cooldownGroup": "PhalanxbaneSpecial"
+  },
+  "PhalanxbaneQ": {
+    "name": "Total Annihilation",
+    "shortName": "Mo QQ",
+    "castTime": 0.0,
+    "cooldown": 15.0,
+    "cooldownGroup": "PhalanxbaneQ"
+  },
+  "AnxiSoldierBurningHeart2": {
+    "name": "Anxi Soldier Burning Heart 2nd Stage",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "AnxiSoldierBurningHeart2"
+  },
+  "AnxiSoldierBurningHeart3": {
+    "name": "Anxi Soldier Burning Heart 3rd Stage",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "AnxiSoldierBurningHeart3"
+  },
+  "AnxiSoldierTotalAnnihilation": {
+    "name": "Anxi Soldier Total Annihilation",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "AnxiSoldierTotalAnnihilation"
+  },
+  "PhalanxbaneQBase": {
+    "name": "Total Annihilation",
+    "shortName": "",
+    "castTime": 0.7,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneQBase"
+  },
+  "PhalanxbaneQSoul": {
+    "name": "Total Annihilation - Soul",
+    "shortName": "",
+    "castTime": 0.7,
+    "cooldown": null,
+    "cooldownGroup": "PhalanxbaneQSoul"
+  },
+  "HeroesBlood": {
+    "name": "Hero's Blood",
+    "shortName": "TB Special",
+    "castTime": 0.759,
+    "cooldown": 12.0,
+    "cooldownGroup": "HeroesBlood"
+  },
+  "Reveldrift": {
+    "name": "Reveldrift",
+    "shortName": "TB Q",
+    "castTime": 1.1,
+    "cooldown": 15.0,
+    "cooldownGroup": "Reveldrift"
+  },
+  "HeroesBloodInebriate": {
+    "name": "Hero's Blood - Inebriate",
+    "shortName": "TB Deepdaze Special",
+    "castTime": 2.949,
+    "cooldown": 0.0,
+    "cooldownGroup": "HeroesBloodInebriate"
+  },
+  "ReveldriftCancel": {
+    "name": "Reveldrift [Cancel]",
+    "shortName": "TB Q [Cancel]",
+    "castTime": 0.402,
+    "cooldown": 15.0,
+    "cooldownGroup": "Reveldrift"
+  },
+  "DrunkslayDamage": {
+    "name": "Drunkslay",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "DrunkslayDamage"
+  },
+  "SkyGrasped": {
+    "name": "Sky Grasped",
+    "shortName": "RD Special",
+    "castTime": 0.95,
+    "cooldown": 18.0,
+    "cooldownGroup": "SkyGrasped"
+  },
+  "SnaringLashCancel": {
+    "name": "Snaring Lash [Cancel]",
+    "shortName": "RD Q [Cancel]",
+    "castTime": 0.365,
+    "cooldown": 15.0,
+    "cooldownGroup": "SnaringLash"
+  },
+  "SnaringLash": {
+    "name": "Snaring Lash",
+    "shortName": "RD Q",
+    "castTime": 1.315,
+    "cooldown": 15.0,
+    "cooldownGroup": "SnaringLash"
+  },
+  "SnaringLashFalcon": {
+    "name": "Snaring Lash Falcon",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "SnaringLashFalcon"
+  },
+  "Peakfall": {
+    "name": "Peakfall",
+    "shortName": "Gauntlet Q1",
+    "castTime": 0.632,
+    "cooldown": 10.0,
+    "cooldownGroup": "Peakfall"
+  },
+  "Castlink": {
+    "name": "Castlink",
+    "shortName": "Gauntlet Q2",
+    "castTime": 0.733,
+    "cooldown": 2.0,
+    "cooldownGroup": "Castlink"
+  },
+  "NightwickTipsylay": {
+    "name": "Nightwick - Tipsylay",
+    "shortName": "Gauntlet Special",
+    "castTime": 0.857,
+    "cooldown": 15.0,
+    "cooldownGroup": "NightwickTipsylay"
+  },
+  "NightwickPrimepick": {
+    "name": "Nightwick - Primepick",
+    "shortName": "Gauntlet Defense Break",
+    "castTime": 0.593,
+    "cooldown": 6.0,
+    "cooldownGroup": "NightwickPrimepick"
+  },
+  "PeakfallJadeflush": {
+    "name": "Peakfall - Jadeflush",
+    "shortName": "Gauntlet Q1 [Inebriate]",
+    "castTime": 0.86,
+    "cooldown": 10.0,
+    "cooldownGroup": "Peakfall"
+  },
+  "PeakfallSelect": {
+    "name": "Peakfall",
+    "shortName": "Gauntlet Q1",
+    "castTime": 0.4,
+    "cooldown": null,
+    "cooldownGroup": "PeakfallSelect"
+  },
+  "CastlinkJadeflush": {
+    "name": "Castlink - Jadeflush",
+    "shortName": "Gauntlet Q2 [Inebriate]",
+    "castTime": 1.48,
+    "cooldown": 2.0,
+    "cooldownGroup": "Castlink"
+  },
+  "CastlinkSelect": {
+    "name": "Castlink",
+    "shortName": "Gauntlet Q2",
+    "castTime": 0.4,
+    "cooldown": null,
+    "cooldownGroup": "CastlinkSelect"
+  },
+  "Whaledraft": {
+    "name": "Whaledraft",
+    "shortName": "Gauntlet Heavy Drink",
+    "castTime": 0.68,
+    "cooldown": null,
+    "cooldownGroup": "Whaledraft"
+  },
+  "DraughtBingeCheck": {
+    "name": "Binge Check",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "DraughtBingeCheck"
+  },
+  "FalconsPursuit": {
+    "name": "Falcon's Pursuit",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "FalconsPursuit"
+  },
+  "Dragonquench1": {
+    "name": "Dragonquench - Inebriate",
+    "shortName": "Gauntlet Deepdaze Heavy 1",
+    "castTime": 0.426,
+    "cooldown": 0.0,
+    "cooldownGroup": "Dragonquench1"
+  },
+  "Dragonquench2": {
+    "name": "Dragonquench - Inebriate",
+    "shortName": "Gauntlet Deepdaze Heavy 2",
+    "castTime": 0.41,
+    "cooldown": 0.0,
+    "cooldownGroup": "Dragonquench2"
+  },
+  "Dragonquench3": {
+    "name": "Dragonquench - Inebriate",
+    "shortName": "Gauntlet Deepdaze Heavy 3",
+    "castTime": 0.43,
+    "cooldown": 0.0,
+    "cooldownGroup": "Dragonquench3"
+  },
+  "Dragonquench4": {
+    "name": "Dragonquench - Inebriate",
+    "shortName": "Gauntlet Deepdaze Heavy 4",
+    "castTime": 1.12,
+    "cooldown": 0.0,
+    "cooldownGroup": "Dragonquench4"
+  },
+  "Dragonquench4Cancel": {
+    "name": "Dragonquench - Inebriate [Cancel]",
+    "shortName": "Gauntlet Deepdaze Heavy 4 [Cancel]",
+    "castTime": 0.482,
+    "cooldown": 0.0,
+    "cooldownGroup": "Dragonquench4Cancel"
+  },
+  "EonpourExhausted": {
+    "name": "Eonpour Exhausted",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "EonpourExhausted"
+  },
+  "SnowpartingLightCharged": {
+    "name": "Grave Frost",
+    "shortName": "Heng LC",
+    "castTime": 1.605,
+    "cooldown": null,
+    "cooldownGroup": "SnowpartingLightCharged"
+  },
+  "SnowpartingHeavyVC": {
+    "name": "Snowbreak Spring",
+    "shortName": "Heng VC",
+    "castTime": 0.857,
+    "cooldown": null,
+    "cooldownGroup": "SnowpartingHeavyVC"
+  },
+  "SnowpartingSpecial": {
+    "name": "Fleeting Trace",
+    "shortName": "Heng Special",
+    "castTime": 2.066,
+    "cooldown": 20.0,
+    "cooldownGroup": "SnowpartingSpecial"
+  },
+  "SnowpartingQ": {
+    "name": "General's Bane",
+    "shortName": "Heng Q",
+    "castTime": 0.615,
+    "cooldown": 12.0,
+    "cooldownGroup": "SnowpartingQ"
+  },
+  "SnowpartingQ2": {
+    "name": "General's Bane 2",
+    "shortName": "Heng Q2",
+    "castTime": 0.708,
+    "cooldown": 12.0,
+    "cooldownGroup": "SnowpartingQ"
+  },
+  "SnowpartingQSlash": {
+    "name": "General's Bane: Slash",
+    "shortName": "Heng Q",
+    "castTime": 0.577,
+    "cooldown": 12.0,
+    "cooldownGroup": "SnowpartingQSlash"
+  },
+  "SnowpartingQStab": {
+    "name": "General's Bane: Stab",
+    "shortName": "Heng Q Stab",
+    "castTime": 1.15,
+    "cooldown": 12.0,
+    "cooldownGroup": "SnowpartingQStab"
+  },
+  "SnowpartingConversion": {
+    "name": "Snowparting Conversion",
+    "shortName": "Heng Tab",
+    "castTime": 0.56,
+    "cooldown": 3.0,
+    "cooldownGroup": "SnowpartingConversion"
+  },
+  "AnxiSoldierSnowbreakSpring": {
+    "name": "Anxi Soldier Snowbreak Spring",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "AnxiSoldierSnowbreakSpring"
+  },
+  "AnxiSoldierGeneralsBaneStab": {
+    "name": "Anxi Soldier General's Bane: Stab",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "AnxiSoldierGeneralsBaneStab"
+  },
+  "AnxiSoldierSnowbreakSpringEnhanced": {
+    "name": "Anxi Soldier Snowbreak Spring",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "AnxiSoldierSnowbreakSpringEnhanced"
+  },
+  "EchoesOfAThousandPlants": {
+    "name": "Echoes of a Thousand Plants",
+    "shortName": "Umbrella Special",
+    "castTime": 1.2,
+    "cooldown": 30.0,
+    "cooldownGroup": "EchoesOfAThousandPlants"
+  },
+  "EchoesOfAThousandPlantsCancel": {
+    "name": "Echoes of a Thousand Plants [Cancel]",
+    "shortName": "Umbrella Special [Cancel]",
+    "castTime": 0.625,
+    "cooldown": 30.0,
+    "cooldownGroup": "EchoesOfAThousandPlants"
+  },
+  "EchoesOfAThousandPlantsFanQQ": {
+    "name": "Echoes of a Thousand Plants",
+    "shortName": "Umbrella Special [Cancel]",
+    "castTime": 0.625,
+    "cooldown": 30.0,
+    "cooldownGroup": "EchoesOfAThousandPlants"
+  },
+  "FloatingGrace": {
+    "name": "Floating Grace",
+    "shortName": "Umbrella Q",
+    "castTime": 1.1,
+    "cooldown": null,
+    "cooldownGroup": "FloatingGrace"
+  },
+  "MendingLoomHealing": {
+    "name": "Mending Loom",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "MendingLoomHealing"
+  },
+  "ThunderShock": {
+    "name": "Thunder Shock",
+    "shortName": "Spear Special",
+    "castTime": 1.4,
+    "cooldown": null,
+    "cooldownGroup": "ThunderShock"
+  },
+  "ThunderShock1": {
+    "name": "Thunder Shock 1-Hit [Cancel]",
+    "shortName": "Spear Special 1-Hit",
+    "castTime": 0.4,
+    "cooldown": null,
+    "cooldownGroup": "ThunderShock1"
+  },
+  "StormRoar": {
+    "name": "Storm Roar",
+    "shortName": "Spear Q",
+    "castTime": 0.9,
+    "cooldown": null,
+    "cooldownGroup": "StormRoar"
+  },
+  "InnerTrackSlash1": {
+    "name": "Inner Track Slash 1st Cast",
+    "shortName": "",
+    "castTime": 0.3,
+    "cooldown": null,
+    "cooldownGroup": "InnerTrackSlash1"
+  },
+  "InnerTrackSlash2": {
+    "name": "Inner Track Slash 2nd Cast",
+    "shortName": "",
+    "castTime": 1.022,
+    "cooldown": null,
+    "cooldownGroup": "InnerTrackSlash2"
+  },
+  "InnerTrackSlash3": {
+    "name": "Inner Track Slash 3rd",
+    "shortName": "",
+    "castTime": 1.426,
+    "cooldown": null,
+    "cooldownGroup": "InnerTrackSlash3"
+  },
+  "InnerTrackSlash": {
+    "name": "Inner Track Slash [3 Casts]",
+    "shortName": "Sword QQQ",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "InnerTrackSlash"
+  },
+  "InnerBalanceStrikeIII1": {
+    "name": "Inner Balance Strike III [1 Cast]",
+    "shortName": "Sword Special 1",
+    "castTime": 1.4,
+    "cooldown": null,
+    "cooldownGroup": "InnerBalanceStrikeIII1"
+  },
+  "InnerBalanceStrikeIII2": {
+    "name": "Inner Balance Strike III [2 Casts][Cancel]",
+    "shortName": "Sword Special 2",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "InnerBalanceStrikeIII2"
+  },
+  "InnerBalanceStrikeIII1ThreeHits": {
+    "name": "Inner Balance Strike III [3 Hits]",
+    "shortName": "",
+    "castTime": 1.063,
+    "cooldown": null,
+    "cooldownGroup": "InnerBalanceStrikeIII1ThreeHits"
+  },
+  "CrisscrossInnerBalanceStrikeIIICancel": {
+    "name": "Crisscross - Inner Balance Strike III [Cancel]",
+    "shortName": "",
+    "castTime": 0.244,
+    "cooldown": null,
+    "cooldownGroup": "CrisscrossInnerBalanceStrikeIIICancel"
+  },
+  "SecondTrackSlash1Cancel": {
+    "name": "Second Track Slash Stage 1 [Cancel]",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "SecondTrackSlash1Cancel"
+  },
+  "SecondTrackSlash1": {
+    "name": "Second Track Slash Stage 1",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "SecondTrackSlash1"
+  },
+  "CrisscrossSecondTrackSlash1": {
+    "name": "Crisscross - Second Track Slash [1 Hit]",
+    "shortName": "",
+    "castTime": 0.225,
+    "cooldown": null,
+    "cooldownGroup": "CrisscrossSecondTrackSlash1"
+  },
+  "CrisscrossSecondTrackSlash2": {
+    "name": "Crisscross - Second Track Slash",
+    "shortName": "",
+    "castTime": 0.683,
+    "cooldown": null,
+    "cooldownGroup": "CrisscrossSecondTrackSlash2"
+  },
+  "SecondTrackSlash1Release": {
+    "name": "Second Track Slash Stage 1 Release [4 Hits]",
+    "shortName": "",
+    "castTime": 0.947,
+    "cooldown": null,
+    "cooldownGroup": "SecondTrackSlash1Release"
+  },
+  "SecondTrackSlash1ReleaseCancel": {
+    "name": "Second Track Slash Stage 1 Release [4 Hits][Cancel]",
+    "shortName": "",
+    "castTime": 0.831,
+    "cooldown": null,
+    "cooldownGroup": "SecondTrackSlash1ReleaseCancel"
+  },
+  "SecondTrackSlashCharge": {
+    "name": "Second Track Slash [Charging]",
+    "shortName": "",
+    "castTime": 0.3,
+    "cooldown": null,
+    "cooldownGroup": "SecondTrackSlashCharge"
+  },
+  "SecondTrackSlashPreCharge": {
+    "name": "Second Track Slash [Pre-charge]",
+    "shortName": "",
+    "castTime": 0.2,
+    "cooldown": null,
+    "cooldownGroup": "SecondTrackSlashPreCharge"
+  },
+  "SecondTrackSlash2Casts1Hit": {
+    "name": "Second Track Slash Stage 1 [2 Casts][1 Hit]",
+    "shortName": "Charged 2 [1 Hit]",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "SecondTrackSlash2Casts1Hit"
+  },
+  "BloodBurst": {
+    "name": "Blood Burst",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "BloodBurst"
+  },
+  "BloodBurstDamage": {
+    "name": "Blood Burst Damage",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "BloodBurstDamage"
+  },
+  "StrategicSwordSpecialBloodBurst": {
+    "name": "Strategic Sword Special Blood Burst",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "StrategicSwordSpecialBloodBurst"
+  },
+  "InnerTrackSlash3Cancel": {
+    "name": "Inner Track Slash 3rd [Cancel]",
+    "shortName": "",
+    "castTime": 1.188,
+    "cooldown": null,
+    "cooldownGroup": "InnerTrackSlash3Cancel"
+  },
+  "InnerTrackSlashCancel": {
+    "name": "Inner Track Slash [3 Casts][Cancel]",
+    "shortName": "Sword QQQ [Cancel]",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "InnerTrackSlashCancel"
+  },
+  "Avalanche": {
+    "name": "Avalanche",
+    "shortName": "Charged",
+    "castTime": 3.395,
+    "cooldown": null,
+    "cooldownGroup": "Avalanche"
+  },
+  "Avalanche1": {
+    "name": "Avalanche 1-Hit [Cancel]",
+    "shortName": "Charged 1-Hit",
+    "castTime": 2.318,
+    "cooldown": null,
+    "cooldownGroup": "Avalanche1"
+  },
+  "StonebreakerCleave1": {
+    "name": "Stonebreaker Cleave 1-Hit [Cancel]",
+    "shortName": "VC",
+    "castTime": 0.5,
+    "cooldown": null,
+    "cooldownGroup": "StonebreakerCleave1"
+  },
+  "StonebreakerCleave": {
+    "name": "Stonebreaker Cleave [Cancel]",
+    "shortName": "VC",
+    "castTime": 0.788,
+    "cooldown": null,
+    "cooldownGroup": "StonebreakerCleave"
+  },
+  "StonebreakerQuake": {
+    "name": "Stonebreaker Quake",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "StonebreakerQuake"
+  },
+  "PredatorsShield": {
+    "name": "Predator's Shield",
+    "shortName": "Shield",
+    "castTime": 1.0,
+    "cooldown": null,
+    "cooldownGroup": "PredatorsShield"
+  },
+  "SoulSweep": {
+    "name": "Soul Sweep",
+    "shortName": "RD Q",
+    "castTime": 1.75,
+    "cooldown": 10.0,
+    "cooldownGroup": "SoulSweep"
+  },
+  "BurnAndBury": {
+    "name": "Burn and Bury",
+    "shortName": "RD Special",
+    "castTime": 0.65,
+    "cooldown": null,
+    "cooldownGroup": "BurnAndBury"
+  },
+  "PiercingDart": {
+    "name": "Piercing Dart",
+    "shortName": "",
+    "castTime": 1.841,
+    "cooldown": null,
+    "cooldownGroup": "PiercingDart"
+  },
+  "SoulbreakDamage": {
+    "name": "Soulbreak",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "SoulbreakDamage"
+  },
+  "SoulSweepCancel": {
+    "name": "Soul Sweep [Cancel]",
+    "shortName": "RD Q [Cancel]",
+    "castTime": 0.0,
+    "cooldown": 10.0,
+    "cooldownGroup": "SoulSweep"
+  },
+  "PiercingDartCharge": {
+    "name": "Piercing Dart [1.5s Charge]",
+    "shortName": "RD Heavy Charge",
+    "castTime": 1.5,
+    "cooldown": null,
+    "cooldownGroup": "PiercingDartCharge"
+  },
+  "SoulbreakGrant": {
+    "name": "Soulbreak Application",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "SoulbreakGrant"
+  },
+  "PiercingDart4Hits": {
+    "name": "Piercing Dart [4 Hits]",
+    "shortName": "RD Heavy 4 Hits",
+    "castTime": 0.796,
+    "cooldown": null,
+    "cooldownGroup": "PiercingDart4Hits"
+  },
+  "PiercingDartSweep1": {
+    "name": "Piercing Dart Sweep 1",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "PiercingDartSweep1"
+  },
+  "PiercingDartSweep2": {
+    "name": "Piercing Dart Sweep 2",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "PiercingDartSweep2"
+  },
+  "PiercingDartSweep3": {
+    "name": "Piercing Dart Sweep 3",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "PiercingDartSweep3"
+  },
+  "PiercingDartSweep4": {
+    "name": "Piercing Dart Sweep 4",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "PiercingDartSweep4"
+  },
+  "PiercingDartSweep5": {
+    "name": "Piercing Dart Sweep 5",
+    "shortName": "RD Heavy 5",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "PiercingDartSweep5"
+  },
+  "PiercingDartSweep6": {
+    "name": "Piercing Dart Sweep 6",
+    "shortName": "RD Heavy 6",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "PiercingDartSweep6"
+  },
+  "PiercingDartSweep7": {
+    "name": "Piercing Dart Sweep 7",
+    "shortName": "RD Heavy 7",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "PiercingDartSweep7"
+  },
+  "SpringSorrow": {
+    "name": "Spring Sorrow",
+    "shortName": "Umbrella Q",
+    "castTime": 0.0,
+    "cooldown": 15.0,
+    "cooldownGroup": "SpringSorrow"
+  },
+  "VernalHeavy": {
+    "name": "Vernal Umbrella Heavy",
+    "shortName": "Umbrella Heavy",
+    "castTime": 0.459,
+    "cooldown": null,
+    "cooldownGroup": "VernalHeavy"
+  },
+  "UnfadingFlower": {
+    "name": "Unfading Flower",
+    "shortName": "UF",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "UnfadingFlower"
+  },
+  "UnfadingFlowerVolley": {
+    "name": "Unfading Flower Volley",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "UnfadingFlowerVolley"
+  },
+  "UnfadingFlowerProjectile": {
+    "name": "Unfading Flower",
+    "shortName": "UF",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "UnfadingFlowerProjectile"
+  },
+  "UnfadingFlowerRelease": {
+    "name": "Unfading Flower",
+    "shortName": "UF",
+    "castTime": 1.093,
+    "cooldown": null,
+    "cooldownGroup": "UnfadingFlowerRelease"
+  },
+  "JadeComboExtension": {
+    "name": "Combo Extension",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "JadeComboExtension"
+  },
+  "SpringSorrowNormal": {
+    "name": "Spring Sorrow",
+    "shortName": "Umbrella Q",
+    "castTime": 1.458,
+    "cooldown": null,
+    "cooldownGroup": "SpringSorrowNormal"
+  },
+  "SpringSorrowBarrage": {
+    "name": "Spring Sorrow",
+    "shortName": "Umbrella Q",
+    "castTime": 1.122,
+    "cooldown": null,
+    "cooldownGroup": "SpringSorrowBarrage"
+  },
+  "colorfulphoenix1": {
+    "name": "Colorful Phoenix [1 hits]",
+    "shortName": "Colorful Phoenix [1 hits]",
+    "castTime": 0.325,
+    "cooldown": null,
+    "cooldownGroup": "colorfulphoenix1"
+  },
+  "colorfulphoenix2": {
+    "name": "Colorful Phoenix [2 hits]",
+    "shortName": "Colorful Phoenix [2 hits]",
+    "castTime": 0.53,
+    "cooldown": null,
+    "cooldownGroup": "colorfulphoenix2"
+  },
+  "ColorfulPhoenix": {
+    "name": "Colorful Phoenix",
+    "shortName": "Colorful Phoenix",
+    "castTime": 0.744,
+    "cooldown": null,
+    "cooldownGroup": "ColorfulPhoenix"
+  },
+  "UnfadingFlowerCancel": {
+    "name": "Unfading Flower [Cancel]",
+    "shortName": "UF [Cancel]",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "UnfadingFlowerCancel"
+  },
+  "UnfadingFlowerReleaseCancel": {
+    "name": "Unfading Flower [Cancel]",
+    "shortName": "UF [Cancel]",
+    "castTime": 0.6,
+    "cooldown": null,
+    "cooldownGroup": "UnfadingFlowerReleaseCancel"
+  },
+  "SpringAway": {
+    "name": "Spring Away",
+    "shortName": "Umbrella Light Charged",
+    "castTime": 11.331,
+    "cooldown": null,
+    "cooldownGroup": "SpringAway"
+  },
+  "SpringAwayProjectile": {
+    "name": "Spring Away Projectile",
+    "shortName": "Umbrella Light Charged",
+    "castTime": 0.0,
+    "cooldown": null,
+    "cooldownGroup": "SpringAwayProjectile"
+  },
+  "ColorfulPhoenix35Blossoms": {
+    "name": "Colorful Phoenix [35 Blossoms]",
+    "shortName": "Colorful Phoenix [35 Blossoms]",
+    "castTime": 0.63,
+    "cooldown": null,
+    "cooldownGroup": "ColorfulPhoenix35Blossoms"
+  },
+  "VerdantGust": {
+    "name": "Verdant Gust",
+    "shortName": "Fan Q",
+    "castTime": 0.75,
+    "cooldown": 15.0,
+    "cooldownGroup": "BoundlessBloom"
+  },
+  "BoundlessBloom": {
+    "name": "Boundless Bloom",
+    "shortName": "Fan Q (Enhanced)",
+    "castTime": 1.0,
+    "cooldown": 15.0,
+    "cooldownGroup": "BoundlessBloom"
+  },
+  "NorthwindSweep": {
+    "name": "Boreal Sweep",
+    "shortName": "Fan Special",
+    "castTime": 0.692,
+    "cooldown": 8.0,
+    "cooldownGroup": "NorthwindSweep"
+  },
+  "EndOfGale": {
+    "name": "End of Gale",
+    "shortName": "Fan Q Perception",
+    "castTime": 1.933,
+    "cooldown": null,
+    "cooldownGroup": "EndOfGale"
+  },
+  "ZephyrWhispersNobleRecovery": {
+    "name": "Zephyr Whispers: Noble Recovery",
+    "shortName": "",
+    "castTime": 0.0,
+    "cooldown": 15.0,
+    "cooldownGroup": "ZephyrWhispersNobleRecovery"
+  }
+}

@@ -121,6 +121,15 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     id: number
   } | null>(null)
 
+  // Real Cast Time & Cooldown State from Actual database
+  const [castStartTime, setCastStartTime] = useState<number>(0)
+  const [castDurationMs, setCastDurationMs] = useState<number>(0)
+  const [isCasting, setIsCasting] = useState<boolean>(false)
+  const [castProgress, setCastProgress] = useState<number>(0)
+  const [activeCooldowns, setActiveCooldowns] = useState<Record<string, number>>({})
+  const bufferedInputRef = useRef<{ key: string; time: number } | null>(null)
+  const [clockTick, setClockTick] = useState<number>(() => Date.now())
+
   const steps: TrainerStep[] = useMemo(
     () => buildTrainerSteps(tokens, settings.keyMap, casts, isRuLocale),
     [tokens, settings.keyMap, casts, isRuLocale],
@@ -148,6 +157,27 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     }, 700)
   }, [])
 
+  const startSkillCast = useCallback(
+    (step: TrainerStep) => {
+      const durMs = Math.max(250, (step.durationSec * 1000) / settings.speed)
+      const now = Date.now()
+      setCastStartTime(now)
+      setCastDurationMs(durMs)
+      setIsCasting(true)
+      setCastProgress(0)
+
+      // Put skill on cooldown if it has one
+      if (step.cooldownSec && step.cooldownGroup) {
+        const cdDurationMs = (step.cooldownSec * 1000) / settings.speed
+        setActiveCooldowns((prev) => ({
+          ...prev,
+          [step.cooldownGroup!]: now + cdDurationMs,
+        }))
+      }
+    },
+    [settings.speed],
+  )
+
   const resetTrainer = useCallback(() => {
     setHasStarted(false)
     setStepIndex(0)
@@ -156,13 +186,18 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     setMisses(0)
     setTimingProgress(0)
     setFeedback(null)
+    setIsCasting(false)
+    setCastProgress(0)
+    setCastStartTime(0)
+    setActiveCooldowns({})
+    bufferedInputRef.current = null
     triggerFeedback("RESET", "perfect")
     if (settings.sound) playSynthTone(440, "sine", 0.08)
     if (steps[0]) setRemainingCount(steps[0].multiplier)
   }, [settings.sound, steps, triggerFeedback])
 
   const handleKeyHit = useCallback(
-    (pressedKey: string) => {
+    (pressedKey: string, fromBuffer = false) => {
       if (!isPlaying || !currentStep) return
 
       const expected = normalizeKeyInput(currentStep.expectedKey)
@@ -197,6 +232,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       // Silently ignore any other keys (WASD, jumps, etc.) before the first skill is pressed.
       if (!hasStarted) {
         if (isMatch) {
+          startSkillCast(currentStep)
           setHasStarted(true)
           setHits(1)
           setCombo(1)
@@ -211,7 +247,24 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       }
 
       // 2. Active rotation:
+      // Account for Cast Time: check if previous skill is currently casting
+      const now = Date.now()
+      const elapsed = now - castStartTime
+      const remainingCastMs = castDurationMs - elapsed
+
+      if (!fromBuffer && isCasting && remainingCastMs > 350) {
+        if (isMatch) {
+          // User pressed the correct next key, but the character is still mid-cast!
+          // Buffer it so it fires right when the cancel window opens!
+          bufferedInputRef.current = { key: pressedKey, time: now }
+          triggerFeedback(isRuLocale ? "⌛ КАСТ..." : "⌛ CASTING...", "hit")
+          return
+        }
+      }
+
       if (isMatch) {
+        bufferedInputRef.current = null
+
         // If this skill was a charge/hold attack, allow a 500ms grace window for releasing the key
         const skillLower = currentStep.cleanName.toLowerCase()
         if (
@@ -222,6 +275,9 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           lastHoldKeyRef.current = { key: expected, expiresAt: Date.now() + 500 }
         }
         lastHitKeyRef.current = { key: expected, time: Date.now() }
+
+        // Start cast timer & cooldown for the newly executed skill
+        startSkillCast(currentStep)
 
         // Success
         if (remainingCount > 1) {
@@ -259,8 +315,6 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           return
         }
 
-        const now = Date.now()
-
         // B. Extra/buffer press of the key that was just hit -> SILENTLY IGNORE (game buffers it)
         if (lastHitKeyRef.current.key === pressed && now - lastHitKeyRef.current.time < 500) {
           return
@@ -272,8 +326,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         }
 
         // D. In "strict" mode:
-        // User requested: "не регай лишние импуты, в целом то кнопка нажата значит игра её запишет"
-        // In Strict Order mode, extra key mashing or buffer inputs should NOT reduce accuracy or cause misses.
+        // Extra key mashing or buffer inputs should NOT reduce accuracy or cause misses.
         if (settings.mode === "strict") {
           return
         }
@@ -292,8 +345,65 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         // NOTE: We do NOT advance stepIndex on wrong key!
       }
     },
-    [isPlaying, hasStarted, currentStep, remainingCount, steps.length, settings.sound, settings.mode, isRuLocale, triggerFeedback],
+    [
+      isPlaying,
+      hasStarted,
+      currentStep,
+      remainingCount,
+      steps.length,
+      settings.sound,
+      settings.mode,
+      settings.speed,
+      isRuLocale,
+      triggerFeedback,
+      isCasting,
+      castDurationMs,
+      castStartTime,
+      startSkillCast,
+    ],
   )
+
+  // Live ticker for cast progress, cooldown countdowns, and buffered input release
+  useEffect(() => {
+    if (!isPlaying || !hasStarted) {
+      if (isCasting) {
+        setIsCasting(false)
+        setCastProgress(0)
+      }
+      return
+    }
+
+    const interval = setInterval(() => {
+      const now = Date.now()
+      setClockTick(now)
+
+      if (isCasting && castDurationMs > 0) {
+        const elapsed = now - castStartTime
+        const pct = Math.min(100, (elapsed / castDurationMs) * 100)
+        setCastProgress(pct)
+
+        const remainingMs = castDurationMs - elapsed
+        if (remainingMs <= 0) {
+          setIsCasting(false)
+          setCastProgress(100)
+
+          if (bufferedInputRef.current && now - bufferedInputRef.current.time < 1200) {
+            const bufferedKey = bufferedInputRef.current.key
+            bufferedInputRef.current = null
+            handleKeyHit(bufferedKey, true)
+          }
+        } else if (remainingMs <= 350 && bufferedInputRef.current && now - bufferedInputRef.current.time < 1200) {
+          setIsCasting(false)
+          setCastProgress(100)
+          const bufferedKey = bufferedInputRef.current.key
+          bufferedInputRef.current = null
+          handleKeyHit(bufferedKey, true)
+        }
+      }
+    }, 25)
+
+    return () => clearInterval(interval)
+  }, [isPlaying, hasStarted, isCasting, castDurationMs, castStartTime, handleKeyHit])
 
   // Listen to companion WebSocket events
   const handleCompanionInput = useCallback(
@@ -442,12 +552,12 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     }
   }, [handleKeyHit, showRemap])
 
-  // Timing mode animation loop (only runs after rotation has started)
+  // Timing mode animation loop (uses actual step cast time)
   useEffect(() => {
-    if (!isPlaying || !hasStarted || settings.mode !== "timing" || steps.length === 0) return
+    if (!isPlaying || !hasStarted || settings.mode !== "timing" || steps.length === 0 || !currentStep) return
 
-    const stepDurationMs = 1200 / settings.speed
-    const interval = 30
+    const stepDurationMs = Math.max(250, (currentStep.durationSec * 1000) / settings.speed)
+    const interval = 25
     const stepIncrement = (interval / stepDurationMs) * 100
 
     const timer = setInterval(() => {
@@ -467,7 +577,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     }, interval)
 
     return () => clearInterval(timer)
-  }, [isPlaying, hasStarted, settings.mode, settings.speed, settings.sound, steps.length, triggerFeedback])
+  }, [isPlaying, hasStarted, settings.mode, settings.speed, settings.sound, steps.length, currentStep, triggerFeedback])
 
   function handleModeChange(mode: TrainerMode) {
     const next = { ...settings, mode }
@@ -650,6 +760,9 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       <div className={styles.trackContainer}>
         {visibleSteps.map(({ step, relativeIdx }) => {
           const isTarget = relativeIdx === 0
+          const cooldownExpiresAt = step.cooldownGroup ? activeCooldowns[step.cooldownGroup] : undefined
+          const remainingCdSec = cooldownExpiresAt ? Math.max(0, Math.ceil((cooldownExpiresAt - clockTick) / 1000)) : 0
+
           return (
             <div
               key={`${step.id}-${relativeIdx}`}
@@ -658,25 +771,74 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
               }`}
             >
               <div className={styles.cardHeader}>
-                <span className={styles.skillName}>{step.cleanName}</span>
-                {isTarget && !hasStarted && (
-                  <span className={styles.startBadge}>{isRuLocale ? "СТАРТ" : "START"}</span>
-                )}
-                {isTarget && hasStarted && remainingCount > 1 && (
-                  <span className={styles.counterBadge}>×{remainingCount}</span>
-                )}
-                {!isTarget && step.multiplier > 1 && (
-                  <span className={styles.multiplierBadge}>×{step.multiplier}</span>
-                )}
+                <span className={styles.skillName} title={step.cleanName}>
+                  {step.cleanName}
+                </span>
+
+                <div className={styles.cardBadges}>
+                  {/* Cooldown Badge */}
+                  {step.cooldownSec && (
+                    <span
+                      className={remainingCdSec > 0 ? styles.cdActiveBadge : styles.cdBadge}
+                      title={
+                        remainingCdSec > 0
+                          ? isRuLocale
+                            ? `Откат: ${remainingCdSec} сек`
+                            : `Cooldown: ${remainingCdSec}s`
+                          : isRuLocale
+                            ? `Кулдаун: ${step.cooldownSec} сек`
+                            : `Base CD: ${step.cooldownSec}s`
+                      }
+                    >
+                      {remainingCdSec > 0 ? `⏳ ${remainingCdSec}s` : `CD ${step.cooldownSec}s`}
+                    </span>
+                  )}
+
+                  {/* Cast Time Badge */}
+                  {step.durationSec > 0 && (
+                    <span
+                      className={styles.castTimeBadge}
+                      title={
+                        isRuLocale
+                          ? `Время каста: ${step.durationSec} сек`
+                          : `Cast duration: ${step.durationSec}s`
+                      }
+                    >
+                      ⏱ {step.durationSec}s
+                    </span>
+                  )}
+
+                  {isTarget && !hasStarted && (
+                    <span className={styles.startBadge}>{isRuLocale ? "СТАРТ" : "START"}</span>
+                  )}
+                  {isTarget && hasStarted && remainingCount > 1 && (
+                    <span className={styles.counterBadge}>×{remainingCount}</span>
+                  )}
+                  {!isTarget && step.multiplier > 1 && (
+                    <span className={styles.multiplierBadge}>×{step.multiplier}</span>
+                  )}
+                </div>
               </div>
 
               <div className={styles.keyPrompt}>
                 <span className={styles.keyTag}>{step.expectedKeyLabel}</span>
               </div>
 
+              {/* Timing mode prompter bar */}
               {isTarget && settings.mode === "timing" && (
                 <div className={styles.timingBarTrack}>
                   <div className={styles.timingBarFill} style={{ width: `${timingProgress}%` }} />
+                </div>
+              )}
+
+              {/* Active Cast Progress Bar */}
+              {isTarget && isCasting && (
+                <div className={styles.castBarTrack}>
+                  <div className={styles.castBarFill} style={{ width: `${castProgress}%` }} />
+                  <span className={styles.castBarText}>
+                    {isRuLocale ? "Каст" : "Cast"}{" "}
+                    {(Math.max(0, (castDurationMs - (clockTick - castStartTime)) / 1000) || 0).toFixed(1)}s
+                  </span>
                 </div>
               )}
             </div>

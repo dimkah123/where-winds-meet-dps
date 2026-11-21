@@ -31,7 +31,10 @@ export interface TrainerStep {
   multiplier: number
   remainingCount: number
   targetTimeSec?: number
-  durationSec?: number
+  durationSec: number
+  cooldownSec?: number
+  cooldownGroup?: string
+  isHold?: boolean
 }
 
 export interface TrainerInputEvent {

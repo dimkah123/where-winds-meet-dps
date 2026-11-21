@@ -1,6 +1,7 @@
 import type { TrainerKeyMap, TrainerStep } from "./types"
 import type { ParsedRotationToken } from "../readableRotation"
 import type { RotationCast } from "../../../../engine/types"
+import { resolveSkillTiming } from "./skillTimings"
 
 /**
  * Maps Russian keyboard layout keys (ЙЦУКЕН) to standard English physical keys (QWERTY).
@@ -205,10 +206,34 @@ export function buildTrainerSteps(
 ): TrainerStep[] {
   return tokens.map((token, index) => {
     const keyInfo = resolveSkillKey(token.cleanName, keyMap, isRuLocale)
-    const matchingCast = casts ? casts.find((c) => c.stepIndex === index || c.skillName === token.skillName) : undefined
-    const isHold = keyInfo.isHold ?? false
+    let simDuration: number | undefined
+    let matchingCast: RotationCast | undefined
+
+    if (casts && casts.length > 0) {
+      const castIdx = casts.findIndex((c) => c.stepIndex === index || c.skillName === token.skillName)
+      if (castIdx >= 0) {
+        matchingCast = casts[castIdx]
+        const nextCast = casts[castIdx + 1]
+        if (nextCast && matchingCast) {
+          const delta = nextCast.timeSec - matchingCast.timeSec
+          if (delta > 0.1 && delta < 15) {
+            simDuration = delta
+          }
+        }
+      }
+    }
+
+    const timingInfo = resolveSkillTiming(
+      token.cleanName,
+      token.skillName,
+      token.multiplier,
+      simDuration,
+    )
+
+    const isHold = keyInfo.isHold ?? timingInfo.isHold ?? false
     // Hold / Charged skills (e.g. Mo Charged x4) are held as 1 action, not tapped repeatedly
     const count = isHold ? 1 : Math.max(1, token.multiplier || 1)
+
     return {
       id: `${index}-${token.cleanName}`,
       rawName: token.raw,
@@ -218,7 +243,10 @@ export function buildTrainerSteps(
       multiplier: count,
       remainingCount: count,
       targetTimeSec: matchingCast?.timeSec,
-      durationSec: 1.0,
+      durationSec: timingInfo.castDurationSec,
+      cooldownSec: timingInfo.cooldownSec,
+      cooldownGroup: timingInfo.cooldownGroup,
+      isHold,
     }
   })
 }

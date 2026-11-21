@@ -386,6 +386,89 @@
   gap: 4px;
 }
 
+.cardBadges {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.castTimeBadge {
+  background: rgba(255, 255, 255, 0.08);
+  color: #c0c0c6;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.cdBadge {
+  background: rgba(100, 140, 200, 0.15);
+  color: #8cb4f5;
+  border: 1px solid rgba(100, 140, 200, 0.3);
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
+  line-height: 1.2;
+}
+
+.cdActiveBadge {
+  background: rgba(220, 80, 50, 0.25);
+  color: #ff9980;
+  border: 1px solid rgba(220, 80, 50, 0.55);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  animation: pulseCd 1.2s infinite alternate;
+}
+
+@keyframes pulseCd {
+  0% {
+    opacity: 0.85;
+    border-color: rgba(220, 80, 50, 0.4);
+  }
+  100% {
+    opacity: 1;
+    border-color: rgba(255, 110, 80, 0.9);
+    box-shadow: 0 0 6px rgba(255, 100, 70, 0.4);
+  }
+}
+
+.castBarTrack {
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
+  overflow: visible;
+  position: relative;
+  margin-top: 4px;
+  border: 1px solid rgba(224, 180, 103, 0.35);
+}
+
+.castBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #d8b070, #fae2a6);
+  border-radius: 2px;
+  transition: width 0.04s linear;
+}
+
+.castBarText {
+  position: absolute;
+  right: 2px;
+  top: -14px;
+  font-size: 0.62rem;
+  color: #fae2a6;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
 .skillName {
   white-space: nowrap;
   overflow: hidden;

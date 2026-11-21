@@ -197,28 +197,46 @@ describe("Rotation Trainer Key Resolution", () => {
     expect(formatKeyDisplay("f", true)).toBe("F (А)")
   })
 
-  it("builds trainer steps with multipliers and hold normalization", () => {
+  it("builds trainer steps with multipliers, hold normalization, and accurate Actual cast & cooldown timings", () => {
     const tokens = [
       { raw: "Mo Special", cleanName: "Mo Special", multiplier: 1, valid: true },
       { raw: "Mo Charged x4", cleanName: "Mo Charged", multiplier: 4, valid: true },
       { raw: "Heng LC x3", cleanName: "Heng LC", multiplier: 3, valid: true },
+      { raw: "Heng Special 6 Hit", cleanName: "Heng Special 6 Hit", multiplier: 1, valid: true },
+      { raw: "Flute Cancel", cleanName: "Flute Cancel", multiplier: 1, valid: true },
+      { raw: "Bursting Nine", cleanName: "Bursting Nine", multiplier: 1, valid: true },
     ]
 
     const steps = buildTrainerSteps(tokens, DEFAULT_KEY_MAP)
-    expect(steps).toHaveLength(3)
+    expect(steps).toHaveLength(6)
     expect(steps[0].expectedKey).toBe("~")
     expect(steps[0].multiplier).toBe(1)
     expect(steps[0].remainingCount).toBe(1)
+    expect(steps[0].durationSec).toBe(1.17)
+    expect(steps[0].cooldownSec).toBe(20)
 
-    // Mo Charged is a hold skill -> normalized to 1 hold action instead of 4 taps
+    // Mo Charged is a hold skill -> normalized to 1 hold action with duration scaled
     expect(steps[1].expectedKey).toBe("r")
     expect(steps[1].multiplier).toBe(1)
     expect(steps[1].remainingCount).toBe(1)
+    expect(steps[1].durationSec).toBe(3.4)
 
     // Tap combo retains multiplier 3
     expect(steps[2].expectedKey).toBe("lclick")
     expect(steps[2].multiplier).toBe(3)
     expect(steps[2].remainingCount).toBe(3)
+
+    // Heng Special 6 Hit (2.07s cast, 20s cooldown)
+    expect(steps[3].durationSec).toBe(2.07)
+    expect(steps[3].cooldownSec).toBe(20)
+
+    // Flute Cancel (0.8s cast, 25s cooldown)
+    expect(steps[4].durationSec).toBe(0.8)
+    expect(steps[4].cooldownSec).toBe(25)
+
+    // Bursting Nine (1.4s cast, 30s cooldown)
+    expect(steps[5].durationSec).toBe(1.4)
+    expect(steps[5].cooldownSec).toBe(30)
   })
 
   it("loads default settings correctly", () => {
