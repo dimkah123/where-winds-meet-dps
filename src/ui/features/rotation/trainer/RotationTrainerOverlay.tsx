@@ -122,7 +122,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   // Sync remainingCount when stepIndex changes
   useEffect(() => {
     if (currentStep) {
-      setRemainingCount(currentStep.remainingCount ?? (currentStep.isHold ? 1 : currentStep.multiplier))
+      setRemainingCount(currentStep.remainingCount ?? currentStep.multiplier)
     }
   }, [stepIndex, currentStep])
 
@@ -181,7 +181,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     bufferedInputRef.current = null
     triggerFeedback(t("trainer.feedback.reset", isRuLocale ? "СБРОС" : "RESET"), "perfect")
     if (settings.sound) playSwitchSound("reset")
-    if (steps[0]) setRemainingCount(steps[0].remainingCount ?? (steps[0].isHold ? 1 : steps[0].multiplier))
+    if (steps[0]) setRemainingCount(steps[0].remainingCount ?? steps[0].multiplier)
   }, [settings.sound, steps, triggerFeedback, t, isRuLocale])
 
   const handleKeyHit = useCallback(
@@ -771,12 +771,10 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
                   {isTarget && !hasStarted && (
                     <span className={styles.startBadge}>{t("trainer.startBadge", isRuLocale ? "СТАРТ" : "START")}</span>
                   )}
-                  {isTarget && (
-                    step.isHold
-                      ? step.multiplier > 1 && <span className={styles.counterBadge}>×{step.multiplier}</span>
-                      : (hasStarted ? remainingCount > 1 : step.multiplier > 1) && (
-                          <span className={styles.counterBadge}>×{hasStarted ? remainingCount : step.multiplier}</span>
-                        )
+                  {isTarget && step.multiplier > 1 && (
+                    <span className={styles.counterBadge}>
+                      ×{hasStarted ? remainingCount : step.multiplier}
+                    </span>
                   )}
                   {!isTarget && step.multiplier > 1 && (
                     <span className={styles.multiplierBadge}>×{step.multiplier}</span>
@@ -805,12 +803,14 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
                 {step.durationSec > 0 && (
                   <span
-                    className={styles.castTimeBadge}
+                    className={isTarget && isCasting ? styles.castActiveBadge : styles.castTimeBadge}
                     title={
                       t("trainer.castDuration", isRuLocale ? "Время каста: {count} сек" : "Cast duration: {count}s").replace("{count}", String(step.durationSec))
                     }
                   >
-                    ⏱ {step.durationSec}s
+                    ⏱ {isTarget && isCasting
+                      ? `${(Math.max(0, (castDurationMs - (clockTick - castStartTime)) / 1000) || 0).toFixed(1)}s`
+                      : `${step.durationSec}s`}
                   </span>
                 )}
               </div>
@@ -826,10 +826,6 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
               {isTarget && isCasting && (
                 <div className={styles.castBarTrack}>
                   <div className={styles.castBarFill} style={{ width: `${castProgress}%` }} />
-                  <span className={styles.castBarText}>
-                    {t("trainer.castTimeLabel", isRuLocale ? "Каст" : "Cast")}{" "}
-                    {(Math.max(0, (castDurationMs - (clockTick - castStartTime)) / 1000) || 0).toFixed(1)}s
-                  </span>
                 </div>
               )}
             </div>

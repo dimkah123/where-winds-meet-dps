@@ -94,24 +94,11 @@ export function resolveSkillTiming(
     if (rule.match.test(normClean) || rule.match.test(cleanWithoutMultiplier)) {
       const isCharged = rule.isCharged ?? false
       let finalCast = rule.castTime
-      if (isCharged) {
-        // Mo Charged scales per stack: 1x ~ 1.04s, 2x ~ 1.70s, 3x ~ 2.50s, 4x ~ 3.40s, 5x ~ 4.25s
-        finalCast = Math.max(1.0, 0.85 * Math.max(1, multiplier))
-      } else if (multiplier > 1 && !rule.cooldown) {
-        // e.g. Heng VC x2
-        finalCast = rule.castTime * multiplier
-      }
 
       // If simulation engine provided a precise simulated duration between casts, prefer it for execution
       // Note: for instant actions (rule.castTime === 0, e.g. weapon swap), keep 0s cast time
-      if (rule.castTime > 0 && simulatedDurationSec && simulatedDurationSec > 0.1 && simulatedDurationSec < 25) {
-        if (isCharged && multiplier > 1 && simulatedDurationSec < 1.5) {
-          finalCast = simulatedDurationSec * multiplier
-        } else if (multiplier > 1 && !rule.cooldown && simulatedDurationSec < rule.castTime * 1.2) {
-          finalCast = simulatedDurationSec * multiplier
-        } else {
-          finalCast = simulatedDurationSec
-        }
+      if (rule.castTime > 0 && simulatedDurationSec && simulatedDurationSec > 0.1 && simulatedDurationSec < 15) {
+        finalCast = simulatedDurationSec
       }
 
       return {

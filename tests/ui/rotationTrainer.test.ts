@@ -230,11 +230,11 @@ describe("Rotation Trainer Key Resolution", () => {
     expect(steps[0].durationSec).toBe(1.17)
     expect(steps[0].cooldownSec).toBe(20)
 
-    // Mo Charged is a hold skill -> multiplier is preserved (4 charges), normalized to 1 hold action, duration scaled to 3.4s
+    // Mo Charged has multiplier 4 and remainingCount 4 so all 4 charges are individually registered
     expect(steps[1].expectedKey).toBe("r")
     expect(steps[1].multiplier).toBe(4)
-    expect(steps[1].remainingCount).toBe(1)
-    expect(steps[1].durationSec).toBe(3.4)
+    expect(steps[1].remainingCount).toBe(4)
+    expect(steps[1].durationSec).toBe(0.85)
     expect(steps[1].isHold).toBe(true)
 
     // Tap combo retains multiplier 3
