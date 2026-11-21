@@ -31,7 +31,8 @@ interface ActionDef {
   key: KeyAction
   labelKey: string
   defaultLabel: string
-  desc: string
+  descKey: string
+  defaultDesc: string
 }
 
 const ACTIONS: ActionDef[] = [
@@ -39,61 +40,71 @@ const ACTIONS: ActionDef[] = [
     key: "skill1",
     labelKey: "trainer.keys.skill1",
     defaultLabel: "Special / Stance Skill (~)",
-    desc: "Mo Special, Heng Special 6 Hit",
+    descKey: "trainer.keys.desc.skill1",
+    defaultDesc: "Mo Special, Heng Special 6 Hit (Special skill / Stance)",
   },
   {
     key: "skill2",
     labelKey: "trainer.keys.skill2",
     defaultLabel: "Primary Skill (Q)",
-    desc: "Heng Q, Mo QQ, Heng Q Stab",
+    descKey: "trainer.keys.desc.skill2",
+    defaultDesc: "Heng Q, Mo QQ, Heng Q Stab (Primary combat skill)",
   },
   {
     key: "heavy",
     labelKey: "trainer.keys.heavy",
     defaultLabel: "Heavy / Charged Attack (R Hold)",
-    desc: "Mo Charged (x4/x5), Heavy attacks",
+    descKey: "trainer.keys.desc.heavy",
+    defaultDesc: "Mo Charged (x4/x5), Heavy charged attacks",
   },
   {
     key: "dual",
     labelKey: "trainer.keys.dual",
     defaultLabel: "Weapon Switch (Wheel Down)",
-    desc: "Mo Swap, Heng Swap (Смена оружия колесиком)",
+    descKey: "trainer.keys.desc.dual",
+    defaultDesc: "Mo Swap, Heng Swap (Weapon switch via wheel)",
   },
   {
     key: "swap",
     labelKey: "trainer.keys.swap",
     defaultLabel: "Dual Skill / Tab Swap (Tab)",
-    desc: "Heng Dual, Mo Dual (Навык парного оружия / Tab)",
+    descKey: "trainer.keys.desc.swap",
+    defaultDesc: "Heng Dual, Mo Dual (Dual weapon skill / Tab)",
   },
   {
     key: "light",
     labelKey: "trainer.keys.light",
     defaultLabel: "Light Attack / Varied Combo (LClick)",
-    desc: "Heng VC, Mo VC, LC (Лёгкая атака / Вариативное комбо)",
+    descKey: "trainer.keys.desc.light",
+    defaultDesc: "Heng VC, Mo VC, LC (Light attack / Varied Combo)",
   },
   {
     key: "deflect",
     labelKey: "trainer.keys.deflect",
     defaultLabel: "Deflect / Parry (E)",
-    desc: "Deflect, Deflect Cancel (Отражение / Парирование)",
+    descKey: "trainer.keys.desc.deflect",
+    defaultDesc: "Deflect, Deflect Cancel (Parry / Deflect)",
   },
   {
     key: "mystic1",
     labelKey: "trainer.keys.mystic1",
     defaultLabel: "Mystic 1 — Flute (F)",
-    desc: "Flute Cancel, Flute Full (Флейта приливов)",
+    descKey: "trainer.keys.desc.mystic1",
+    defaultDesc: "Flute Cancel, Flute Full (Flute of the Tides)",
   },
   {
     key: "mystic2",
     labelKey: "trainer.keys.mystic2",
     defaultLabel: "Mystic 2 — Toad / Bursting (G)",
-    desc: "Bursting Nine, Toad (Жаба / Взрыв девяти / Боковая мыши)",
+    descKey: "trainer.keys.desc.mystic2",
+    defaultDesc: "Bursting Nine, Toad (Ninefold Burst / Toad / Mouse side)",
   },
   {
     key: "dodge",
     labelKey: "trainer.keys.dodge",
     defaultLabel: "Dodge / Roll (Shift)",
-    desc: "Slide, Dash, Evade",
+    descKey: "trainer.keys.desc.dodge",
+    defaultDesc: "Slide, Dash, Evade",
   },
 ]
 
@@ -275,10 +286,10 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
                   type="button"
                   className={styles.popoutBtn}
                   onClick={handlePopout}
-                  title={t("trainer.settings.popout", "Open in separate window")}
+                  title={t("trainer.settings.popout", "Pop out")}
                 >
                   <PopoutIcon className={styles.btnIcon} />
-                  <span>{t("trainer.settings.popout", "В отдельном окне")}</span>
+                  <span>{t("trainer.settings.popout", "Pop out")}</span>
                 </button>
               )}
             </div>
@@ -291,7 +302,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
               onClick={() => setActiveTab("keys")}
             >
               <KeyboardIcon className={styles.tabIcon} />
-              <span>{t("trainer.settings.tabKeys", "Назначение клавиш")} ({ACTIONS.length})</span>
+              <span>{t("trainer.settings.tabKeys", "Keybindings")} ({ACTIONS.length})</span>
             </button>
             <button
               type="button"
@@ -299,7 +310,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
               onClick={() => setActiveTab("companion")}
             >
               <PlugIcon className={styles.tabIcon} />
-              <span>{t("trainer.settings.tabCompanion", "In-Game Компаньон")}</span>
+              <span>{t("trainer.settings.tabCompanion", "In-Game Companion")}</span>
               <span className={isConnected ? styles.tabBadgeActive : styles.tabBadgeOffline} />
             </button>
           </div>
@@ -319,7 +330,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
                       <span className={styles.actionName}>
                         {t(action.labelKey, action.defaultLabel)}
                       </span>
-                      <span className={styles.actionDesc}>{action.desc}</span>
+                      <span className={styles.actionDesc}>{t(action.descKey, action.defaultDesc)}</span>
                     </div>
 
                     <button
@@ -354,8 +365,8 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
                 <span className={isConnected ? styles.dotActive : styles.dotOffline} />
                 <span>
                   {isConnected
-                    ? t("trainer.companionRunning", "In-game hook active (Windows)")
-                    : t("trainer.companionNotRunning", "Companion offline")}
+                    ? t("trainer.companionRunning", "Companion is active and streaming game inputs.")
+                    : t("trainer.companionNotRunning", "Companion offline. Download and run it before training in-game.")}
                 </span>
               </div>
               <button
@@ -363,7 +374,9 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
                 className={styles.companionLinkBtn}
                 onClick={() => setActiveTab("companion")}
               >
-                {isConnected ? "Настройки компаньона →" : "Скачать .exe для игры →"}
+                {isConnected
+                  ? t("trainer.companionSettings", "Companion Settings →")
+                  : t("trainer.downloadExeShortCta", "Download .exe for in-game →")}
               </button>
             </div>
           </>
@@ -467,10 +480,10 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
             <div className={styles.poppedOutIcon}>
               <PopoutIcon size={36} />
             </div>
-            <p>{t("trainer.settings.poppedOutHint", "Настройки открыты в отдельном окне.")}</p>
+            <p>{t("trainer.settings.poppedOutHint", "Settings dialog is open in a separate window.")}</p>
             <div style={{ display: "flex", gap: "10px" }}>
               <button type="button" className="btn primary" onClick={handleClosePopout}>
-                {t("trainer.settings.restoreInline", "Вернуть в оверлей")}
+                {t("trainer.settings.restoreInline", "Dock back")}
               </button>
               <button
                 type="button"
@@ -480,7 +493,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
                   onClose()
                 }}
               >
-                {t("common.close", "Закрыть")}
+                {t("common.close", "Close")}
               </button>
             </div>
           </div>

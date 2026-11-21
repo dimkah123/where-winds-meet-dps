@@ -77,6 +77,20 @@ describe("Rotation Trainer Key Resolution", () => {
       isHold: true,
     })
 
+    // In Russian locale, should have Russian key letter and '(Удерж.)'
+    expect(resolveSkillKey("Mo Charged", DEFAULT_KEY_MAP, true)).toEqual({
+      key: "r",
+      label: "R (К) (Удерж.)",
+      isHold: true,
+    })
+
+    // In English locale, should NEVER contain Cyrillic characters
+    const enSkills = ["Mo Special", "Heng Special 6 Hit", "Heng Q", "Mo Charged", "Heng Dual", "Mo Swap", "Heng VC", "Deflect", "Flute Cancel", "Bursting Nine"]
+    for (const sk of enSkills) {
+      const res = resolveSkillKey(sk, DEFAULT_KEY_MAP, false)
+      expect(/[а-яА-ЯёЁ]/.test(res.label)).toBe(false)
+    }
+
     expect(resolveSkillKey("Heng Tab", DEFAULT_KEY_MAP)).toEqual({
       key: "tab",
       label: "Tab",

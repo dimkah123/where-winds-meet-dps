@@ -191,10 +191,10 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     setCastStartTime(0)
     setActiveCooldowns({})
     bufferedInputRef.current = null
-    triggerFeedback("RESET", "perfect")
+    triggerFeedback(t("trainer.feedback.reset", isRuLocale ? "СБРОС" : "RESET"), "perfect")
     if (settings.sound) playSynthTone(440, "sine", 0.08)
     if (steps[0]) setRemainingCount(steps[0].multiplier)
-  }, [settings.sound, steps, triggerFeedback])
+  }, [settings.sound, steps, triggerFeedback, t, isRuLocale])
 
   const handleKeyHit = useCallback(
     (pressedKey: string, fromBuffer = false) => {
@@ -237,7 +237,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           setHits(1)
           setCombo(1)
           setMaxCombo((m) => Math.max(m, 1))
-          triggerFeedback("START!", "perfect")
+          triggerFeedback(t("trainer.feedback.start", isRuLocale ? "СТАРТ!" : "START!"), "perfect")
           if (settings.sound) playSynthTone(880, "triangle", 0.09) // A5
           lastHitKeyRef.current = { key: expected, time: Date.now() }
           setStepIndex(1)
@@ -257,7 +257,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           // User pressed the correct next key, but the character is still mid-cast!
           // Buffer it so it fires right when the cancel window opens!
           bufferedInputRef.current = { key: pressedKey, time: now }
-          triggerFeedback(isRuLocale ? "⌛ КАСТ..." : "⌛ CASTING...", "hit")
+          triggerFeedback(t("trainer.feedback.casting", isRuLocale ? "⌛ КАСТ..." : "⌛ CASTING..."), "hit")
           return
         }
       }
@@ -282,7 +282,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         // Success
         if (remainingCount > 1) {
           setRemainingCount((prev) => prev - 1)
-          triggerFeedback(`${remainingCount - 1} left`, "hit")
+          triggerFeedback(`${remainingCount - 1} ${t("trainer.feedback.left", isRuLocale ? "ост." : "left")}`, "hit")
           if (settings.sound) playSynthTone(587.33, "sine", 0.05) // D5
         } else {
           setHits((h) => h + 1)
@@ -291,7 +291,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
             setMaxCombo((m) => Math.max(m, next))
             return next
           })
-          triggerFeedback("PERFECT", "perfect")
+          triggerFeedback(t("trainer.feedback.perfect", isRuLocale ? "ОТЛИЧНО" : "PERFECT"), "perfect")
           if (settings.sound) playSynthTone(880, "triangle", 0.09) // A5
 
           // Advance step
@@ -360,6 +360,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       castDurationMs,
       castStartTime,
       startSkillCast,
+      t,
     ],
   )
 
@@ -567,7 +568,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           // Missed timing window!
           setMisses((m) => m + 1)
           setCombo(0)
-          triggerFeedback("MISS", "wrong")
+          triggerFeedback(t("trainer.feedback.miss", isRuLocale ? "ПРОМАХ" : "MISS"), "wrong")
           if (settings.sound) playSynthTone(180, "sawtooth", 0.1)
           setStepIndex((idx) => (idx + 1 < steps.length ? idx + 1 : 0))
           return 0
@@ -577,7 +578,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     }, interval)
 
     return () => clearInterval(timer)
-  }, [isPlaying, hasStarted, settings.mode, settings.speed, settings.sound, steps.length, currentStep, triggerFeedback])
+  }, [isPlaying, hasStarted, settings.mode, settings.speed, settings.sound, steps.length, currentStep, triggerFeedback, t, isRuLocale])
 
   function handleModeChange(mode: TrainerMode) {
     const next = { ...settings, mode }
@@ -782,12 +783,8 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
                       className={remainingCdSec > 0 ? styles.cdActiveBadge : styles.cdBadge}
                       title={
                         remainingCdSec > 0
-                          ? isRuLocale
-                            ? `Откат: ${remainingCdSec} сек`
-                            : `Cooldown: ${remainingCdSec}s`
-                          : isRuLocale
-                            ? `Кулдаун: ${step.cooldownSec} сек`
-                            : `Base CD: ${step.cooldownSec}s`
+                          ? t("trainer.cooldownRemaining", isRuLocale ? "Откат: {count} сек" : "Cooldown: {count}s").replace("{count}", String(remainingCdSec))
+                          : t("trainer.cooldownBase", isRuLocale ? "Кулдаун: {count} сек" : "Base CD: {count}s").replace("{count}", String(step.cooldownSec))
                       }
                     >
                       {remainingCdSec > 0 ? `⏳ ${remainingCdSec}s` : `CD ${step.cooldownSec}s`}
@@ -799,9 +796,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
                     <span
                       className={styles.castTimeBadge}
                       title={
-                        isRuLocale
-                          ? `Время каста: ${step.durationSec} сек`
-                          : `Cast duration: ${step.durationSec}s`
+                        t("trainer.castDuration", isRuLocale ? "Время каста: {count} сек" : "Cast duration: {count}s").replace("{count}", String(step.durationSec))
                       }
                     >
                       ⏱ {step.durationSec}s
@@ -809,7 +804,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
                   )}
 
                   {isTarget && !hasStarted && (
-                    <span className={styles.startBadge}>{isRuLocale ? "СТАРТ" : "START"}</span>
+                    <span className={styles.startBadge}>{t("trainer.startBadge", isRuLocale ? "СТАРТ" : "START")}</span>
                   )}
                   {isTarget && hasStarted && remainingCount > 1 && (
                     <span className={styles.counterBadge}>×{remainingCount}</span>
@@ -836,7 +831,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
                 <div className={styles.castBarTrack}>
                   <div className={styles.castBarFill} style={{ width: `${castProgress}%` }} />
                   <span className={styles.castBarText}>
-                    {isRuLocale ? "Каст" : "Cast"}{" "}
+                    {t("trainer.castTimeLabel", isRuLocale ? "Каст" : "Cast")}{" "}
                     {(Math.max(0, (castDurationMs - (clockTick - castStartTime)) / 1000) || 0).toFixed(1)}s
                   </span>
                 </div>
