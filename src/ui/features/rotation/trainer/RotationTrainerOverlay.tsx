@@ -19,6 +19,7 @@ import {
   StopwatchIcon,
   TargetIcon,
 } from "./TrainerIcons"
+import { getSavedPipDimensions } from "./useDocumentPictureInPicture"
 import type { TrainerInputEvent, TrainerKeyMap, TrainerMode, TrainerStep } from "./types"
 import { useCompanionSocket } from "./useCompanionSocket"
 import styles from "./RotationTrainerOverlay.module.scss"
@@ -67,11 +68,25 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   const prevWindowSizeRef = useRef<{ width: number; height: number } | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
 
+  // Ensure sleek compact height on mount in floating PiP / popup overlay
+  useEffect(() => {
+    const currentWin = rootRef.current?.ownerDocument?.defaultView
+    if (!currentWin || currentWin === window) return
+    try {
+      const curH = currentWin.innerHeight || currentWin.outerHeight
+      const savedDims = getSavedPipDimensions()
+      // If window was left oversized (e.g. from previous sessions), shrink to compact height
+      if (curH > savedDims.height + 35 && typeof currentWin.resizeTo === "function") {
+        currentWin.resizeTo(currentWin.innerWidth || savedDims.width, savedDims.height)
+      }
+    } catch {}
+  }, [])
+
   const openRemapSettings = useCallback(() => {
     const currentWin = rootRef.current?.ownerDocument?.defaultView || window
     try {
       const currentW = currentWin.outerWidth || currentWin.innerWidth || 960
-      const currentH = currentWin.outerHeight || currentWin.innerHeight || 320
+      const currentH = currentWin.outerHeight || currentWin.innerHeight || 185
       prevWindowSizeRef.current = { width: currentW, height: currentH }
 
       // Automatically expand window height if compact (< 500px) so settings fit cleanly

@@ -46,9 +46,9 @@ export function copyStylesheetsToWindow(targetWin: Window, title: string) {
 }
 
 const SAVED_W_KEY = "wwm.trainer.pipWidth"
-const SAVED_H_KEY = "wwm.trainer.pipHeight"
+const SAVED_H_KEY = "wwm.trainer.pipHeight.v2"
 export const DEFAULT_PIP_WIDTH = 960
-export const DEFAULT_PIP_HEIGHT = 320
+export const DEFAULT_PIP_HEIGHT = 185
 
 export function getSavedPipDimensions(): { width: number; height: number } {
   if (typeof localStorage === "undefined") {
@@ -58,7 +58,7 @@ export function getSavedPipDimensions(): { width: number; height: number } {
   const savedH = Number(localStorage.getItem(SAVED_H_KEY))
   return {
     width: savedW >= 600 && savedW <= 2560 ? savedW : DEFAULT_PIP_WIDTH,
-    height: savedH >= 240 && savedH <= 1440 ? savedH : DEFAULT_PIP_HEIGHT,
+    height: savedH >= 150 && savedH <= 1440 ? savedH : DEFAULT_PIP_HEIGHT,
   }
 }
 
@@ -70,7 +70,7 @@ function attachWindowResizeListener(targetWin: Window) {
       try {
         const curW = targetWin.innerWidth || targetWin.outerWidth
         const curH = targetWin.innerHeight || targetWin.outerHeight
-        if (curW >= 600 && curH >= 240) {
+        if (curW >= 600 && curH >= 150) {
           localStorage.setItem(SAVED_W_KEY, String(curW))
           localStorage.setItem(SAVED_H_KEY, String(curH))
         }
