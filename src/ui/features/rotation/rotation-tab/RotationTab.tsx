@@ -7,7 +7,6 @@ import { RotationTimelinePanel } from "../rotation-timeline-panel/RotationTimeli
 import { BlossomTimelinePanel } from "../blossom-timeline-panel/BlossomTimelinePanel"
 import { BlossomPanel } from "../../overview/blossom-panel/BlossomPanel"
 import { RotationTrainerHost } from "../trainer/RotationTrainerHost"
-import { GamepadIcon } from "../trainer/TrainerIcons"
 import styles from "./RotationTab.module.scss"
 
 export function RotationTab({
@@ -35,8 +34,7 @@ export function RotationTab({
                 onClick={openTrainer}
                 title={t("trainer.openPipTooltip")}
               >
-                <GamepadIcon className={styles.btnIcon} size={15} />
-                <span>{t("trainer.pipButton")}</span>
+                {t("trainer.pipButton")}
               </button>
             </div>
             <RotationOptionsPanel
