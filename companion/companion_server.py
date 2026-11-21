@@ -13,11 +13,13 @@ Uses native Win32 GetAsyncKeyState differential polling:
 import asyncio
 import base64
 import ctypes
+import ctypes.wintypes
 import hashlib
 import json
 import os
 import struct
 import sys
+import threading
 import time
 
 try:
@@ -173,6 +175,65 @@ def frame_ws_message(payload_str: str) -> bytes:
     else:
         header = struct.pack("!BBQ", 0x81, 127, length)
     return header + data
+
+
+# Low-level mouse hook to capture mouse wheel scrolling (wheeldown / wheelup)
+WH_MOUSE_LL = 14
+WM_MOUSEWHEEL = 0x020A
+
+HOOKPROC = ctypes.WINFUNCTYPE(ctypes.c_long, ctypes.c_int, ctypes.wintypes.WPARAM, ctypes.wintypes.LPARAM)
+
+
+class MSLLHOOKSTRUCT(ctypes.Structure):
+    _fields_ = [
+        ("pt", ctypes.wintypes.POINT),
+        ("mouseData", ctypes.wintypes.DWORD),
+        ("flags", ctypes.wintypes.DWORD),
+        ("time", ctypes.wintypes.DWORD),
+        ("dwExtraInfo", ctypes.c_ulong),
+    ]
+
+
+_mouse_hook_handle = None
+_mouse_hook_proc_ref = None
+
+
+def mouse_wheel_hook_thread(loop: asyncio.AbstractEventLoop):
+    global _mouse_hook_handle, _mouse_hook_proc_ref
+
+    def low_level_mouse_proc(nCode, wParam, lParam):
+        if nCode >= 0 and wParam == WM_MOUSEWHEEL:
+            try:
+                ms = MSLLHOOKSTRUCT.from_address(lParam)
+                # High word of mouseData contains wheel delta (signed 16-bit short)
+                delta = ctypes.c_short((ms.mouseData >> 16) & 0xFFFF).value
+                direction = "wheeldown" if delta < 0 else "wheelup"
+                now = time.time()
+                if connected_clients:
+                    asyncio.run_coroutine_threadsafe(
+                        event_queue.put({
+                            "type": "input",
+                            "action": "down",
+                            "key": direction,
+                            "device": "mouse",
+                            "time": now,
+                        }),
+                        loop,
+                    )
+            except Exception:
+                pass
+        return user32.CallNextHookEx(_mouse_hook_handle, nCode, wParam, lParam)
+
+    _mouse_hook_proc_ref = HOOKPROC(low_level_mouse_proc)
+    _mouse_hook_handle = user32.SetWindowsHookExW(WH_MOUSE_LL, _mouse_hook_proc_ref, None, 0)
+    if not _mouse_hook_handle:
+        print("  [Notice] Could not register low-level mouse wheel hook.")
+        return
+
+    msg = ctypes.wintypes.MSG()
+    while user32.GetMessageW(ctypes.byref(msg), 0, 0, 0) > 0:
+        user32.TranslateMessage(ctypes.byref(msg))
+        user32.DispatchMessageW(ctypes.byref(msg))
 
 
 async def unified_input_polling_loop():
@@ -340,6 +401,10 @@ async def main():
     print("=" * 66)
 
     server = await asyncio.start_server(handle_client, WS_HOST, WS_PORT)
+
+    loop = asyncio.get_running_loop()
+    wheel_thread = threading.Thread(target=mouse_wheel_hook_thread, args=(loop,), daemon=True)
+    wheel_thread.start()
 
     async with server:
         await asyncio.gather(

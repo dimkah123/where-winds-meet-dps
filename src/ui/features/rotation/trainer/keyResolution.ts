@@ -52,6 +52,8 @@ export function normalizeKeyInput(key: string): string {
   }
   if (lower === "xbutton1" || lower === "mouse4" || lower === "m4") return "mouse4"
   if (lower === "xbutton2" || lower === "mouse5" || lower === "m5") return "mouse5"
+  if (lower === "wheeldown" || lower === "wheel_down" || lower === "mwheeldown") return "wheeldown"
+  if (lower === "wheelup" || lower === "wheel_up" || lower === "mwheelup") return "wheelup"
   return RU_TO_EN_KEY_MAP[lower] ?? lower
 }
 
@@ -59,7 +61,9 @@ export function formatKeyDisplay(key: string, isRuLocale = false): string {
   const norm = normalizeKeyInput(key)
   if (norm === "lclick") return isRuLocale ? "ЛКМ" : "LClick"
   if (norm === "rclick") return isRuLocale ? "ПКМ" : "RClick"
-  if (norm === "mclick") return isRuLocale ? "Колесико" : "Wheel (MMB)"
+  if (norm === "wheeldown") return isRuLocale ? "Колесико вниз" : "Wheel Down"
+  if (norm === "wheelup") return isRuLocale ? "Колесико вверх" : "Wheel Up"
+  if (norm === "mclick") return isRuLocale ? "Клик колесика" : "Wheel Click"
   if (norm === "mouse4") return isRuLocale ? "Боковая 1" : "Mouse 4"
   if (norm === "mouse5") return isRuLocale ? "Боковая 2" : "Mouse 5"
   if (norm === "~") return isRuLocale ? "~ (Ё)" : "~"
@@ -102,7 +106,7 @@ export function resolveSkillKey(
 
   // 1. Dual weapon attack / switch without tab (e.g. Heng Dual, Mo Dual, Dual Blade)
   if (norm.includes("dual") || norm.includes("парн")) {
-    const key = keyMap.dual ?? "mclick"
+    const key = keyMap.dual ?? "wheeldown"
     return { key, label: formatKeyDisplay(key, isRuLocale), isHold: false }
   }
 
@@ -110,7 +114,7 @@ export function resolveSkillKey(
   if (/\b(tab|swap)\b/i.test(cleanName)) {
     // Legacy support for "Heng Tab" and "Mo Tab" which are actually Dual skills
     if (norm.includes("heng") || norm.includes("mo")) {
-      const key = keyMap.dual ?? "mclick"
+      const key = keyMap.dual ?? "wheeldown"
       return { key, label: formatKeyDisplay(key, isRuLocale), isHold: false }
     }
     return { key: keyMap.swap, label: formatKeyDisplay(keyMap.swap, isRuLocale), isHold: false }

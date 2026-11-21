@@ -143,7 +143,12 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         pressed === expected ||
         (expected === "lclick" && pressed === "lclick") ||
         (expected === "rclick" && pressed === "rclick") ||
-        (expected === "mclick" && (pressed === "mclick" || pressed === "mouse3")) ||
+        (expected === "wheeldown" &&
+          (pressed === "wheeldown" || pressed === "wheel" || pressed === "mclick" || pressed === "mouse3")) ||
+        (expected === "wheelup" &&
+          (pressed === "wheelup" || pressed === "wheel")) ||
+        (expected === "mclick" &&
+          (pressed === "mclick" || pressed === "mouse3" || pressed === "wheeldown" || pressed === "wheel")) ||
         (expected === "mouse4" && (pressed === "mouse4" || pressed === "xbutton1")) ||
         (expected === "mouse5" && (pressed === "mouse5" || pressed === "xbutton2"))
 
@@ -332,6 +337,18 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       }
     }
 
+    function onWheel(e: WheelEvent) {
+      if (showRemap) return
+      e.preventDefault()
+      const direction = e.deltaY > 0 ? "wheeldown" : "wheelup"
+      const now = Date.now()
+      const last = lastPressTimeRef.current[direction] || 0
+      if (now - last < 80) return
+      lastPressTimeRef.current[direction] = now
+
+      handleKeyHit(direction)
+    }
+
     const doc = rootRef.current?.ownerDocument || document
     const win = doc.defaultView || window
 
@@ -342,6 +359,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       target.addEventListener("keydown", onKeyDown as EventListener)
       target.addEventListener("mousedown", onMouseDown as EventListener)
       target.addEventListener("auxclick", onAuxClick as EventListener)
+      target.addEventListener("wheel", onWheel as EventListener, { passive: false })
     }
 
     return () => {
@@ -349,6 +367,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         target.removeEventListener("keydown", onKeyDown as EventListener)
         target.removeEventListener("mousedown", onMouseDown as EventListener)
         target.removeEventListener("auxclick", onAuxClick as EventListener)
+        target.removeEventListener("wheel", onWheel as EventListener)
       }
     }
   }, [handleKeyHit, showRemap])

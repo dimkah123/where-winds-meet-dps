@@ -56,14 +56,14 @@ const ACTIONS: ActionDef[] = [
   {
     key: "dual",
     labelKey: "trainer.keys.dual",
-    defaultLabel: "Dual Weapon Attack (Wheel / MMB)",
-    desc: "Heng Dual, Mo Dual (Парное оружие / Колесико)",
+    defaultLabel: "Weapon Switch (Wheel Down)",
+    desc: "Heng Dual, Mo Dual (Смена оружия / Колесико вниз)",
   },
   {
     key: "swap",
     labelKey: "trainer.keys.swap",
-    defaultLabel: "Weapon Swap (Tab)",
-    desc: "Weapon swap without attack",
+    defaultLabel: "Weapon Swap / Stance (Tab)",
+    desc: "Смена оружия / стойки без атаки (Tab)",
   },
   {
     key: "light",
@@ -174,6 +174,14 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
       applyKey(recordingAction!, btn)
     }
 
+    function handleWheel(e: WheelEvent) {
+      if (Date.now() - recordingStartTimeRef.current < 150) return
+      e.preventDefault()
+      e.stopPropagation()
+      const direction = e.deltaY > 0 ? "wheeldown" : "wheelup"
+      applyKey(recordingAction!, direction)
+    }
+
     function handleContextMenu(e: MouseEvent) {
       e.preventDefault()
       e.stopPropagation()
@@ -192,6 +200,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
       target.addEventListener("keydown", handleKeyDown as EventListener, { capture: true })
       target.addEventListener("mousedown", handleMouseDown as EventListener, { capture: true })
       target.addEventListener("auxclick", handleAuxClick as EventListener, { capture: true })
+      target.addEventListener("wheel", handleWheel as EventListener, { capture: true, passive: false })
       target.addEventListener("contextmenu", handleContextMenu as EventListener, { capture: true })
     }
 
@@ -200,6 +209,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
         target.removeEventListener("keydown", handleKeyDown as EventListener, { capture: true })
         target.removeEventListener("mousedown", handleMouseDown as EventListener, { capture: true })
         target.removeEventListener("auxclick", handleAuxClick as EventListener, { capture: true })
+        target.removeEventListener("wheel", handleWheel as EventListener, { capture: true })
         target.removeEventListener("contextmenu", handleContextMenu as EventListener, { capture: true })
       }
     }

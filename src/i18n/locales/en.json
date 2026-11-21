@@ -3034,7 +3034,7 @@
   "trainer.downloadZip": "Download ZIP archive",
   "trainer.inGameHook": "IN-GAME HOOK ACTIVE",
   "trainer.keys.dodge": "Dodge / Dash (Shift)",
-  "trainer.keys.dual": "Dual Weapon Attack (Wheel / MMB)",
+  "trainer.keys.dual": "Weapon Switch (Wheel Down)",
   "trainer.keys.heavy": "Heavy / Charged Attack (R Hold)",
   "trainer.keys.light": "Light Attack / Combo (LClick)",
   "trainer.keys.mystic": "Mystic / Flute (F)",

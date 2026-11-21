@@ -8,7 +8,7 @@ export const DEFAULT_KEY_MAP: TrainerKeyMap = {
   skill2: "q",
   heavy: "r",
   swap: "tab",
-  dual: "mclick",
+  dual: "wheeldown",
   light: "lclick",
   varied: "e",
   mystic1: "f",
@@ -31,6 +31,7 @@ export function loadTrainerSettings(): TrainerSettings {
     const userMap = (parsed.keyMap ?? {}) as Partial<TrainerKeyMap>
     const mystic1 = userMap.mystic1 ?? userMap.mystic ?? DEFAULT_KEY_MAP.mystic1
     const mystic2 = userMap.mystic2 ?? DEFAULT_KEY_MAP.mystic2
+    const dual = userMap.dual === "mclick" || !userMap.dual ? DEFAULT_KEY_MAP.dual : userMap.dual
     return {
       mode: parsed.mode === "timing" ? "timing" : "strict",
       speed: typeof parsed.speed === "number" ? parsed.speed : 1.0,
@@ -38,6 +39,7 @@ export function loadTrainerSettings(): TrainerSettings {
       keyMap: {
         ...DEFAULT_KEY_MAP,
         ...userMap,
+        dual,
         mystic1,
         mystic2,
       },

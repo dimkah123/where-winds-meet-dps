@@ -78,20 +78,20 @@ describe("Rotation Trainer Key Resolution", () => {
     })
 
     expect(resolveSkillKey("Heng Tab", DEFAULT_KEY_MAP)).toEqual({
-      key: "mclick",
-      label: "Wheel (MMB)",
+      key: "wheeldown",
+      label: "Wheel Down",
       isHold: false,
     })
 
     expect(resolveSkillKey("Heng Dual", DEFAULT_KEY_MAP)).toEqual({
-      key: "mclick",
-      label: "Wheel (MMB)",
+      key: "wheeldown",
+      label: "Wheel Down",
       isHold: false,
     })
 
     expect(resolveSkillKey("Mo Dual", DEFAULT_KEY_MAP)).toEqual({
-      key: "mclick",
-      label: "Wheel (MMB)",
+      key: "wheeldown",
+      label: "Wheel Down",
       isHold: false,
     })
 
@@ -144,7 +144,9 @@ describe("Rotation Trainer Key Resolution", () => {
   it("formats key display labels cleanly", () => {
     expect(formatKeyDisplay("lclick")).toBe("LClick")
     expect(formatKeyDisplay("rclick")).toBe("RClick")
-    expect(formatKeyDisplay("mclick")).toBe("Wheel (MMB)")
+    expect(formatKeyDisplay("mclick")).toBe("Wheel Click")
+    expect(formatKeyDisplay("wheeldown")).toBe("Wheel Down")
+    expect(formatKeyDisplay("wheelup")).toBe("Wheel Up")
     expect(formatKeyDisplay("mouse4")).toBe("Mouse 4")
     expect(formatKeyDisplay("mouse5")).toBe("Mouse 5")
     expect(formatKeyDisplay("tab")).toBe("Tab")
@@ -159,7 +161,9 @@ describe("Rotation Trainer Key Resolution", () => {
     // Russian locale display
     expect(formatKeyDisplay("lclick", true)).toBe("ЛКМ")
     expect(formatKeyDisplay("rclick", true)).toBe("ПКМ")
-    expect(formatKeyDisplay("mclick", true)).toBe("Колесико")
+    expect(formatKeyDisplay("mclick", true)).toBe("Клик колесика")
+    expect(formatKeyDisplay("wheeldown", true)).toBe("Колесико вниз")
+    expect(formatKeyDisplay("wheelup", true)).toBe("Колесико вверх")
     expect(formatKeyDisplay("mouse4", true)).toBe("Боковая 1")
     expect(formatKeyDisplay("mouse5", true)).toBe("Боковая 2")
     expect(formatKeyDisplay("~", true)).toBe("~ (Ё)")
@@ -200,7 +204,7 @@ describe("Rotation Trainer Key Resolution", () => {
     expect(settings.keyMap.skill1).toBe("~")
     expect(settings.keyMap.skill2).toBe("q")
     expect(settings.keyMap.heavy).toBe("r")
-    expect(settings.keyMap.dual).toBe("mclick")
+    expect(settings.keyMap.dual).toBe("wheeldown")
     expect(settings.keyMap.mystic1).toBe("f")
     expect(settings.keyMap.mystic2).toBe("g")
   })
