@@ -53,9 +53,9 @@ const ACTIONS: ActionDef[] = [
   {
     key: "heavy",
     labelKey: "trainer.keys.heavy",
-    defaultLabel: "Heavy / Charged Attack (R Hold)",
+    defaultLabel: "Heavy / Charged / VC (R)",
     descKey: "trainer.keys.desc.heavy",
-    defaultDesc: "Mo Charged (x4/x5), Heavy charged attacks",
+    defaultDesc: "Mo Charged (Hold), Heng VC, Mo VC (Varied combo / Heavy attack R)",
   },
   {
     key: "dual",
@@ -74,9 +74,9 @@ const ACTIONS: ActionDef[] = [
   {
     key: "light",
     labelKey: "trainer.keys.light",
-    defaultLabel: "Light Attack / Varied Combo (LClick)",
+    defaultLabel: "Light Attack / LC (LClick)",
     descKey: "trainer.keys.desc.light",
-    defaultDesc: "Heng VC, Mo VC, LC (Light attack / Varied Combo)",
+    defaultDesc: "Heng LC, Mo LC, Light attacks (LClick)",
   },
   {
     key: "deflect",

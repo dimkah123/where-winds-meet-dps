@@ -130,8 +130,8 @@ describe("Rotation Trainer Key Resolution", () => {
     })
 
     expect(resolveSkillKey("Heng VC", DEFAULT_KEY_MAP)).toEqual({
-      key: "lclick",
-      label: "LClick",
+      key: "r",
+      label: "R",
       isHold: false,
     })
 

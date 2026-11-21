@@ -126,15 +126,19 @@ export function resolveSkillKey(
     }
   }
 
+  // 2b. Varied Combo (VC) -> R (tap)
+  if (norm.includes("vc") || norm.includes("varied") || norm.includes("вариатив")) {
+    const key = keyMap.heavy ?? "r"
+    return { key, label: formatKeyDisplay(key, isRuLocale), isHold: false }
+  }
+
   // 3. Stance / Special skill (e.g. Mo Special, Heng Special) -> '~'
   if (norm.includes("special") || norm.includes("stance")) {
     return { key: keyMap.skill1, label: formatKeyDisplay(keyMap.skill1, isRuLocale), isHold: false }
   }
 
-  // 4. Light Attack / Varied Combo (e.g. Heng VC, Mo VC, Heng LC, Mo LC, Light attacks)
+  // 4. Light Attack / Light Combo (e.g. Heng LC, Mo LC, Light attacks)
   if (
-    norm.includes("vc") ||
-    norm.includes("varied") ||
     norm.includes("lc") ||
     norm.includes("light") ||
     norm.includes("slash") ||
