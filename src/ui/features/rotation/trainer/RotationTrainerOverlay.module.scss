@@ -314,13 +314,13 @@
 .skillCard {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   border-radius: 6px;
   padding: 5px 8px;
   box-sizing: border-box;
   transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
   position: relative;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .targetCard {
@@ -385,6 +385,8 @@
   justify-content: space-between;
   gap: 4px;
   width: 100%;
+  min-height: 18px;
+  flex-shrink: 0;
 }
 
 .cardBadges {
@@ -394,20 +396,23 @@
   flex-shrink: 0;
 }
 
+.keyPrompt {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0;
+}
+
 .cardTimings {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
   width: 100%;
-  margin-top: auto;
-}
-
-.keyPrompt {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 1px 0;
+  min-height: 18px;
+  flex-shrink: 0;
 }
 
 .castTimeBadge {
@@ -458,14 +463,16 @@
 }
 
 .castBarTrack {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   width: 100%;
   height: 4px;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.6);
   overflow: visible;
-  position: relative;
-  margin-top: 4px;
-  border: 1px solid rgba(224, 180, 103, 0.35);
+  border-top: 1px solid rgba(224, 180, 103, 0.4);
+  z-index: 5;
 }
 
 .castBarFill {
@@ -535,26 +542,25 @@
   letter-spacing: 0.02em;
 }
 
-.keyPrompt {
-  display: flex;
+.keyTag {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin: 4px 0;
-}
-
-.keyTag {
   letter-spacing: 0.04em;
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
 }
 
 .timingBarTrack {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   width: 100%;
   height: 3px;
   background: rgba(255, 255, 255, 0.12);
-  border-radius: 2px;
   overflow: hidden;
-  margin-top: 2px;
+  z-index: 5;
 }
 
 .timingBarFill {

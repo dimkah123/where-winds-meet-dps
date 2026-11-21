@@ -789,33 +789,31 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
               </div>
 
               {/* Bottom Timings Row: Cooldown & Cast Time */}
-              {(Boolean(step.cooldownSec) || step.durationSec > 0) && (
-                <div className={styles.cardTimings}>
-                  {step.cooldownSec && (
-                    <span
-                      className={remainingCdSec > 0 ? styles.cdActiveBadge : styles.cdBadge}
-                      title={
-                        remainingCdSec > 0
-                          ? t("trainer.cooldownRemaining", isRuLocale ? "Откат: {count} сек" : "Cooldown: {count}s").replace("{count}", String(remainingCdSec))
-                          : t("trainer.cooldownBase", isRuLocale ? "Кулдаун: {count} сек" : "Base CD: {count}s").replace("{count}", String(step.cooldownSec))
-                      }
-                    >
-                      {remainingCdSec > 0 ? `⏳ ${remainingCdSec}s` : `CD ${step.cooldownSec}s`}
-                    </span>
-                  )}
+              <div className={styles.cardTimings}>
+                {step.cooldownSec && (
+                  <span
+                    className={remainingCdSec > 0 ? styles.cdActiveBadge : styles.cdBadge}
+                    title={
+                      remainingCdSec > 0
+                        ? t("trainer.cooldownRemaining", isRuLocale ? "Откат: {count} сек" : "Cooldown: {count}s").replace("{count}", String(remainingCdSec))
+                        : t("trainer.cooldownBase", isRuLocale ? "Кулдаун: {count} сек" : "Base CD: {count}s").replace("{count}", String(step.cooldownSec))
+                    }
+                  >
+                    {remainingCdSec > 0 ? `⏳ ${remainingCdSec}s` : `CD ${step.cooldownSec}s`}
+                  </span>
+                )}
 
-                  {step.durationSec > 0 && (
-                    <span
-                      className={styles.castTimeBadge}
-                      title={
-                        t("trainer.castDuration", isRuLocale ? "Время каста: {count} сек" : "Cast duration: {count}s").replace("{count}", String(step.durationSec))
-                      }
-                    >
-                      ⏱ {step.durationSec}s
-                    </span>
-                  )}
-                </div>
-              )}
+                {step.durationSec > 0 && (
+                  <span
+                    className={styles.castTimeBadge}
+                    title={
+                      t("trainer.castDuration", isRuLocale ? "Время каста: {count} сек" : "Cast duration: {count}s").replace("{count}", String(step.durationSec))
+                    }
+                  >
+                    ⏱ {step.durationSec}s
+                  </span>
+                )}
+              </div>
 
               {/* Timing mode prompter bar */}
               {isTarget && settings.mode === "timing" && (
