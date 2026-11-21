@@ -66,6 +66,17 @@
   white-space: nowrap;
 }
 
+.overwriteBtn {
+  background: rgba(232, 199, 114, 0.15) !important;
+  border-color: #c0a060 !important;
+  color: #e8c772 !important;
+
+  &:hover {
+    background: rgba(232, 199, 114, 0.28) !important;
+    border-color: #e8c772 !important;
+  }
+}
+
 .closeBtn {
   background: transparent;
   border: none;

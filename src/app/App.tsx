@@ -224,7 +224,7 @@ function AppInner() {
   } = useAppUpdateChecker()
 
   const loadCloudBuildById = useCallback(
-    async (shortId: string) => {
+    async (shortId: string, options?: { fromMyBuilds?: boolean; asNewProfile?: boolean }) => {
       if (!shortId) return
       lastLoadedCloudIdRef.current = shortId
 
@@ -260,37 +260,53 @@ function AppInner() {
         const editToken = getEditToken(shortId)
         const user = getStoredSession().userProfile
         const isOwner = Boolean((user && loaded.ownerId && user.id === loaded.ownerId) || editToken)
+        const isFromMyBuilds = Boolean(options?.fromMyBuilds || isOwner)
 
         setCurrentCloudId(shortId)
         setWizard(null)
         resetActiveDraft(inputsData)
         setLastSavedJson(JSON.stringify(inputsData))
 
-        setCommitted((prev) => {
-          const activeProf = prev.profiles.find((p) => p.id === prev.activeId)
-          if (!activeProf) return prev
-          return {
-            ...prev,
-            profiles: prev.profiles.map((p) =>
-              p.id === prev.activeId
-                ? {
-                    ...p,
-                    name: titleName || p.name,
-                    inputs: inputsData!,
-                  }
-                : p,
-            ),
+        if (options?.asNewProfile) {
+          const newId = newProfileId()
+          const newProf: StoredProfile = {
+            id: newId,
+            name: titleName || t("common.newProfile"),
+            inputs: inputsData,
           }
-        })
-
-        if (!isOwner) {
+          setCommitted((prev) => {
+            const nextState: ProfilesState = {
+              profiles: [...prev.profiles, newProf],
+              activeId: newId,
+            }
+            saveProfiles(nextState)
+            return nextState
+          })
+          setSharedBannerInfo(null)
+        } else if (isFromMyBuilds) {
+          setCommitted((prev) => {
+            const nextState: ProfilesState = {
+              ...prev,
+              profiles: prev.profiles.map((p) =>
+                p.id === prev.activeId
+                  ? {
+                      ...p,
+                      name: titleName || p.name,
+                      inputs: inputsData!,
+                    }
+                  : p,
+              ),
+            }
+            saveProfiles(nextState)
+            return nextState
+          })
+          setSharedBannerInfo(null)
+        } else {
           setSharedBannerInfo({
             author: authorName,
             title: titleName,
             inputs: inputsData,
           })
-        } else {
-          setSharedBannerInfo(null)
         }
 
         if (typeof window !== "undefined") {
@@ -373,6 +389,10 @@ function AppInner() {
 
   function handleDismissShared() {
     setSharedBannerInfo(null)
+  }
+
+  function handleDiscardShared() {
+    setSharedBannerInfo(null)
     const active = committed.profiles.find((profile) => profile.id === committed.activeId)
     if (active) {
       resetActiveDraft(active.inputs)
@@ -450,17 +470,23 @@ function AppInner() {
   }
 
   const handleSave = useCallback(() => {
-    if (sharedBannerInfo) return
     const next: ProfilesState = {
       ...committed,
       profiles: committed.profiles.map((profile) =>
-        profile.id === committed.activeId ? { ...profile, inputs: activeDraft } : profile,
+        profile.id === committed.activeId
+          ? {
+              ...profile,
+              name: sharedBannerInfo?.title ? sharedBannerInfo.title : profile.name,
+              inputs: activeDraft,
+            }
+          : profile,
       ),
     }
     persist(next)
     setLastSavedJson(draftJson)
     // eslint-disable-next-line react-hooks/purity
     setSavedAt(Date.now())
+    setSharedBannerInfo(null)
 
     if (currentCloudId) {
       const activeProf = committed.profiles.find((p) => p.id === committed.activeId)
@@ -482,6 +508,71 @@ function AppInner() {
         .catch(() => {})
     }
   }, [activeDraft, committed, currentCloudId, draftJson, headerResult.dps, sharedBannerInfo])
+
+  async function handleOverwriteProfile(targetId: string) {
+    if (isSimulationRunning) return
+    const target = committed.profiles.find((p) => p.id === targetId)
+    if (!target) return
+
+    if (targetId !== committed.activeId) {
+      const msg = t(
+        "profile.confirmOverwrite",
+        "Перезаписать профиль «{name}» текущей сборкой?",
+      ).replace("{name}", target.name)
+      if (!(await confirm(msg))) return
+    }
+
+    const next: ProfilesState = {
+      ...committed,
+      profiles: committed.profiles.map((p) =>
+        p.id === targetId
+          ? {
+              ...p,
+              name: sharedBannerInfo?.title ? sharedBannerInfo.title : p.name,
+              inputs: activeDraft,
+            }
+          : p,
+      ),
+    }
+    persist(next)
+    setLastSavedJson(draftJson)
+    // eslint-disable-next-line react-hooks/purity
+    setSavedAt(Date.now())
+    setSharedBannerInfo(null)
+  }
+
+  function handleSaveCurrentAsNew() {
+    if (isSimulationRunning) return
+    const defaultName =
+      sharedBannerInfo?.title ||
+      (activeRotationName(activeDraft)
+        ? `${activeRotationName(activeDraft)}`
+        : `${t("common.newProfile")} ${committed.profiles.length + 1}`)
+
+    const userChosenName = window.prompt(
+      t("profile.promptNewProfileName", "Введите название нового профиля:"),
+      defaultName,
+    )
+    if (userChosenName === null) return
+    const name = userChosenName.trim() || defaultName
+
+    const newId = newProfileId()
+    const newProf: StoredProfile = {
+      id: newId,
+      name,
+      inputs: activeDraft,
+    }
+    const next: ProfilesState = {
+      profiles: [...committed.profiles, newProf],
+      activeId: newId,
+    }
+    persist(next)
+    resetActiveDraft(activeDraft)
+    setLastSavedJson(JSON.stringify(activeDraft))
+    // eslint-disable-next-line react-hooks/purity
+    setSavedAt(Date.now())
+    setSharedBannerInfo(null)
+  }
   async function handleReset() {
     if (isSimulationRunning) return
     if (!isDirty) return
@@ -620,7 +711,7 @@ function AppInner() {
       }
 
       e.preventDefault()
-      if (isDirty && !sharedBannerInfo && !isSimulationRunning) {
+      if ((isDirty || !!sharedBannerInfo) && !isSimulationRunning) {
         handleSave()
       }
     }
@@ -805,8 +896,8 @@ function AppInner() {
       {myBuildsDialogOpen && (
         <MyBuildsDialog
           onClose={() => setMyBuildsDialogOpen(false)}
-          onSelectBuild={(shortId) => {
-            loadCloudBuildById(shortId)
+          onSelectBuild={(shortId, asNewProfile) => {
+            loadCloudBuildById(shortId, { fromMyBuilds: true, asNewProfile })
           }}
         />
       )}
@@ -851,8 +942,10 @@ function AppInner() {
               <SharedBuildBanner
                 author={sharedBannerInfo.author}
                 title={sharedBannerInfo.title}
-                onSave={handleSaveSharedToProfiles}
+                onSaveAsNew={handleSaveSharedToProfiles}
+                onOverwrite={() => handleOverwriteProfile(committed.activeId)}
                 onDismiss={handleDismissShared}
+                onDiscard={handleDiscardShared}
               />
             )}
           </div>
@@ -918,18 +1011,18 @@ function AppInner() {
                       className={
                         styles.toolbarBtn +
                         ` ${styles.saveBtn}` +
-                        (isDirty && !sharedBannerInfo
+                        (isDirty || !!sharedBannerInfo
                           ? ` ${styles.saveBtnDirty}`
                           : isJustSaved
                             ? ` ${styles.saveBtnSaved}`
                             : "")
                       }
                       onClick={handleSave}
-                      disabled={!isDirty || !!sharedBannerInfo}
+                      disabled={!isDirty && !sharedBannerInfo}
                       aria-label={t("common.save")}
                       title={
                         sharedBannerInfo
-                          ? t("app.saveDisabledSharedBuild")
+                          ? t("app.saveSharedToActiveProfile", "Сохранить открытую сборку в текущий профиль")
                           : isDirty
                             ? t("app.saveChangesTooltip")
                             : isJustSaved
@@ -1217,10 +1310,15 @@ function AppInner() {
                   <ProfilePanel
                     profiles={committed.profiles}
                     activeId={committed.activeId}
+                    activeDraft={activeDraft}
+                    isDirty={isDirty}
+                    hasSharedBanner={Boolean(sharedBannerInfo)}
                     customSkills={customSkills}
                     customBuffs={customBuffs}
                     customDebuffs={customDebuffs}
                     onCreate={createProfile}
+                    onSaveCurrentAsNew={handleSaveCurrentAsNew}
+                    onOverwrite={handleOverwriteProfile}
                     onSelect={selectProfile}
                     onRename={renameProfile}
                     onDuplicate={duplicateProfile}

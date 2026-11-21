@@ -1,5 +1,5 @@
-import { useRef, useState } from "react"
-import type { StoredProfile } from "../../../../engine/types"
+import { useMemo, useRef, useState } from "react"
+import type { Inputs, StoredProfile } from "../../../../engine/types"
 import type { Skill } from "../../../../engine/skill"
 import type { Buff } from "../../../../engine/buff"
 import type { Debuff } from "../../../../engine/debuff"
@@ -16,10 +16,15 @@ import styles from "./ProfilePanel.module.scss"
 interface Props {
   profiles: StoredProfile[]
   activeId: string
+  activeDraft: Inputs
+  isDirty: boolean
+  hasSharedBanner?: boolean
   customSkills: Skill[]
   customBuffs: Buff[]
   customDebuffs: Debuff[]
   onCreate: () => void
+  onSaveCurrentAsNew: () => void
+  onOverwrite: (id: string) => void
   onSelect: (id: string) => void
   onRename: (id: string, name: string) => void
   onDuplicate: (id: string) => void
@@ -31,10 +36,15 @@ interface Props {
 export function ProfilePanel({
   profiles,
   activeId,
+  activeDraft,
+  isDirty,
+  hasSharedBanner,
   customSkills,
   customBuffs,
   customDebuffs,
   onCreate,
+  onSaveCurrentAsNew,
+  onOverwrite,
   onSelect,
   onRename,
   onDuplicate,
@@ -46,8 +56,13 @@ export function ProfilePanel({
   const [editingId, setEditingId] = useState<string | null>(null)
   const [draftName, setDraftName] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const profilesForMetrics = useMemo(() => {
+    return profiles.map((p) => (p.id === activeId ? { ...p, inputs: activeDraft } : p))
+  }, [profiles, activeId, activeDraft])
+
   const { metricsByProfileId, isPending } = useProfileMetrics(
-    profiles,
+    profilesForMetrics,
     customSkills,
     customBuffs,
     customDebuffs,
@@ -117,11 +132,19 @@ export function ProfilePanel({
       <div className="toolbar">
         <span className="toolbar-label">{t("common.profiles")}</span>
         <div className="spacer" />
+        <button
+          type="button"
+          className="btn primary"
+          onClick={onSaveCurrentAsNew}
+          title={t("profile.saveCurrentAsNewTooltip", "Создать новый профиль из текущей открытой сборки")}
+        >
+          + {t("profile.saveCurrentAsNew", "Сохранить текущую как новый")}
+        </button>
+        <button type="button" className="btn" onClick={onCreate}>
+          + {t("common.newProfile")}
+        </button>
         <button type="button" className="btn" onClick={handleImportClick}>
           {t("common.import")}
-        </button>
-        <button type="button" className="btn primary" onClick={onCreate}>
-          + {t("common.newProfile")}
         </button>
         <input
           ref={fileInputRef}
@@ -136,9 +159,10 @@ export function ProfilePanel({
         {profiles.map((profile) => {
           const isActive = profile.id === activeId
           const isEditing = editingId === profile.id
-          const icon = classIcon(profile.inputs.classId)
+          const currentInputs = isActive ? activeDraft : profile.inputs
+          const icon = classIcon(currentInputs.classId)
           const metrics = metricsByProfileId?.[profile.id]
-          const rotationName = activeRotationName(profile.inputs)
+          const rotationName = activeRotationName(currentInputs)
           return (
             <div key={profile.id} className={styles.card + (isActive ? ` ${styles.isActive}` : "")}>
               {icon && <img className={styles.watermark} src={icon} alt="" />}
@@ -170,7 +194,15 @@ export function ProfilePanel({
                   </span>
                 )}
                 {isActive && <span className={styles.activeBadge}>{t("common.active")}</span>}
-                <span className={styles.classLabel}>{classLabel(profile.inputs.classId)}</span>
+                {isActive && (isDirty || hasSharedBanner) && (
+                  <span
+                    className={styles.dirtyBadge}
+                    title={t("profile.unsavedChangesTooltip", "В этой сборке есть несохранённые изменения")}
+                  >
+                    ● {t("profile.unsavedChanges", "Не сохранено")}
+                  </span>
+                )}
+                <span className={styles.classLabel}>{classLabel(currentInputs.classId)}</span>
               </div>
 
               <div className={styles.stats} style={{ opacity: isPending ? 0.6 : 1 }}>
@@ -208,6 +240,18 @@ export function ProfilePanel({
                   disabled={isActive}
                 >
                   {t("profile.select")}
+                </button>
+                <button
+                  type="button"
+                  className={`btn ${isActive && (isDirty || hasSharedBanner) ? "primary" : ""}`}
+                  onClick={() => onOverwrite(profile.id)}
+                  title={
+                    isActive
+                      ? t("profile.overwriteActiveTooltip", "Перезаписать этот профиль текущей открытой сборкой")
+                      : t("profile.overwriteOtherTooltip", "Заменить данные этого профиля текущей открытой сборкой")
+                  }
+                >
+                  💾 {t("profile.overwrite", "Перезаписать")}
                 </button>
                 <button
                   type="button"

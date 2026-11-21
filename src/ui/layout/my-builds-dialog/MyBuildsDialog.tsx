@@ -7,7 +7,7 @@ import styles from "./MyBuildsDialog.module.scss"
 
 interface Props {
   onClose: () => void
-  onSelectBuild: (shortId: string) => void
+  onSelectBuild: (shortId: string, asNewProfile?: boolean) => void
 }
 
 export function MyBuildsDialog({ onClose, onSelectBuild }: Props) {
@@ -99,11 +99,23 @@ export function MyBuildsDialog({ onClose, onSelectBuild }: Props) {
                       type="button"
                       className={`${styles.actionBtn} ${styles.openBtn}`}
                       onClick={() => {
-                        onSelectBuild(b.shortId)
+                        onSelectBuild(b.shortId, false)
                         onClose()
                       }}
+                      title={t("share.cloud.openOverwriteTooltip", "Открыть и перезаписать текущий профиль")}
                     >
                       {t("common.open", "Открыть")}
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.actionBtn}
+                      onClick={() => {
+                        onSelectBuild(b.shortId, true)
+                        onClose()
+                      }}
+                      title={t("share.cloud.openAsNewTooltip", "Открыть и добавить как новый профиль")}
+                    >
+                      + {t("share.cloud.asNewProfile", "В новый")}
                     </button>
                     <button
                       type="button"
