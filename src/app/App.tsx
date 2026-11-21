@@ -110,9 +110,15 @@ function extractSharedData(search: string): string | null {
   return null
 }
 
-function extractCloudShortId(search: string, hash: string): string | null {
+function extractCloudShortId(search: string, hash: string, pathname = ""): string | null {
+  // 1. Direct path check: /b/:id or /build/:id
+  const path = pathname || (typeof window !== "undefined" ? window.location.pathname : "")
+  const pathMatch = path.match(/\/(?:b|build)\/([A-Za-z0-9_-]+)/)
+  if (pathMatch) return pathMatch[1]
+
+  // 2. Hash check: #/b/:id or #/build/:id or #...?b=:id
   if (hash) {
-    const bMatch = hash.match(/#\/b\/([A-Za-z0-9_-]+)/)
+    const bMatch = hash.match(/#(?:(?:\/b|\/build)\/|.*\?(?:.*&)?(?:b|id)=)([A-Za-z0-9_-]+)/)
     if (bMatch) return bMatch[1]
     const qIdx = hash.indexOf("?")
     if (qIdx >= 0) {
@@ -121,6 +127,8 @@ function extractCloudShortId(search: string, hash: string): string | null {
       if (val) return val
     }
   }
+
+  // 3. Search params check: ?b=:id or ?id=:id
   if (search) {
     const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search)
     const val = params.get("b") || params.get("id")
@@ -144,6 +152,7 @@ function AppInner() {
   const isOnSimulationTab = pathname === SIMULATION_PATH
   const areInputsLocked = isSimulationRunning && !isOnSimulationTab
   const navigate = useNavigate()
+  const { t } = useI18n()
   const lastLoadedDataRef = useRef<string | null>(null)
 
   const startParseSimulation = simulation.start
@@ -214,14 +223,13 @@ function AppInner() {
     reload: reloadApp,
   } = useAppUpdateChecker()
 
-  useEffect(() => {
-    const hashStr = typeof window !== "undefined" ? window.location.hash : ""
-    const shortId = extractCloudShortId(location.search, hashStr)
-    if (!shortId || shortId === lastLoadedCloudIdRef.current) return
-    lastLoadedCloudIdRef.current = shortId
+  const loadCloudBuildById = useCallback(
+    async (shortId: string) => {
+      if (!shortId) return
+      lastLoadedCloudIdRef.current = shortId
 
-    loadBuildFromCloud(shortId)
-      .then(async (loaded) => {
+      try {
+        const loaded = await loadBuildFromCloud(shortId)
         let inputsData: Inputs | null = null
         let authorName = loaded.author || ""
         let titleName = loaded.title || ""
@@ -239,7 +247,15 @@ function AppInner() {
           }
         }
 
-        if (!inputsData) return
+        if (!inputsData) {
+          alert(t("share.cloud.parseError", "Ошибка чтения данных сборки."))
+          return
+        }
+
+        // Auto-equip graduation gear if this build is following a graduation build and inventory is empty
+        if (inputsData.graduationBuildId && (!inputsData.inventory || inputsData.inventory.length === 0)) {
+          inputsData = equipGraduationGearToInputs(inputsData)
+        }
 
         const editToken = getEditToken(shortId)
         const user = getStoredSession().userProfile
@@ -250,6 +266,23 @@ function AppInner() {
         resetActiveDraft(inputsData)
         setLastSavedJson(JSON.stringify(inputsData))
 
+        setCommitted((prev) => {
+          const activeProf = prev.profiles.find((p) => p.id === prev.activeId)
+          if (!activeProf) return prev
+          return {
+            ...prev,
+            profiles: prev.profiles.map((p) =>
+              p.id === prev.activeId
+                ? {
+                    ...p,
+                    name: titleName || p.name,
+                    inputs: inputsData!,
+                  }
+                : p,
+            ),
+          }
+        })
+
         if (!isOwner) {
           setSharedBannerInfo({
             author: authorName,
@@ -259,12 +292,35 @@ function AppInner() {
         } else {
           setSharedBannerInfo(null)
         }
+
+        if (typeof window !== "undefined") {
+          window.history.replaceState(null, "", `${window.location.pathname}#/overview`)
+        }
         navigate("/overview", { replace: true })
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Failed to load cloud build:", err)
-      })
-  }, [location.pathname, location.search, navigate])
+        alert(
+          t("share.cloud.loadError", "Не удалось загрузить сборку из облака: ") +
+            (err instanceof Error ? err.message : String(err)),
+        )
+      }
+    },
+    [navigate, resetActiveDraft, t],
+  )
+
+  useEffect(() => {
+    function checkUrl() {
+      const hashStr = typeof window !== "undefined" ? window.location.hash : ""
+      const shortId = extractCloudShortId(location.search, hashStr, location.pathname)
+      if (shortId && shortId !== lastLoadedCloudIdRef.current) {
+        loadCloudBuildById(shortId)
+      }
+    }
+
+    checkUrl()
+    window.addEventListener("hashchange", checkUrl)
+    return () => window.removeEventListener("hashchange", checkUrl)
+  }, [location.pathname, location.search, loadCloudBuildById])
 
   useEffect(() => {
     const data = extractSharedData(location.search)
@@ -386,7 +442,6 @@ function AppInner() {
   const goToRotationTab = useCallback(() => navigate("/rotation"), [navigate])
   const goToRotationEditorTab = useCallback(() => navigate("/rotation-editor"), [navigate])
 
-  const { t } = useI18n()
   const confirm = useConfirm()
 
   function persist(next: ProfilesState) {
@@ -751,8 +806,7 @@ function AppInner() {
         <MyBuildsDialog
           onClose={() => setMyBuildsDialogOpen(false)}
           onSelectBuild={(shortId) => {
-            lastLoadedCloudIdRef.current = null
-            window.location.hash = `#/b/${shortId}`
+            loadCloudBuildById(shortId)
           }}
         />
       )}
@@ -1057,6 +1111,8 @@ function AppInner() {
         <fieldset className={styles.routeFields} disabled={areInputsLocked}>
           <Routes>
             <Route path="/" element={<Navigate to="/overview" replace />} />
+            <Route path="/b/:id" element={<Navigate to="/overview" replace />} />
+            <Route path="/build/:id" element={<Navigate to="/overview" replace />} />
             <Route
               path="/build"
               element={

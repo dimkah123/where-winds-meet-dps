@@ -213,4 +213,29 @@ describe("shareBuild engine", () => {
     expect(decoded.inputs.inventory[0].words[0].word).toBe("crit")
     expect(decoded.inputs.inventory[0].words[4].retuned).toBe(true)
   })
+
+  it("automatically equips graduation gear when saving/loading a build following graduation build with empty inventory", async () => {
+    const payload: SharedBuildPayload = {
+      v: 2,
+      author: "GraduationTester",
+      title: "3 Heng + Bow",
+      inputs: {
+        ...defaultInputs,
+        classId: "stonesplitStrength",
+        breakthrough: 18,
+        graduationBuildId: "graduation-stonesplitStrength-max-build",
+        inventory: [],
+        equipped: { ...defaultInputs.equipped },
+      },
+    }
+
+    const encoded = await encodeSharedBuild(payload)
+    const decoded = await decodeSharedBuild(encoded)
+
+    expect(decoded.title).toBe("3 Heng + Bow")
+    expect(decoded.inputs.inventory.length).toBe(8)
+    expect(decoded.inputs.equipped.leftWeapon).toBeTruthy()
+    expect(decoded.inputs.bowGear?.bow).toBeTruthy()
+    expect(decoded.inputs.bowGear?.thumbRing).toBeTruthy()
+  })
 })

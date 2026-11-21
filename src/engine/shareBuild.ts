@@ -5,7 +5,7 @@ import { hydrateInputs, newGearPieceId } from "../storage"
 import { GEAR_WORD_IDS } from "../data/stats/statLines"
 import { ATTUNEMENT_OPTIONS } from "./attunements"
 import { gearBaseStatsFor } from "../data/stats/gearBaseStats"
-import { defaultGraduationBuildId } from "./graduation"
+import { defaultGraduationBuildId, equipGraduationGearToInputs } from "./graduation"
 import { defaultArsenalForClass } from "./panel"
 import { defaultArsenalScores } from "../definitions/baseStats/arsenal"
 import { defaultEnhancementLevels, getDefaultTalentsForClass } from "../definitions/baseStats"
@@ -159,7 +159,11 @@ export async function decompressBytes(bytes: Uint8Array): Promise<Uint8Array> {
 }
 
 function encodeToCompactV2(payload: SharedBuildPayload): CompactBuildV2 {
-  const { author, title, inputs } = payload
+  const { author, title } = payload
+  let inputs = payload.inputs
+  if (inputs.graduationBuildId && (!inputs.inventory || inputs.inventory.length === 0)) {
+    inputs = equipGraduationGearToInputs(inputs)
+  }
   const inventoryById = new Map((inputs.inventory || []).map((p) => [p.id, p]))
 
   const g: Record<number, CompactGearPiece> = {}
@@ -361,7 +365,7 @@ function decodeFromCompactV2(v2: CompactBuildV2): SharedBuildPayload {
 
   const resolvedRotation = resolveRotationId(v2.c, v2.r, v2.t)
 
-  const inputs: Inputs = hydrateInputs({
+  let inputs: Inputs = hydrateInputs({
     ...base,
     inventory,
     equipped,
@@ -406,6 +410,10 @@ function decodeFromCompactV2(v2: CompactBuildV2): SharedBuildPayload {
     activeCustomRotation: v2.cr,
   })
 
+  if (inputs.graduationBuildId && (!inputs.inventory || inputs.inventory.length === 0)) {
+    inputs = equipGraduationGearToInputs(inputs)
+  }
+
   return {
     v: 2,
     author: v2.a || "",
@@ -441,7 +449,10 @@ export async function decodeSharedBuild(encoded: string): Promise<SharedBuildPay
   if (!parsed.inputs) {
     throw new Error("Invalid shared build payload")
   }
-  const inputs = hydrateInputs(parsed.inputs as unknown as Inputs)
+  let inputs = hydrateInputs(parsed.inputs as unknown as Inputs)
+  if (inputs.graduationBuildId && (!inputs.inventory || inputs.inventory.length === 0)) {
+    inputs = equipGraduationGearToInputs(inputs)
+  }
   return {
     v: typeof parsed.v === "number" ? parsed.v : 1,
     author: typeof parsed.author === "string" ? parsed.author : "",
