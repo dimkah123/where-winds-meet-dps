@@ -415,7 +415,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
 
             <div className={styles.downloadGroup}>
               <a
-                href="/downloads/WWM-Companion.exe"
+                href="/downloads/WWM-Companion.exe?v=2.1.0"
                 download="WWM-Companion.exe"
                 className={styles.downloadBtnPrimary}
               >
@@ -424,7 +424,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
               </a>
               <div className={styles.downloadSubGroup}>
                 <a
-                  href="/downloads/WWM-Companion.zip"
+                  href="/downloads/WWM-Companion.zip?v=2.1.0"
                   download="WWM-Companion.zip"
                   className={styles.downloadBtnSecondary}
                 >
@@ -432,7 +432,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
                   <span>{t("trainer.downloadZip", "Download ZIP archive")}</span>
                 </a>
                 <a
-                  href="/downloads/start-companion.bat"
+                  href="/downloads/start-companion.bat?v=2.1.0"
                   download="start-companion.bat"
                   className={styles.downloadBtnSecondary}
                 >

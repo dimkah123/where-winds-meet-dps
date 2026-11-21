@@ -74,10 +74,11 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     if (!currentWin || currentWin === window) return
     try {
       const curH = currentWin.innerHeight || currentWin.outerHeight
+      const curW = currentWin.innerWidth || currentWin.outerWidth
       const savedDims = getSavedPipDimensions()
-      // If window was left oversized (e.g. from previous sessions), shrink to compact height
-      if (curH > savedDims.height + 35 && typeof currentWin.resizeTo === "function") {
-        currentWin.resizeTo(currentWin.innerWidth || savedDims.width, savedDims.height)
+      // If window was left oversized (e.g. from previous sessions or settings dialog), shrink to compact height & width
+      if ((curH > 220 || curW > 880) && typeof currentWin.resizeTo === "function") {
+        currentWin.resizeTo(savedDims.width, savedDims.height)
       }
     } catch {}
   }, [])
@@ -85,13 +86,13 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   const openRemapSettings = useCallback(() => {
     const currentWin = rootRef.current?.ownerDocument?.defaultView || window
     try {
-      const currentW = currentWin.outerWidth || currentWin.innerWidth || 960
-      const currentH = currentWin.outerHeight || currentWin.innerHeight || 185
+      const currentW = currentWin.outerWidth || currentWin.innerWidth || 760
+      const currentH = currentWin.outerHeight || currentWin.innerHeight || 165
       prevWindowSizeRef.current = { width: currentW, height: currentH }
 
       // Automatically expand window height if compact (< 500px) so settings fit cleanly
       if (currentH < 500 && typeof currentWin.resizeTo === "function") {
-        const targetW = Math.max(currentW, 960)
+        const targetW = Math.max(currentW, 880)
         currentWin.resizeTo(targetW, 540)
       }
     } catch (err) {
@@ -106,9 +107,9 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
     const currentWin = rootRef.current?.ownerDocument?.defaultView || window
     try {
-      if (prevWindowSizeRef.current && typeof currentWin.resizeTo === "function") {
-        const { width, height } = prevWindowSizeRef.current
-        currentWin.resizeTo(width, height)
+      if (typeof currentWin.resizeTo === "function") {
+        const savedDims = getSavedPipDimensions()
+        currentWin.resizeTo(savedDims.width, savedDims.height)
       }
     } catch (err) {
       console.warn("Could not restore trainer window size", err)
@@ -658,7 +659,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
           {!isConnected && (
             <a
-              href="/downloads/WWM-Companion.exe"
+              href="/downloads/WWM-Companion.exe?v=2.1.0"
               download="WWM-Companion.exe"
               className={styles.companionDownloadCta}
               title={t(
@@ -777,32 +778,6 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
                 </span>
 
                 <div className={styles.cardBadges}>
-                  {/* Cooldown Badge */}
-                  {step.cooldownSec && (
-                    <span
-                      className={remainingCdSec > 0 ? styles.cdActiveBadge : styles.cdBadge}
-                      title={
-                        remainingCdSec > 0
-                          ? t("trainer.cooldownRemaining", isRuLocale ? "Откат: {count} сек" : "Cooldown: {count}s").replace("{count}", String(remainingCdSec))
-                          : t("trainer.cooldownBase", isRuLocale ? "Кулдаун: {count} сек" : "Base CD: {count}s").replace("{count}", String(step.cooldownSec))
-                      }
-                    >
-                      {remainingCdSec > 0 ? `⏳ ${remainingCdSec}s` : `CD ${step.cooldownSec}s`}
-                    </span>
-                  )}
-
-                  {/* Cast Time Badge */}
-                  {step.durationSec > 0 && (
-                    <span
-                      className={styles.castTimeBadge}
-                      title={
-                        t("trainer.castDuration", isRuLocale ? "Время каста: {count} сек" : "Cast duration: {count}s").replace("{count}", String(step.durationSec))
-                      }
-                    >
-                      ⏱ {step.durationSec}s
-                    </span>
-                  )}
-
                   {isTarget && !hasStarted && (
                     <span className={styles.startBadge}>{t("trainer.startBadge", isRuLocale ? "СТАРТ" : "START")}</span>
                   )}
@@ -818,6 +793,35 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
               <div className={styles.keyPrompt}>
                 <span className={styles.keyTag}>{step.expectedKeyLabel}</span>
               </div>
+
+              {/* Bottom Timings Row: Cooldown & Cast Time */}
+              {(Boolean(step.cooldownSec) || step.durationSec > 0) && (
+                <div className={styles.cardTimings}>
+                  {step.cooldownSec && (
+                    <span
+                      className={remainingCdSec > 0 ? styles.cdActiveBadge : styles.cdBadge}
+                      title={
+                        remainingCdSec > 0
+                          ? t("trainer.cooldownRemaining", isRuLocale ? "Откат: {count} сек" : "Cooldown: {count}s").replace("{count}", String(remainingCdSec))
+                          : t("trainer.cooldownBase", isRuLocale ? "Кулдаун: {count} сек" : "Base CD: {count}s").replace("{count}", String(step.cooldownSec))
+                      }
+                    >
+                      {remainingCdSec > 0 ? `⏳ ${remainingCdSec}s` : `CD ${step.cooldownSec}s`}
+                    </span>
+                  )}
+
+                  {step.durationSec > 0 && (
+                    <span
+                      className={styles.castTimeBadge}
+                      title={
+                        t("trainer.castDuration", isRuLocale ? "Время каста: {count} сек" : "Cast duration: {count}s").replace("{count}", String(step.durationSec))
+                      }
+                    >
+                      ⏱ {step.durationSec}s
+                    </span>
+                  )}
+                </div>
+              )}
 
               {/* Timing mode prompter bar */}
               {isTarget && settings.mode === "timing" && (

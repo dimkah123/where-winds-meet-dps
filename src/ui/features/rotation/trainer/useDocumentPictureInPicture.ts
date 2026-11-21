@@ -45,10 +45,10 @@ export function copyStylesheetsToWindow(targetWin: Window, title: string) {
   }
 }
 
-const SAVED_W_KEY = "wwm.trainer.pipWidth"
-const SAVED_H_KEY = "wwm.trainer.pipHeight.v2"
-export const DEFAULT_PIP_WIDTH = 960
-export const DEFAULT_PIP_HEIGHT = 185
+const SAVED_W_KEY = "wwm.trainer.pipWidth.v3"
+const SAVED_H_KEY = "wwm.trainer.pipHeight.v3"
+export const DEFAULT_PIP_WIDTH = 760
+export const DEFAULT_PIP_HEIGHT = 165
 
 export function getSavedPipDimensions(): { width: number; height: number } {
   if (typeof localStorage === "undefined") {
@@ -57,8 +57,8 @@ export function getSavedPipDimensions(): { width: number; height: number } {
   const savedW = Number(localStorage.getItem(SAVED_W_KEY))
   const savedH = Number(localStorage.getItem(SAVED_H_KEY))
   return {
-    width: savedW >= 600 && savedW <= 2560 ? savedW : DEFAULT_PIP_WIDTH,
-    height: savedH >= 150 && savedH <= 1440 ? savedH : DEFAULT_PIP_HEIGHT,
+    width: savedW >= 550 && savedW <= 1600 ? savedW : DEFAULT_PIP_WIDTH,
+    height: savedH >= 140 && savedH <= 220 ? savedH : DEFAULT_PIP_HEIGHT,
   }
 }
 
@@ -70,8 +70,11 @@ function attachWindowResizeListener(targetWin: Window) {
       try {
         const curW = targetWin.innerWidth || targetWin.outerWidth
         const curH = targetWin.innerHeight || targetWin.outerHeight
-        if (curW >= 600 && curH >= 150) {
+        if (curW >= 550 && curW <= 1600) {
           localStorage.setItem(SAVED_W_KEY, String(curW))
+        }
+        // Only save normal overlay heights (not oversized dialogs like 540px)
+        if (curH >= 140 && curH <= 220) {
           localStorage.setItem(SAVED_H_KEY, String(curH))
         }
       } catch {}
