@@ -122,7 +122,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   // Sync remainingCount when stepIndex changes
   useEffect(() => {
     if (currentStep) {
-      setRemainingCount(currentStep.multiplier)
+      setRemainingCount(currentStep.remainingCount ?? (currentStep.isHold ? 1 : currentStep.multiplier))
     }
   }, [stepIndex, currentStep])
 
@@ -175,7 +175,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     bufferedInputRef.current = null
     triggerFeedback(t("trainer.feedback.reset", isRuLocale ? "СБРОС" : "RESET"), "perfect")
     if (settings.sound) playSwitchSound("reset")
-    if (steps[0]) setRemainingCount(steps[0].multiplier)
+    if (steps[0]) setRemainingCount(steps[0].remainingCount ?? (steps[0].isHold ? 1 : steps[0].multiplier))
   }, [settings.sound, steps, triggerFeedback, t, isRuLocale])
 
   const handleKeyHit = useCallback(
@@ -754,7 +754,10 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
               }`}
             >
               <div className={styles.cardHeader}>
-                <span className={styles.skillName} title={step.cleanName}>
+                <span
+                  className={styles.skillName}
+                  title={step.multiplier > 1 ? `${step.cleanName} ×${step.multiplier}` : step.cleanName}
+                >
                   {step.cleanName}
                 </span>
 
@@ -762,8 +765,12 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
                   {isTarget && !hasStarted && (
                     <span className={styles.startBadge}>{t("trainer.startBadge", isRuLocale ? "СТАРТ" : "START")}</span>
                   )}
-                  {isTarget && hasStarted && remainingCount > 1 && (
-                    <span className={styles.counterBadge}>×{remainingCount}</span>
+                  {isTarget && (
+                    step.isHold
+                      ? step.multiplier > 1 && <span className={styles.counterBadge}>×{step.multiplier}</span>
+                      : (hasStarted ? remainingCount > 1 : step.multiplier > 1) && (
+                          <span className={styles.counterBadge}>×{hasStarted ? remainingCount : step.multiplier}</span>
+                        )
                   )}
                   {!isTarget && step.multiplier > 1 && (
                     <span className={styles.multiplierBadge}>×{step.multiplier}</span>

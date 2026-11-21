@@ -525,9 +525,14 @@
 }
 
 .multiplierBadge {
-  font-size: 0.68rem;
-  color: #888;
-  font-weight: 600;
+  background: rgba(224, 180, 103, 0.18);
+  color: #e0b467;
+  border: 1px solid rgba(224, 180, 103, 0.4);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.02em;
 }
 
 .keyPrompt {

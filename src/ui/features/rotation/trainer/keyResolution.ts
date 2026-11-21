@@ -204,35 +204,48 @@ export function buildTrainerSteps(
   casts?: RotationCast[],
   isRuLocale = false,
 ): TrainerStep[] {
+  let currentCastIdx = 0
+
   return tokens.map((token, index) => {
     const keyInfo = resolveSkillKey(token.cleanName, keyMap, isRuLocale)
     let simDuration: number | undefined
     let matchingCast: RotationCast | undefined
 
+    const stepMultiplier = Math.max(1, token.multiplier || 1)
+
     if (casts && casts.length > 0) {
-      const castIdx = casts.findIndex((c) => c.stepIndex === index || c.skillName === token.skillName)
+      // Find the next cast matching this token at or after currentCastIdx
+      const foundIdx = casts.findIndex(
+        (c, i) => i >= currentCastIdx && (c.stepIndex === index || c.skillName === token.skillName),
+      )
+      const castIdx =
+        foundIdx >= 0 ? foundIdx : casts.findIndex((c) => c.skillName === token.skillName)
+
       if (castIdx >= 0) {
         matchingCast = casts[castIdx]
-        const nextCast = casts[castIdx + 1]
+        const nextCast = casts[castIdx + stepMultiplier] ?? casts[castIdx + 1]
         if (nextCast && matchingCast) {
           const delta = nextCast.timeSec - matchingCast.timeSec
-          if (delta > 0.1 && delta < 15) {
-            simDuration = delta
+          if (delta > 0.1 && delta < 25) {
+            // If nextCast was immediately adjacent (+1) but multiplier > 1, scale delta by multiplier
+            simDuration =
+              !casts[castIdx + stepMultiplier] && stepMultiplier > 1 ? delta * stepMultiplier : delta
           }
         }
+        currentCastIdx = castIdx + stepMultiplier
       }
     }
 
     const timingInfo = resolveSkillTiming(
       token.cleanName,
       token.skillName,
-      token.multiplier,
+      stepMultiplier,
       simDuration,
     )
 
     const isHold = keyInfo.isHold ?? timingInfo.isHold ?? false
     // Hold / Charged skills (e.g. Mo Charged x4) are held as 1 action, not tapped repeatedly
-    const count = isHold ? 1 : Math.max(1, token.multiplier || 1)
+    const count = isHold ? 1 : stepMultiplier
 
     return {
       id: `${index}-${token.cleanName}`,
@@ -240,7 +253,7 @@ export function buildTrainerSteps(
       cleanName: token.cleanName,
       expectedKey: normalizeKeyInput(keyInfo.key),
       expectedKeyLabel: keyInfo.label,
-      multiplier: count,
+      multiplier: stepMultiplier,
       remainingCount: count,
       targetTimeSec: matchingCast?.timeSec,
       durationSec: timingInfo.castDurationSec,

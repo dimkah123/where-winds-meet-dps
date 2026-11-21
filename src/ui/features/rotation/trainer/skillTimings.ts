@@ -103,8 +103,14 @@ export function resolveSkillTiming(
       }
 
       // If simulation engine provided a precise simulated duration between casts, prefer it for execution
-      if (simulatedDurationSec && simulatedDurationSec > 0.1 && simulatedDurationSec < 15) {
-        finalCast = simulatedDurationSec
+      if (simulatedDurationSec && simulatedDurationSec > 0.1 && simulatedDurationSec < 25) {
+        if (isCharged && multiplier > 1 && simulatedDurationSec < 1.5) {
+          finalCast = simulatedDurationSec * multiplier
+        } else if (multiplier > 1 && !rule.cooldown && simulatedDurationSec < rule.castTime * 1.2) {
+          finalCast = simulatedDurationSec * multiplier
+        } else {
+          finalCast = simulatedDurationSec
+        }
       }
 
       return {
