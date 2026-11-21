@@ -188,6 +188,11 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     (pressedKey: string, fromBuffer = false) => {
       if (!isPlaying || !currentStep) return
 
+      if (pressedKey.toLowerCase() === "f5") {
+        resetTrainer()
+        return
+      }
+
       const expected = normalizeKeyInput(currentStep.expectedKey)
       const pressed = normalizeKeyInput(pressedKey)
 
@@ -404,14 +409,17 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
       if (e.action !== "down") return
 
-      // Alt+R hotkey to reset combo to beginning
+      // F5 or Alt+R hotkey to reset combo to beginning
       if (
+        e.key.toLowerCase() === "f5" ||
         e.key === "alt+r" ||
         e.key === "reset" ||
         ((e.key === "r" || e.key === "к") && altHeldRef.current)
       ) {
-        resetTrainer()
-        return
+        if (!showRemap) {
+          resetTrainer()
+          return
+        }
       }
 
       const norm = normalizeKeyInput(e.key)
@@ -453,8 +461,18 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     function onKeyDown(e: KeyboardEvent) {
       if (e.repeat) return
 
+      // F5 to reset combo (matches in-game trial reset prompt, prevent browser refresh)
+      if (e.key === "F5" || e.code === "F5") {
+        e.preventDefault()
+        if (!showRemap) {
+          resetTrainer()
+          return
+        }
+      }
+
       // Alt+R hotkey to reset combo to beginning
       if (
+        !showRemap &&
         e.altKey &&
         (e.code === "KeyR" || e.key.toLowerCase() === "r" || e.key.toLowerCase() === "к")
       ) {
@@ -715,7 +733,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
               type="button"
               className={styles.iconBtn}
               onClick={resetTrainer}
-              title={`${t("common.reset", "Reset")} (Alt+R)`}
+              title={`${t("common.reset", "Reset")} (F5 / Alt+R)`}
             >
               <ResetIcon className={styles.btnIcon} />
             </button>

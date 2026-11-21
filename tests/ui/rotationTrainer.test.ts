@@ -32,6 +32,8 @@ describe("Rotation Trainer Key Resolution", () => {
     expect(normalizeKeyInput("m5")).toBe("mouse5")
     expect(normalizeKeyInput("q")).toBe("q")
     expect(normalizeKeyInput("r")).toBe("r")
+    expect(normalizeKeyInput("f5")).toBe("f5")
+    expect(normalizeKeyInput("F5")).toBe("f5")
   })
 
   it("resolves default user keys for skills accurately", () => {
