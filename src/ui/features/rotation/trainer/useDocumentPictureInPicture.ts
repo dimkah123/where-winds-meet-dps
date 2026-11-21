@@ -45,13 +45,48 @@ export function copyStylesheetsToWindow(targetWin: Window, title: string) {
   }
 }
 
+const SAVED_W_KEY = "wwm.trainer.pipWidth"
+const SAVED_H_KEY = "wwm.trainer.pipHeight"
+export const DEFAULT_PIP_WIDTH = 960
+export const DEFAULT_PIP_HEIGHT = 320
+
+export function getSavedPipDimensions(): { width: number; height: number } {
+  if (typeof localStorage === "undefined") {
+    return { width: DEFAULT_PIP_WIDTH, height: DEFAULT_PIP_HEIGHT }
+  }
+  const savedW = Number(localStorage.getItem(SAVED_W_KEY))
+  const savedH = Number(localStorage.getItem(SAVED_H_KEY))
+  return {
+    width: savedW >= 600 && savedW <= 2560 ? savedW : DEFAULT_PIP_WIDTH,
+    height: savedH >= 240 && savedH <= 1440 ? savedH : DEFAULT_PIP_HEIGHT,
+  }
+}
+
+function attachWindowResizeListener(targetWin: Window) {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  targetWin.addEventListener("resize", () => {
+    clearTimeout(timer)
+    timer = setTimeout(() => {
+      try {
+        const curW = targetWin.innerWidth || targetWin.outerWidth
+        const curH = targetWin.innerHeight || targetWin.outerHeight
+        if (curW >= 600 && curH >= 240) {
+          localStorage.setItem(SAVED_W_KEY, String(curW))
+          localStorage.setItem(SAVED_H_KEY, String(curH))
+        }
+      } catch {}
+    }, 250)
+  })
+}
+
 export function useDocumentPictureInPicture() {
   const [pipWindow, setPipWindow] = useState<Window | null>(null)
 
   const openPip = useCallback(
     async (options: PipOptions = {}) => {
-      const width = options.width ?? 800
-      const height = options.height ?? 260
+      const defaultDims = getSavedPipDimensions()
+      const width = options.width ?? defaultDims.width
+      const height = options.height ?? defaultDims.height
       const title = options.title ?? "WWM Rotation Trainer"
 
       // 1. Try Document Picture-in-Picture API
@@ -65,6 +100,7 @@ export function useDocumentPictureInPicture() {
 
           const win = await docPip.requestWindow({ width, height })
           copyStylesheetsToWindow(win, title)
+          attachWindowResizeListener(win)
 
           win.addEventListener("pagehide", () => {
             setPipWindow(null)
@@ -88,6 +124,7 @@ export function useDocumentPictureInPicture() {
 
       if (popup) {
         copyStylesheetsToWindow(popup, title)
+        attachWindowResizeListener(popup)
         popup.addEventListener("beforeunload", () => {
           setPipWindow(null)
         })

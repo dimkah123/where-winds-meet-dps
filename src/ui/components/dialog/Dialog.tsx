@@ -17,6 +17,7 @@ interface DialogProps {
   onClose?: () => void
   layer?: DialogLayer
   surfaceClassName?: string
+  overlayClassName?: string
   initialFocusRef?: RefObject<HTMLElement | null>
   children: ReactNode
 }
@@ -27,6 +28,7 @@ export function Dialog({
   onClose,
   layer = "dialog",
   surfaceClassName,
+  overlayClassName,
   initialFocusRef,
   children,
 }: DialogProps) {
@@ -71,7 +73,7 @@ export function Dialog({
   return (
     <div
       ref={overlayRef}
-      className={`${styles.overlay} ${LAYER_CLASS[layer]}`}
+      className={`${styles.overlay} ${LAYER_CLASS[layer]}${overlayClassName ? ` ${overlayClassName}` : ""}`}
       role="dialog"
       aria-modal="true"
       aria-labelledby={labelledBy}

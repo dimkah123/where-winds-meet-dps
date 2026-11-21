@@ -59,13 +59,13 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   const openRemapSettings = useCallback(() => {
     const currentWin = rootRef.current?.ownerDocument?.defaultView || window
     try {
-      const currentW = currentWin.outerWidth || currentWin.innerWidth || 800
-      const currentH = currentWin.outerHeight || currentWin.innerHeight || 260
+      const currentW = currentWin.outerWidth || currentWin.innerWidth || 960
+      const currentH = currentWin.outerHeight || currentWin.innerHeight || 320
       prevWindowSizeRef.current = { width: currentW, height: currentH }
 
       // Automatically expand window height if compact (< 500px) so settings fit cleanly
       if (currentH < 500 && typeof currentWin.resizeTo === "function") {
-        const targetW = Math.max(currentW, 820)
+        const targetW = Math.max(currentW, 960)
         currentWin.resizeTo(targetW, 540)
       }
     } catch (err) {

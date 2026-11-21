@@ -424,8 +424,6 @@ export function ReadableRotationDialog({
           disabled={parsed.totalSteps === 0}
           onClick={() =>
             openPip({
-              width: 620,
-              height: 220,
               title: `WWM Trainer — ${title}`,
             })
           }

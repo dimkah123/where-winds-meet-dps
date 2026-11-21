@@ -463,7 +463,12 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
   }
 
   return (
-    <Dialog labelledBy="trainer-keymap-title" onClose={onClose} surfaceClassName={styles.surface}>
+    <Dialog
+      labelledBy="trainer-keymap-title"
+      onClose={onClose}
+      surfaceClassName={styles.surface}
+      overlayClassName={styles.dialogOverlay}
+    >
       {dialogContent}
     </Dialog>
   )

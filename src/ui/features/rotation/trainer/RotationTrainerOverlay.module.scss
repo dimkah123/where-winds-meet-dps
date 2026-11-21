@@ -6,7 +6,7 @@
   box-sizing: border-box;
   background: #141416;
   color: #e8e8e8;
-  padding: 8px 12px;
+  padding: 8px 14px;
   user-select: none;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   overflow: hidden;
@@ -34,7 +34,9 @@
 .headerLeft {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
 }
 
 .companionBadge {
@@ -47,6 +49,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   background: rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
 }
 
 .connected {
@@ -116,19 +119,21 @@
 }
 
 .rotationTitle {
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--color-accent, #c0a060);
   white-space: nowrap;
-  max-width: 200px;
+  max-width: 340px;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex-shrink: 1;
 }
 
 .headerControls {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .modeGroup {
@@ -224,10 +229,10 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
+  gap: 12px;
   flex: 1;
   width: 100%;
-  padding: 10px 4px;
+  padding: 12px 6px;
   position: relative;
   overflow: hidden;
   mask-image: linear-gradient(to right, black calc(100% - 40px), transparent 100%);
@@ -239,7 +244,7 @@
   flex-direction: column;
   justify-content: space-between;
   border-radius: 6px;
-  padding: 6px 10px;
+  padding: 7px 11px;
   box-sizing: border-box;
   transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
   position: relative;
@@ -247,9 +252,9 @@
 }
 
 .targetCard {
-  min-width: 165px;
-  max-width: 210px;
-  height: 90px;
+  min-width: 180px;
+  max-width: 230px;
+  height: 98px;
   background: linear-gradient(135deg, rgba(45, 36, 20, 0.95), rgba(30, 24, 14, 0.95));
   border: 2px solid #e0b467;
   box-shadow: 0 0 16px rgba(224, 180, 103, 0.35);
@@ -258,25 +263,25 @@
 
   .skillName {
     color: #fae2a6;
-    font-size: 0.94rem;
+    font-size: 0.96rem;
     font-weight: 700;
   }
 
   .keyTag {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 800;
     color: #12100a;
     background: linear-gradient(135deg, #fae2a6, #d8b070);
-    padding: 3px 12px;
+    padding: 3px 14px;
     border-radius: 4px;
     box-shadow: 0 0 8px rgba(216, 176, 112, 0.5);
   }
 }
 
 .queueCard {
-  min-width: 110px;
-  max-width: 140px;
-  height: 76px;
+  min-width: 120px;
+  max-width: 155px;
+  height: 82px;
   background: rgba(28, 28, 32, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.1);
   opacity: 0.72;
@@ -432,9 +437,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 4px;
+  padding-top: 6px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 0.74rem;
+  font-size: 0.78rem;
   color: var(--color-text-muted, #9c9c9c);
   font-variant-numeric: tabular-nums;
 }
