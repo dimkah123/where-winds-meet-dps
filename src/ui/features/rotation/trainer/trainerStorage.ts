@@ -10,7 +10,7 @@ export const DEFAULT_KEY_MAP: TrainerKeyMap = {
   swap: "tab",
   dual: "wheeldown",
   light: "lclick",
-  varied: "e",
+  deflect: "e",
   mystic1: "f",
   mystic2: "g",
   dodge: "shift",
@@ -32,6 +32,8 @@ export function loadTrainerSettings(): TrainerSettings {
     const mystic1 = userMap.mystic1 ?? userMap.mystic ?? DEFAULT_KEY_MAP.mystic1
     const mystic2 = userMap.mystic2 ?? DEFAULT_KEY_MAP.mystic2
     const dual = userMap.dual === "mclick" || !userMap.dual ? DEFAULT_KEY_MAP.dual : userMap.dual
+    const light = userMap.light ?? DEFAULT_KEY_MAP.light
+    const deflect = userMap.deflect ?? DEFAULT_KEY_MAP.deflect
     return {
       mode: parsed.mode === "timing" ? "timing" : "strict",
       speed: typeof parsed.speed === "number" ? parsed.speed : 1.0,
@@ -40,6 +42,8 @@ export function loadTrainerSettings(): TrainerSettings {
         ...DEFAULT_KEY_MAP,
         ...userMap,
         dual,
+        light,
+        deflect,
         mystic1,
         mystic2,
       },

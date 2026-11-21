@@ -130,14 +130,29 @@ export function resolveSkillKey(
     return { key: keyMap.skill1, label: formatKeyDisplay(keyMap.skill1, isRuLocale), isHold: false }
   }
 
-  // 4. Varied combo (e.g. Heng VC, Mo VC)
-  if (norm.includes("vc") || norm.includes("varied")) {
-    return { key: keyMap.varied, label: formatKeyDisplay(keyMap.varied, isRuLocale), isHold: false }
+  // 4. Light Attack / Varied Combo (e.g. Heng VC, Mo VC, Heng LC, Mo LC, Light attacks)
+  if (
+    norm.includes("vc") ||
+    norm.includes("varied") ||
+    norm.includes("lc") ||
+    norm.includes("light") ||
+    norm.includes("slash") ||
+    norm.includes("лайт")
+  ) {
+    const key = keyMap.light ?? "lclick"
+    return { key, label: formatKeyDisplay(key, isRuLocale), isHold: false }
   }
 
-  // 5. Light combo / attack (e.g. Heng LC, Mo LC)
-  if (norm.includes("lc") || norm.includes("light") || norm.includes("slash")) {
-    return { key: keyMap.light, label: formatKeyDisplay(keyMap.light, isRuLocale), isHold: false }
+  // 5. Deflect / Parry (Default: "e")
+  if (
+    norm.includes("deflect") ||
+    norm.includes("дефлект") ||
+    norm.includes("отражен") ||
+    norm.includes("парир") ||
+    norm.includes("parry")
+  ) {
+    const key = keyMap.deflect ?? "e"
+    return { key, label: formatKeyDisplay(key, isRuLocale), isHold: false }
   }
 
   // 6. Mystic skills

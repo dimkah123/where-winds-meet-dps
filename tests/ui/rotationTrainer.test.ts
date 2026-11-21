@@ -114,14 +114,26 @@ describe("Rotation Trainer Key Resolution", () => {
     })
 
     expect(resolveSkillKey("Heng VC", DEFAULT_KEY_MAP)).toEqual({
-      key: "e",
-      label: "E",
+      key: "lclick",
+      label: "LClick",
       isHold: false,
     })
 
     expect(resolveSkillKey("Heng LC", DEFAULT_KEY_MAP)).toEqual({
       key: "lclick",
       label: "LClick",
+      isHold: false,
+    })
+
+    expect(resolveSkillKey("Deflect", DEFAULT_KEY_MAP)).toEqual({
+      key: "e",
+      label: "E",
+      isHold: false,
+    })
+
+    expect(resolveSkillKey("Deflect Cancel", DEFAULT_KEY_MAP)).toEqual({
+      key: "e",
+      label: "E",
       isHold: false,
     })
 

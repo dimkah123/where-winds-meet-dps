@@ -4,10 +4,11 @@ export interface TrainerKeyMap {
   skill1: string // Special / Stance (Default: "~")
   skill2: string // Primary skill Q (Default: "q")
   heavy: string // Heavy / Charged attack (Default: "r")
-  swap: string // Weapon swap (Default: "tab")
-  dual: string // Dual Weapon attack / switch without tab (Default: "mclick")
-  light: string // Light attack (Default: "lclick")
-  varied: string // Varied combo (Default: "e")
+  swap: string // Dual Skill / Tab Swap (Default: "tab")
+  dual: string // Weapon Switch (Default: "wheeldown")
+  light: string // Light attack / Varied combo (Default: "lclick")
+  deflect: string // Deflect / Parry (Default: "e")
+  varied?: string // Legacy fallback for light
   mystic1: string // Mystic 1 / Flute (Default: "f")
   mystic2: string // Mystic 2 / Toad / Bursting Nine (Default: "g")
   mystic?: string // Legacy fallback for mystic1
