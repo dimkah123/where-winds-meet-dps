@@ -5,6 +5,7 @@
     "Fixed": "Исправлено"
   },
   "headlines": {
+    "1.3.5": "Интерактивный оверлей-тренер ротаций в игре, приложение-компаньон и тактильный звук",
     "1.3.2": "Эргономичные группы в шапке, упрощенный шеринг и полировка интерфейса",
     "1.3.1": "Единый тулбар в шапке, меню настроек и полировка интерфейса",
     "1.3.0": "Облачные билды, вход через Google и полировка панели статов",
@@ -28,6 +29,17 @@
     "1.0.0": "Релиз калькулятора УВС для Расколотого пика (Сила)"
   },
   "items": {
+    "Floating Picture-in-Picture Rotation Trainer overlay (PiP & In-Page) running on top of Where Winds Meet with live queue, cast tracking, and combo scoring.": "Плавающий оверлей-тренер ротаций (Picture-in-Picture и внутристраничный) поверх Where Winds Meet с живой очередью, шкалой каста и комбо-счетчиком.",
+    "In-Game Companion app (WWM-Companion.exe) with non-blocking Windows RawInput streaming game mouse wheel down inputs over local WebSocket.": "Приложение-компаньон (WWM-Companion.exe) с неблокирующим Windows RawInput, передающим прокрутку колесика мыши по локальному WebSocket.",
+    "Acoustic mechanical switch click audio synthesis (Cherry MX Blue / Kailh Box White tactile click leaf + housing bottom-out clack + harmonic resonance).": "Акустический синтез клика синих механических свитчей (щелчок лепестка Cherry MX Blue / Kailh Box White, удар кейкапа о дно и гармонический резонанс).",
+    "Live cast time execution tracking and cooldown monitoring per skill directly from Actual game data with input buffering during cast animation.": "Учет времени каста и мониторинг кулдаунов способностей напрямую из игровых данных Actual с мягкой буферизацией нажатий во время анимации.",
+    "Custom key remap configuration dialog with interactive key recording for mouse buttons (Wheel Down, LClick, RClick, M4, M5) and keyboard.": "Диалог переназначения клавиш с интерактивной записью кнопок мыши (колесико вниз, ЛКМ, ПКМ, боковые кнопки M4, M5) и клавиатуры.",
+    "Ultra-compact HUD dimensions (760x165px default) with dedicated bottom timing row for cooldowns and cast execution times.": "Ультракомпактные размеры окна HUD (760x165px по умолчанию) с отдельной нижней строкой таймингов для кулдаунов и каста.",
+    "Varied Combo and Light Attack unified to Left Click by default; Deflect mapped to E by default.": "Varied Combo и легкая атака по умолчанию объединены на ЛКМ; дефлект/парирование по умолчанию назначено на E.",
+    "Clean English key display labels without Cyrillic artifacts in EN locale and full Russian keyboard layout normalization in RU locale.": "Чистые английские обозначения клавиш без кириллицы при английском интерфейсе и полная нормализация русской раскладки (ЙЦУКЕН) при русском.",
+    "Eliminated WH_MOUSE_LL low-level Windows hook, completely resolving mouse lag, cursor stuttering, or game input interception.": "Полный отказ от низкоуровневого хука WH_MOUSE_LL: курсор мыши и управление в игре больше никогда не перехватываются и не лагают.",
+    "Preserved multiplier count (×4, ×5) and scaled full cast duration (~3.3–3.4s) for charged hold attacks (Mo Charged x4) instead of single 0.82s ticks.": "Сохранение счетчика зарядов (×4, ×5) и учет полного времени каста (~3.3–3.4 сек) для серий заряженных атак Мо вместо одиночного тика 0.82 сек.",
+    "Configured instant 0s cast time and 0.6s internal cooldown for weapon swap via mouse wheel, preventing unwanted cast state locks.": "Настройка мгновенного каста (0 сек) и внутреннего кулдауна 0.6 сек для свапа оружия колесиком, исключающая задержку следующих ударов.",
     "Ergonomic 3-zone header layout grouping actions into Editing Workspace, Main Share CTA, and System Settings.": "Эргономичная группировка панели действий в шапке на 3 зоны: Рабочая зона, Кнопка шеринга (CTA) и Системные настройки.",
     "Integrated alerts indicator into Settings menu with an eye-catching animated red pulse when warnings exist.": "Индикатор предупреждений внутри меню настроек с анимированной красной пульсацией при наличии непросмотренных алертов.",
     "Stylized gaming and Wuxia font typography option toggleable directly from the Interface Settings popover.": "Опциональный стилизованный уся-шрифт с переключателем в меню настроек интерфейса.",

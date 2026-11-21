@@ -2,6 +2,12 @@ import type { ChangelogEntry } from "./types"
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: "1.3.5",
+    date: "2026-11-21",
+    headline: "Interactive In-Game Rotation Trainer Overlay, Companion App & Tactile Audio",
+    loadDetails: () => import("./entries/v1-3-5").then((module) => module.details),
+  },
+  {
     version: "1.3.2",
     date: "2026-11-19",
     headline: "Ergonomic Header Groups, Redesigned Share Dialog & Visual Polish",

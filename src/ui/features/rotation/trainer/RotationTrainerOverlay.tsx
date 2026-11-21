@@ -646,7 +646,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
           {!isConnected && (
             <a
-              href="/downloads/WWM-Companion.exe?v=2.1.0"
+              href="/downloads/WWM-Companion.exe?v=1.3.5"
               download="WWM-Companion.exe"
               className={styles.companionDownloadCta}
               title={t(

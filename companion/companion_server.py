@@ -504,7 +504,7 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
         welcome = {
             "type": "status",
             "connected": True,
-            "version": "1.3.2",
+            "version": "1.3.5",
             "isAdmin": is_admin(),
             "engine": "GetAsyncKeyState-Native-Win32",
         }
