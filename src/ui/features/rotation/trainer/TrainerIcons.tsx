@@ -3,6 +3,28 @@ interface IconProps {
   size?: number
 }
 
+export function GamepadIcon({ className, size = 14 }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M4 4.5h8a3.5 3.5 0 013.4 4.3l-.9 3.7A2 2 0 0112.5 14h-.8a2 2 0 01-1.8-1.2L9.4 11H6.6l-.5 1.8A2 2 0 014.3 14h-.8a2 2 0 01-1.9-1.5l-.9-3.7A3.5 3.5 0 014 4.5z" />
+      <path d="M4.5 7.5h2M5.5 6.5v2" />
+      <circle cx="10.5" cy="7" r=".6" fill="currentColor" />
+      <circle cx="12" cy="8.5" r=".6" fill="currentColor" />
+    </svg>
+  )
+}
+
 export function DownloadIcon({ className, size = 14 }: IconProps) {
   return (
     <svg

@@ -13,6 +13,7 @@ import {
 } from "../readableRotation"
 import { useDocumentPictureInPicture } from "../trainer/useDocumentPictureInPicture"
 import { RotationTrainerOverlay } from "../trainer/RotationTrainerOverlay"
+import { GamepadIcon } from "../trainer/TrainerIcons"
 import styles from "./ReadableRotationDialog.module.scss"
 
 interface Props {
@@ -420,7 +421,7 @@ export function ReadableRotationDialog({
         </button>
         <button
           type="button"
-          className="btn"
+          className={`btn ${styles.trainerPipBtn}`}
           disabled={parsed.totalSteps === 0}
           onClick={() =>
             openPip({
@@ -429,7 +430,8 @@ export function ReadableRotationDialog({
           }
           title={t("trainer.openPipTooltip")}
         >
-          🎮 {t("trainer.pipButton")}
+          <GamepadIcon className={styles.btnIcon} size={14} />
+          <span>{t("trainer.pipButton")}</span>
         </button>
         {onApply && (
           <button
