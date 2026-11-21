@@ -18,14 +18,17 @@ import { graduationBuildFromCustom } from "./customGraduationBuild"
 import { withEncounterFieldsOf } from "./encounterOptions"
 import { withZeroedDerivedStats } from "./derivedInputs"
 import type {
+  BowGear,
   BowGearLevel,
   BowPiece,
   EquippedSlots,
   GearLevel,
+  GearPiece,
+  GearSlot,
   Inputs,
   MindMethodSlot,
 } from "./types"
-import { BOW_GEAR_LEVELS, EMPTY_EQUIPPED, WEAPON_SLOTS } from "./types"
+import { BOW_GEAR_LEVELS, EMPTY_EQUIPPED, GEAR_SLOTS, WEAPON_SLOTS } from "./types"
 
 export type GraduationVariant = "maxRolls" | "relayed"
 
@@ -244,4 +247,53 @@ export function graduationQiSourceInputs(inputs: Inputs): Inputs | null {
     ),
     useGraduationQiBreak: false,
   })
+}
+
+export function equipGraduationGearToInputs(
+  inputs: Inputs,
+  variant: GraduationVariant = "maxRolls",
+): Inputs {
+  const followed = followedGraduationBuild(inputs)
+  if (!followed) return inputs
+  const gearLevel = gearLevelForBreakthrough(inputs.breakthrough)
+  const build = graduationBuildAtLevel(followed, variant, gearLevel)
+
+  const idMap = new Map<GearSlot, string>()
+  let counter = 0
+  const inventory: GearPiece[] = build.gear.map((piece) => {
+    counter++
+    const id = `gp-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}-${counter}`
+    idMap.set(piece.slot, id)
+    return {
+      ...piece,
+      id,
+      words: piece.words.map((word) => ({ ...word })) as typeof piece.words,
+      ...(build.set && WEAPON_SLOTS.includes(piece.slot) ? { set: build.set } : {}),
+    }
+  })
+
+  const equipped = { ...EMPTY_EQUIPPED }
+  for (const slot of GEAR_SLOTS) {
+    equipped[slot] = idMap.get(slot) ?? null
+  }
+
+  const bowLevel = bowGearLevelFor(gearLevel)
+  const bowPiece: BowPiece | null =
+    build.bowSet && bowLevel !== null
+      ? { level: bowLevel, rarity: "legendary", set: build.bowSet }
+      : null
+
+  const bowGear: BowGear = {
+    bow: bowPiece ? { ...bowPiece } : null,
+    thumbRing: bowPiece ? { ...bowPiece } : null,
+  }
+
+  return {
+    ...inputs,
+    inventory,
+    equipped,
+    bowGear,
+    arsenal: build.arsenal ?? inputs.arsenal,
+    enhancements: defaultEnhancementLevels(inputs.breakthrough, { inventory, equipped }),
+  }
 }

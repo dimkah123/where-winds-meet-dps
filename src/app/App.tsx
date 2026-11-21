@@ -54,7 +54,7 @@ import { formatNumber, formatCompactDamage } from "../ui/utils/numberFormatting"
 import { MyBuildsDialog } from "../ui/layout/my-builds-dialog/MyBuildsDialog"
 import { loadBuildFromCloud, getEditToken, updateBuildInCloud } from "../cloud/cloudBuilds"
 import { getStoredSession } from "../cloud/auth"
-import { followedGraduationBuild } from "../engine/graduation"
+import { equipGraduationGearToInputs, followedGraduationBuild } from "../engine/graduation"
 import { graduationBuildKey } from "../i18n/contentKeys"
 import { useI18n } from "../i18n/i18nContext"
 import { I18nProvider } from "../i18n/I18nProvider"
@@ -719,6 +719,7 @@ function AppInner() {
           relayedTheoreticalDps={graduation.relayedTheoreticalDps}
           onFollowBuild={(graduationBuildId) => setInputs({ ...inputs, graduationBuildId })}
           onCustomBuildsChanged={setCustomGraduationBuilds}
+          onEquipBuild={(variant) => setInputs(equipGraduationGearToInputs(inputs, variant))}
           onClose={mustChooseGraduationBuild ? undefined : () => setGraduationDialogOpen(false)}
         />
       )}

@@ -251,7 +251,6 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       if (!norm) return
 
       if (showRemap) {
-        setRemapRecordedKey({ key: norm, time: Date.now() })
         return
       }
 
@@ -271,7 +270,6 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       const btn = getButtonName(e.button)
 
       if (showRemap) {
-        setRemapRecordedKey({ key: btn, time: Date.now() })
         return
       }
 

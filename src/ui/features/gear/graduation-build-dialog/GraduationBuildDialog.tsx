@@ -8,6 +8,7 @@ import {
   graduationBuildAtLevel,
   graduationBuildsForProfile,
   graduationInputs,
+  type GraduationVariant,
 } from "../../../../engine/graduation"
 import type { CustomGraduationBuild } from "../../../../engine/customGraduationBuild"
 import { resistanceForInputs } from "../../../../engine/panel"
@@ -43,6 +44,7 @@ interface Props {
   relayedTheoreticalDps: number | null
   onFollowBuild(graduationBuildId: string): void
   onCustomBuildsChanged(builds: CustomGraduationBuild[]): void
+  onEquipBuild?: (variant?: GraduationVariant) => void
   // Absent while the profile follows no build: the dialog then cannot be
   // dismissed until one is chosen.
   onClose?: () => void
@@ -63,6 +65,7 @@ export function GraduationBuildDialog({
   relayedTheoreticalDps,
   onFollowBuild,
   onCustomBuildsChanged,
+  onEquipBuild,
   onClose,
 }: Props) {
   const { t } = useI18n()
@@ -248,11 +251,30 @@ export function GraduationBuildDialog({
         )}
       </DialogBody>
 
-      {onClose && (
+      {(onClose || (onEquipBuild && build)) && (
         <DialogFooter>
-          <button ref={closeButtonRef} type="button" className="btn primary" onClick={onClose}>
-            {t("common.close")}
-          </button>
+          {onEquipBuild && build && (
+            <button
+              type="button"
+              className="btn primary"
+              onClick={() => {
+                onEquipBuild(variant)
+                if (onClose) onClose()
+              }}
+              title={t(
+                "gear.graduationBuildDialog.equipThisBuildTooltip",
+                "Скопировать и надеть все предметы этого эталонного билда на вашего персонажа",
+              )}
+            >
+              ⚡ {t("gear.graduationBuildDialog.equipThisBuild", "Надеть это снаряжение")}
+            </button>
+          )}
+          <div style={{ flex: 1 }} />
+          {onClose && (
+            <button ref={closeButtonRef} type="button" className="btn" onClick={onClose}>
+              {t("common.close")}
+            </button>
+          )}
         </DialogFooter>
       )}
     </Dialog>

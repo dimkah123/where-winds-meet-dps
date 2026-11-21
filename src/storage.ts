@@ -822,8 +822,26 @@ export function importProfile(text: string): StoredProfile {
     })
     candidate = result?.blob.profiles[0] ?? maybeWrapper.profile
   } else {
-    const bare = parsed as { inputs?: unknown }
-    candidate = { ...bare, inputs: splitSplendorAttunements(bare.inputs) }
+    const bare = parsed as {
+      inputs?: unknown
+      title?: unknown
+      author?: unknown
+      name?: unknown
+      id?: unknown
+    }
+    const candidateInputs = (bare.inputs && typeof bare.inputs === "object" ? bare.inputs : bare) as Inputs
+    candidate = {
+      id: typeof bare.id === "string" && bare.id ? bare.id : newProfileId(),
+      name:
+        typeof bare.name === "string" && bare.name
+          ? bare.name
+          : typeof bare.title === "string" && bare.title
+            ? String(bare.title)
+            : typeof bare.author === "string" && bare.author
+              ? `Build (${bare.author})`
+              : "Imported profile",
+      inputs: splitSplendorAttunements(candidateInputs),
+    }
   }
   if (!isStoredProfile(candidate)) {
     throw new Error("Imported profile failed validation (missing or invalid fields)")
@@ -832,13 +850,17 @@ export function importProfile(text: string): StoredProfile {
   const idMap = new Map<string, string>()
   const inventory = hydrated.inventory.map((piece) => {
     const nextId = newGearPieceId()
-    idMap.set(piece.id, nextId)
+    idMap.set(String(piece.id), nextId)
     return { ...piece, id: nextId }
   })
   const equipped = { ...EMPTY_EQUIPPED, ...hydrated.equipped }
   for (const slot of Object.keys(equipped) as (keyof typeof equipped)[]) {
     const oldId = equipped[slot]
-    equipped[slot] = oldId ? (idMap.get(oldId) ?? null) : null
+    equipped[slot] = oldId ? (idMap.get(String(oldId)) ?? null) : null
+    if (!equipped[slot]) {
+      const match = inventory.find((p) => p.slot === slot)
+      if (match) equipped[slot] = match.id
+    }
   }
   return {
     id: newProfileId(),

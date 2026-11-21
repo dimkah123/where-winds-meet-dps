@@ -14,6 +14,7 @@ import { BOW_SLOTS, GEAR_SLOTS, isWeaponSlot } from "../../../../engine/types"
 import { gearLevelForBreakthrough } from "../../../../definitions/baseStats/breakthroughs"
 import { slotSetFor } from "../../../../engine/setBonuses"
 import { withSetChoice } from "../../../../engine/setChoice"
+import { equipGraduationGearToInputs } from "../../../../engine/graduation"
 import { useI18n } from "../../../../i18n/i18nContext"
 import { useConfirm } from "../../../components/confirm-dialog/confirmContext"
 import { SubTabs } from "../../../components/sub-tabs/SubTabs"
@@ -340,6 +341,29 @@ export function GearTab({
             + {t("gear.createGear")}
           </button>
         </div>
+        {inventory.length === 0 && (
+          <div className={styles.emptyInventoryBanner}>
+            <div className={styles.emptyInventoryText}>
+              <span className={styles.emptyInventoryIcon}>💡</span>
+              <div>
+                <strong>{t("gear.emptyInventoryTitle", "Экипировка не надета")}</strong>
+                <p>
+                  {t(
+                    "gear.emptyInventoryDesc",
+                    "Вы можете надеть снаряжение отслеживаемого эталона в один клик или импортировать вещи из игры.",
+                  )}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="btn primary"
+              onClick={() => onChange(equipGraduationGearToInputs(inputs))}
+            >
+              ⚡ {t("gear.equipGraduationGear", "Надеть снаряжение эталона")}
+            </button>
+          </div>
+        )}
         <GearSlotTiles
           inputs={inputs}
           inventory={inventory}

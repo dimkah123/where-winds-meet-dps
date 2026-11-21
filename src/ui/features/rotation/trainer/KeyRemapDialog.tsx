@@ -91,6 +91,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
   const isRuLocale = locale === "ru"
   const [draft, setDraft] = useState<TrainerKeyMap>({ ...keyMap })
   const [recordingAction, setRecordingAction] = useState<KeyAction | null>(null)
+  const recordingStartTimeRef = useRef(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const justRecordedRef = useRef(0)
 
@@ -114,14 +115,14 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
   // 1. Companion / Global in-game inputs
   useEffect(() => {
     if (!recordingAction || !recordedKey) return
+    // Only accept companion inputs that occurred AFTER recording started
+    if (recordedKey.time < recordingStartTimeRef.current + 50) return
     applyKey(recordingAction, recordedKey.key)
   }, [recordingAction, recordedKey, applyKey])
 
   // 2. Direct DOM keyboard & mouse inputs inside the dialog (works in PiP & main window)
   useEffect(() => {
     if (!recordingAction) return
-
-    const startTime = Date.now()
 
     function getButtonName(button: number): string {
       if (button === 2) return "rclick"
@@ -144,7 +145,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
 
     function handleMouseDown(e: MouseEvent) {
       // Ignore click that started recording
-      if (Date.now() - startTime < 120) return
+      if (Date.now() - recordingStartTimeRef.current < 200) return
 
       e.preventDefault()
       e.stopPropagation()
@@ -155,7 +156,7 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
     function handleAuxClick(e: MouseEvent) {
       e.preventDefault()
       e.stopPropagation()
-      if (Date.now() - startTime < 120) return
+      if (Date.now() - recordingStartTimeRef.current < 200) return
       const btn = getButtonName(e.button)
       applyKey(recordingAction!, btn)
     }
@@ -234,7 +235,11 @@ export function KeyRemapDialog({ keyMap, onChange, onClose, isConnected = false,
                   onClick={(e) => {
                     e.stopPropagation()
                     if (Date.now() - justRecordedRef.current < 250) return
-                    setRecordingAction((prev) => (prev === action.key ? null : action.key))
+                    setRecordingAction((prev) => {
+                      if (prev === action.key) return null
+                      recordingStartTimeRef.current = Date.now()
+                      return action.key
+                    })
                   }}
                 >
                   {isRecording ? (
