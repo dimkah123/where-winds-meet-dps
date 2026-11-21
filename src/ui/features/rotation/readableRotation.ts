@@ -1,6 +1,6 @@
 import type { Result } from "../../../engine/types"
 import { newStepId, type Rotation, type RotationStep } from "../../../engine/rotation"
-import { isPrePullSkill, type Skill } from "../../../engine/skill"
+import type { Skill } from "../../../engine/skill"
 import { weaponTagOf } from "../../../engine/buffs/tags"
 
 export function getWeaponSwapShortName(weapon: string): string {
@@ -238,9 +238,9 @@ export function readableRotationText(
   const casts = (result?.casts ?? []).filter((c) => {
     if (!c.stepId) return true
     const isDirectSwap = c.stepId.startsWith("swap-") || c.stepId.startsWith("direct-swap-")
-    // Keep active in-combat direct weapon swaps (e.g. Heng -> Mo, Mo -> Heng)
+    // Keep all direct weapon swaps (both prepull and in-combat, e.g. Mo -> Heng, Heng -> Mo)
     if (isDirectSwap) {
-      return !c.prePull && c.stepId.includes("-active")
+      return true
     }
     return true
   })
@@ -361,12 +361,9 @@ export function readableRotationFromSteps(
     const skill = skillsById.get(skillId)
 
     const weapon = skill ? weaponTagOf(skill) : ""
-    const isPrepull = skill ? isPrePullSkill(skill) : false
 
     if (weapon && drawnWeapon && weapon !== drawnWeapon && !skill?.isWeaponSwap) {
-      if (!isPrepull) {
-        entries.push(getWeaponSwapShortName(weapon))
-      }
+      entries.push(getWeaponSwapShortName(weapon))
       drawnWeapon = weapon
     } else if (weapon) {
       drawnWeapon = weapon
@@ -809,7 +806,7 @@ export function parseReadableRotation(
         raw,
         cleanName,
         multiplier,
-        skillId: `direct-swap-${classId}-${normKey.replace(" swap", "")}-active`,
+        skillId: `direct-swap-${classId}-${normKey.replace(" swap", "")}-${isPrepull ? "prepull" : "active"}`,
         skillName: cleanName,
         valid: true,
       })
