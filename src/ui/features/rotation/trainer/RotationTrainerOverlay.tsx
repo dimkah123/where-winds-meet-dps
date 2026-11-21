@@ -277,6 +277,19 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       if (isMatch) {
         bufferedInputRef.current = null
 
+        // Prevent ghost double-counting on multi-hit/charged skills (e.g. Mo Charged 2.37s hold):
+        // Physical key chatter, micro-releases, or holding wavers within the minimum charge/animation
+        // duration must NOT count as a separate charge.
+        const minRepIntervalMs = currentStep.isHold
+          ? Math.max(550, Math.min(1100, ((currentStep.durationSec || 2.0) * 1000 * 0.45) / settings.speed))
+          : Math.max(160, Math.min(450, ((currentStep.durationSec || 0.6) * 1000 * 0.35) / settings.speed))
+
+        const timeSinceLastHit = now - lastHitKeyRef.current.time
+        if (lastHitKeyRef.current.key === expected && timeSinceLastHit < minRepIntervalMs) {
+          // Key jitter / chatter / premature repeat while holding the current charge -> ignore!
+          return
+        }
+
         // If this skill was a charge/hold attack, allow a 500ms grace window for releasing the key
         const skillLower = currentStep.cleanName.toLowerCase()
         if (
@@ -512,6 +525,11 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         return
       }
 
+      // If in-game companion hook is actively connected, let it handle all inputs to prevent double-counting
+      if (isConnected) {
+        return
+      }
+
       const norm = normalizeKeyInput(e.key === " " ? "space" : e.key)
       if (!norm) return
 
@@ -530,6 +548,11 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     function onMouseDown(e: MouseEvent) {
       if (e.button === 3 || e.button === 4) {
         e.preventDefault()
+      }
+
+      // If in-game companion hook is actively connected, let it handle all inputs to prevent double-counting
+      if (isConnected) {
+        return
       }
 
       const btn = getButtonName(e.button)
@@ -554,6 +577,12 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
     function onWheel(e: WheelEvent) {
       e.preventDefault()
+
+      // If in-game companion hook is actively connected, let it handle all inputs to prevent double-counting
+      if (isConnected) {
+        return
+      }
+
       const direction = e.deltaY > 0 ? "wheeldown" : "wheelup"
       if (showRemap) {
         setRemapRecordedKey({ key: direction, time: Date.now() })
