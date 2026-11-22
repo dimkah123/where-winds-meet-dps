@@ -376,7 +376,7 @@ export function ShareBuildDialog({
       powerLabel: t("content.statLine.power", "Power"),
       agilityLabel: t("content.statLine.agility", "Agility"),
       momentumLabel: t("content.statLine.momentum", "Momentum"),
-      constitutionLabel: t("content.statLine.body", "Constitution"),
+      constitutionLabel: t("content.statLine.body", "Body"),
       defenseLabel: t("content.statLine.defense", "Defense"),
       maxHpLabel: t("content.statLine.maxHp", "Max HP"),
       physDefenseLabel: t("content.statLine.physDef", "Physical Defense"),

@@ -465,7 +465,7 @@ export function drawBuildCard(
     subCol2X,
     currentY,
     subColW,
-    labels?.constitutionLabel || "Constitution",
+    labels?.constitutionLabel || "Body",
     fmtAtk(data.body ?? 0),
     {
       valColor: "#f0f0f0",

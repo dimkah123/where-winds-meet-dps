@@ -248,7 +248,7 @@ describe("StatsOverviewPanel", () => {
     )
   })
 
-  it("shows Constitution, Defense and Max HP alongside Power, Agility and Momentum", () => {
+  it("shows Body, Defense and Max HP alongside Power, Agility and Momentum", () => {
     const equipped = equippedPiecesFor(defaultInputs)
     const attrs = totalPlayerAttributes(
       defaultInputs.breakthrough,
@@ -267,7 +267,7 @@ describe("StatsOverviewPanel", () => {
       </I18nProvider>,
     )
 
-    expect(screen.getByText("Constitution").parentElement).toHaveTextContent(fmt(attrs.body, false))
+    expect(screen.getByText("Body").parentElement).toHaveTextContent(fmt(attrs.body, false))
     expect(screen.getByText("Defense").parentElement).toHaveTextContent(fmt(attrs.defense, false))
     expect(screen.getByText("Max HP").parentElement).toHaveTextContent(String(Math.round(maxHp)))
   })

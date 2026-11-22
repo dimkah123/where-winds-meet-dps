@@ -61,7 +61,7 @@ export const STAT_LINES = [
   { id: "power", label: "Power", unit: "raw", maxRoll: ATTRIBUTE_CEILING },
   { id: "agility", label: "Agility", unit: "raw", maxRoll: ATTRIBUTE_CEILING },
   { id: "momentum", label: "Momentum", unit: "raw", maxRoll: ATTRIBUTE_CEILING },
-  { id: "body", label: "Constitution", unit: "raw", maxRoll: ATTRIBUTE_CEILING },
+  { id: "body", label: "Body", unit: "raw", maxRoll: ATTRIBUTE_CEILING },
   { id: "defense", label: "Defense", unit: "raw", maxRoll: ATTRIBUTE_CEILING },
   {
     id: "precision",
