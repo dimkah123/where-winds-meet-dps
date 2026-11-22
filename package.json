@@ -9,6 +9,7 @@
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "companion": "python companion/companion_server.py",
+    "build:exe": "pnpm run build && pyinstaller --noconfirm --onefile --name \"WWM-Calculator\" --add-data \"dist;dist\" --icon \"public/favicon.ico\" --uac-admin --distpath \"desktop-dist\" companion/wwm_launcher.py",
     "dev": "node scripts/generateVersion.mjs && node scripts/copyOcrAssets.mjs && vite",
     "build": "node scripts/generateVersion.mjs && node scripts/copyOcrAssets.mjs && tsc -b && vite build",
     "preview": "vite preview",
