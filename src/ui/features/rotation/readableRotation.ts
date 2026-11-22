@@ -525,6 +525,7 @@ export const COMMON_MYSTIC_AND_UNIVERSAL: Record<string, string> = {
   "breath 1 hit": "mystic-fire-breath-1-hit",
   "breath full": "mystic-fire-breath-2-hit",
   toad: "mystic-toad-cancel",
+  "toad cancel": "mystic-toad-cancel",
   "dragon head": "mystic-dragon-head-plus",
   soaring: "mystic-soaring",
   deflect: "universal-deflect-cancel",

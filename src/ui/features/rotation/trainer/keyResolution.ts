@@ -202,6 +202,53 @@ export function resolveSkillKey(
   return { key: keyMap.skill2, label: formatKeyDisplay(keyMap.skill2, isRuLocale), isHold: false }
 }
 
+export function isDeflectToken(token?: ParsedRotationToken): boolean {
+  if (!token) return false
+  const normClean = (token.cleanName || "").toLowerCase()
+  const normId = (token.skillId || "").toLowerCase()
+  return (
+    normClean.includes("deflect") ||
+    normClean.includes("дефлект") ||
+    normClean.includes("parry") ||
+    normClean.includes("парир") ||
+    normClean.includes("отражен") ||
+    normId.includes("deflect")
+  )
+}
+
+export function isCancelSkillToken(token: ParsedRotationToken): boolean {
+  if (!token || isDeflectToken(token)) return false
+
+  const normClean = (token.cleanName || "").toLowerCase()
+  const normRaw = (token.raw || "").toLowerCase()
+  const normId = (token.skillId || "").toLowerCase()
+
+  if (
+    normClean.includes("cancel") ||
+    normClean.includes("кенсл") ||
+    normClean.includes("отмен") ||
+    normRaw.includes("cancel") ||
+    normRaw.includes("кенсл") ||
+    normRaw.includes("отмен")
+  ) {
+    return true
+  }
+
+  // Known cancel mystics / skills that cancel recovery via deflect
+  if (
+    normId === "mystic-flute-of-the-tides-cancel" ||
+    normId === "mystic-flute-of-the-tides-prepull" ||
+    normId === "mystic-toad-cancel" ||
+    normId === "mystic-leaping-toad-cancel" ||
+    normId === "mystic-drunken-poet-drink-cancel" ||
+    normId === "universal-golden-body-cancel"
+  ) {
+    return true
+  }
+
+  return false
+}
+
 export function buildTrainerSteps(
   tokens: ParsedRotationToken[],
   keyMap: TrainerKeyMap,
@@ -209,8 +256,10 @@ export function buildTrainerSteps(
   isRuLocale = false,
 ): TrainerStep[] {
   let currentCastIdx = 0
+  const steps: TrainerStep[] = []
 
-  return tokens.map((token, index) => {
+  for (let index = 0; index < tokens.length; index++) {
+    const token = tokens[index]
     const keyInfo = resolveSkillKey(token.cleanName, keyMap, isRuLocale)
     let simDuration: number | undefined
     let matchingCast: RotationCast | undefined
@@ -248,7 +297,7 @@ export function buildTrainerSteps(
     const isHold = keyInfo.isHold ?? timingInfo.isHold ?? false
     const count = stepMultiplier
 
-    return {
+    steps.push({
       id: `${index}-${token.cleanName}`,
       rawName: token.raw,
       cleanName: token.cleanName,
@@ -261,6 +310,36 @@ export function buildTrainerSteps(
       cooldownSec: timingInfo.cooldownSec,
       cooldownGroup: timingInfo.cooldownGroup,
       isHold,
+    })
+
+    // If this skill has a cancel (e.g. Flute Cancel, Toad Cancel) and the next token is not already Deflect,
+    // inject an explicit Deflect step into the button timeline so player is prompted to press Deflect (E).
+    const nextToken = tokens[index + 1]
+    if (isCancelSkillToken(token) && !isDeflectToken(nextToken)) {
+      const deflectKey = keyMap.deflect ?? "e"
+      const hasCyrillic = /[а-яА-ЯёЁ]/.test(token.cleanName)
+      const deflectName = hasCyrillic || isRuLocale ? "Дефлект" : "Deflect"
+      const deflectTargetTime =
+        matchingCast?.timeSec !== undefined
+          ? matchingCast.timeSec + timingInfo.castDurationSec
+          : undefined
+
+      steps.push({
+        id: `${index}-${token.cleanName}-deflect-cancel`,
+        rawName: `${token.raw} -> ${deflectName}`,
+        cleanName: deflectName,
+        expectedKey: normalizeKeyInput(deflectKey),
+        expectedKeyLabel: formatKeyDisplay(deflectKey, isRuLocale),
+        multiplier: 1,
+        remainingCount: 1,
+        targetTimeSec: deflectTargetTime,
+        durationSec: 0.25,
+        cooldownSec: undefined,
+        cooldownGroup: "Deflect",
+        isHold: false,
+      })
     }
-  })
+  }
+
+  return steps
 }

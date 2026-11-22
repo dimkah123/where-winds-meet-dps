@@ -225,7 +225,8 @@ describe("Rotation Trainer Key Resolution", () => {
     ]
 
     const steps = buildTrainerSteps(tokens, DEFAULT_KEY_MAP)
-    expect(steps).toHaveLength(7)
+    // 7 original tokens + 1 injected Deflect after Flute Cancel = 8 steps
+    expect(steps).toHaveLength(8)
     expect(steps[0].expectedKey).toBe("~")
     expect(steps[0].multiplier).toBe(1)
     expect(steps[0].remainingCount).toBe(1)
@@ -249,17 +250,64 @@ describe("Rotation Trainer Key Resolution", () => {
     expect(steps[3].cooldownSec).toBe(20)
 
     // Flute Cancel (0.8s cast, 25s cooldown)
+    expect(steps[4].cleanName).toBe("Flute Cancel")
+    expect(steps[4].expectedKey).toBe("f")
     expect(steps[4].durationSec).toBe(0.8)
     expect(steps[4].cooldownSec).toBe(25)
 
+    // Injected Deflect cancel step immediately following Flute Cancel
+    expect(steps[5].cleanName).toBe("Deflect")
+    expect(steps[5].expectedKey).toBe("e")
+    expect(steps[5].expectedKeyLabel).toBe("E")
+    expect(steps[5].durationSec).toBe(0.25)
+    expect(steps[5].isHold).toBe(false)
+
     // Bursting Nine (1.4s cast, 30s cooldown)
-    expect(steps[5].durationSec).toBe(1.4)
-    expect(steps[5].cooldownSec).toBe(30)
+    expect(steps[6].cleanName).toBe("Bursting Nine")
+    expect(steps[6].durationSec).toBe(1.4)
+    expect(steps[6].cooldownSec).toBe(30)
 
     // Mo Swap via wheel (instant cast 0s, 0.6s cooldown)
-    expect(steps[6].expectedKey).toBe("wheeldown")
-    expect(steps[6].durationSec).toBe(0)
-    expect(steps[6].cooldownSec).toBe(0.6)
+    expect(steps[7].expectedKey).toBe("wheeldown")
+    expect(steps[7].durationSec).toBe(0)
+    expect(steps[7].cooldownSec).toBe(0.6)
+  })
+
+  it("injects Deflect after cancel skills unless next step is already Deflect", () => {
+    // 1. Without subsequent Deflect -> should inject Deflect
+    const tokensWithoutDeflect = [
+      { raw: "Flute Cancel", cleanName: "Flute Cancel", multiplier: 1, valid: true },
+      { raw: "Heng Special", cleanName: "Heng Special", multiplier: 1, valid: true },
+    ]
+    const stepsWithDeflect = buildTrainerSteps(tokensWithoutDeflect, DEFAULT_KEY_MAP)
+    expect(stepsWithDeflect).toHaveLength(3)
+    expect(stepsWithDeflect[0].cleanName).toBe("Flute Cancel")
+    expect(stepsWithDeflect[1].cleanName).toBe("Deflect")
+    expect(stepsWithDeflect[1].expectedKey).toBe("e")
+    expect(stepsWithDeflect[2].cleanName).toBe("Heng Special")
+
+    // 2. With subsequent Deflect already in rotation -> do NOT inject duplicate
+    const tokensWithDeflect = [
+      { raw: "Flute Cancel", cleanName: "Flute Cancel", multiplier: 1, valid: true },
+      { raw: "Deflect", cleanName: "Deflect", multiplier: 1, valid: true },
+      { raw: "Heng Special", cleanName: "Heng Special", multiplier: 1, valid: true },
+    ]
+    const stepsNoDuplicate = buildTrainerSteps(tokensWithDeflect, DEFAULT_KEY_MAP)
+    expect(stepsNoDuplicate).toHaveLength(3)
+    expect(stepsNoDuplicate[0].cleanName).toBe("Flute Cancel")
+    expect(stepsNoDuplicate[1].cleanName).toBe("Deflect")
+    expect(stepsNoDuplicate[2].cleanName).toBe("Heng Special")
+
+    // 3. Russian locale localization
+    const tokensRu = [
+      { raw: "Флейта Отмена", cleanName: "Флейта Отмена", multiplier: 1, valid: true },
+      { raw: "Удар", cleanName: "Удар", multiplier: 1, valid: true },
+    ]
+    const stepsRu = buildTrainerSteps(tokensRu, DEFAULT_KEY_MAP, undefined, true)
+    expect(stepsRu).toHaveLength(3)
+    expect(stepsRu[1].cleanName).toBe("Дефлект")
+    expect(stepsRu[1].expectedKey).toBe("e")
+    expect(stepsRu[1].expectedKeyLabel).toBe("E (У)")
   })
 
   it("loads default settings correctly", () => {

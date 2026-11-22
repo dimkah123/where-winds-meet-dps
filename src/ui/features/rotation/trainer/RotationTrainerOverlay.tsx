@@ -360,7 +360,20 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         expected.startsWith("wheel") ||
         expected === "tab"
 
-      if (!fromBuffer && isCasting && remainingCastMs > 350 && !isMultiHitRepetition && !isSwapAction) {
+      const isCancelAction =
+        currentStep.cleanName.toLowerCase().includes("deflect") ||
+        currentStep.cleanName.toLowerCase().includes("дефлект") ||
+        currentStep.cleanName.toLowerCase().includes("parry") ||
+        expected === normalizeKeyInput(settings.keyMap.deflect ?? "e")
+
+      if (
+        !fromBuffer &&
+        isCasting &&
+        remainingCastMs > 350 &&
+        !isMultiHitRepetition &&
+        !isSwapAction &&
+        !isCancelAction
+      ) {
         if (isMatch) {
           bufferedInputRef.current = { key: pressedKey, time: now }
           triggerFeedback(t("trainer.feedback.casting", isRuLocale ? "⌛ КАСТ..." : "⌛ CASTING..."), "hit")
