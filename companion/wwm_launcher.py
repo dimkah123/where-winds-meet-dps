@@ -23,15 +23,34 @@ import subprocess
 import sys
 import threading
 import time
+import urllib.request
 import webbrowser
 
 # Resolve web assets directory (works both in development and inside PyInstaller bundle)
-if getattr(sys, "frozen", False):
-    BUNDLE_DIR = sys._MEIPASS
-    DIST_DIR = os.path.join(BUNDLE_DIR, "dist")
-else:
-    BUNDLE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    DIST_DIR = os.path.join(BUNDLE_DIR, "dist")
+def get_dist_dir() -> str:
+    if getattr(sys, "frozen", False):
+        base = getattr(sys, "_MEIPASS", os.path.dirname(sys.executable))
+        candidates = [
+            os.path.join(base, "dist"),
+            base,
+            os.path.join(os.path.dirname(sys.executable), "dist"),
+        ]
+        for c in candidates:
+            if os.path.isfile(os.path.join(c, "index.html")):
+                return os.path.abspath(c)
+        return os.path.abspath(os.path.join(base, "dist"))
+    else:
+        root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        candidates = [
+            os.path.join(root, "dist"),
+            os.path.abspath("dist"),
+        ]
+        for c in candidates:
+            if os.path.isfile(os.path.join(c, "index.html")):
+                return os.path.abspath(c)
+        return candidates[0]
+
+DIST_DIR = get_dist_dir()
 
 HTTP_HOST = "127.0.0.1"
 HTTP_PORT = 47998
@@ -52,16 +71,22 @@ mimetypes.add_type("text/css", ".css")
 mimetypes.add_type("image/svg+xml", ".svg")
 mimetypes.add_type("application/wasm", ".wasm")
 mimetypes.add_type("application/json", ".json")
+mimetypes.add_type("image/png", ".png")
+mimetypes.add_type("image/jpeg", ".jpg")
+mimetypes.add_type("image/webp", ".webp")
+mimetypes.add_type("font/woff2", ".woff2")
+mimetypes.add_type("font/woff", ".woff")
 
 
 class SPAHandler(http.server.SimpleHTTPRequestHandler):
     """Serves the static Vite/React build with Single-Page Application (SPA) fallback."""
 
     def __init__(self, *args, directory=None, **kwargs):
-        super().__init__(*args, directory=directory or DIST_DIR, **kwargs)
+        super().__init__(*args, directory=directory or get_dist_dir(), **kwargs)
 
     def do_GET(self):
-        local_path = self.translate_path(self.path)
+        clean_path = self.path.split("?")[0].split("#")[0]
+        local_path = self.translate_path(clean_path)
         if not os.path.exists(local_path) or (
             os.path.isdir(local_path) and not os.path.exists(os.path.join(local_path, "index.html"))
         ):
@@ -79,15 +104,67 @@ class SPAHandler(http.server.SimpleHTTPRequestHandler):
         pass
 
 
-def start_http_server(dist_dir: str, host: str = HTTP_HOST, port: int = HTTP_PORT):
-    handler = lambda *args, **kwargs: SPAHandler(*args, directory=dist_dir, **kwargs)
-    httpd = http.server.ThreadingHTTPServer((host, port), handler)
-    t = threading.Thread(target=httpd.serve_forever, daemon=True)
-    t.start()
-    return httpd
+def cleanup_stale_processes():
+    """Closes orphaned WWM-Companion or WWM-Calculator instances to avoid port conflicts."""
+    current_pid = os.getpid()
+    try:
+        ps_cmd = f"""
+        $cur = {current_pid}
+        Get-Process -ErrorAction SilentlyContinue | Where-Object {{
+            ($_.ProcessName -like "*WWM-Companion*" -or $_.ProcessName -like "*WWM-Calculator*") -and $_.Id -ne $cur
+        }} | ForEach-Object {{
+            try {{ Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue }} catch {{}}
+        }}
+        """
+        subprocess.run(
+            ["powershell", "-NoProfile", "-NonInteractive", "-Command", ps_cmd],
+            capture_output=True,
+            timeout=3,
+        )
+    except Exception:
+        pass
 
 
-def launch_app_window(url: str = f"http://{HTTP_HOST}:{HTTP_PORT}"):
+def is_port_available(host: str, port: int) -> bool:
+    import socket
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        try:
+            s.bind((host, port))
+            return True
+        except OSError:
+            return False
+
+
+def start_http_server(dist_dir: str, host: str = HTTP_HOST, initial_port: int = HTTP_PORT):
+    """Starts local HTTP server on initial_port or next available port."""
+    candidate_ports = [initial_port, 47997, 47996, 47995, 48080, 48081]
+    for port in candidate_ports:
+        try:
+            handler = lambda *args, **kwargs: SPAHandler(*args, directory=dist_dir, **kwargs)
+            httpd = http.server.ThreadingHTTPServer((host, port), handler)
+            t = threading.Thread(target=httpd.serve_forever, daemon=True)
+            t.start()
+            return httpd, port
+        except OSError:
+            continue
+    raise RuntimeError("Could not find an available port to bind local HTTP server.")
+
+
+def wait_for_http_ready(host: str, port: int, timeout: float = 3.0) -> bool:
+    """Verifies that the HTTP server responds with 200 before launching UI."""
+    url = f"http://{host}:{port}/"
+    start = time.time()
+    while time.time() - start < timeout:
+        try:
+            with urllib.request.urlopen(url, timeout=0.5) as resp:
+                if resp.status in (200, 304):
+                    return True
+        except Exception:
+            time.sleep(0.08)
+    return False
+
+
+def launch_app_window(url: str):
     """Launches the calculator in a dedicated app window (without browser tabs or address bar)."""
     # 1. Edge (standard on all Windows 10/11)
     edge_paths = [
@@ -588,6 +665,7 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
 
 
 async def main():
+    cleanup_stale_processes()
     ensure_admin()
 
     admin_status = "ENABLED (Full In-Game Capture)" if is_admin() else "NOT ELEVATED (Desktop only)"
@@ -595,38 +673,52 @@ async def main():
     print("=" * 68)
     print("  Where Winds Meet — Calculator & Rotation Trainer (All-in-One)")
     print("=" * 68)
-    print(f"  [Web App]      http://{HTTP_HOST}:{HTTP_PORT}")
-    print(f"  [Companion]    ws://{WS_HOST}:{WS_PORT}")
+    print(f"  [Assets]       {DIST_DIR}")
     print(f"  [Admin Rights] {admin_status}")
     print("  [Input Engine] Native Win32 (GetAsyncKeyState 250Hz + RawInput)")
-    print("  [Assets]       " + ("Embedded Bundle" if getattr(sys, "frozen", False) else DIST_DIR))
     print("=" * 68)
-    print("  Starting local server & opening application window...")
+    print("  Starting local server & verifying connection...")
 
     # 1. Start HTTP Server serving dist/
-    start_http_server(DIST_DIR, HTTP_HOST, HTTP_PORT)
-    time.sleep(0.3)
+    httpd, actual_http_port = start_http_server(DIST_DIR, HTTP_HOST, HTTP_PORT)
+    print(f"  [Web Server]   http://{HTTP_HOST}:{actual_http_port}")
 
-    # 2. Launch App Window (Edge/Chrome in standalone --app mode)
-    launch_app_window(f"http://{HTTP_HOST}:{HTTP_PORT}")
+    # 2. Wait for HTTP server to respond with 200 before launching UI window
+    is_ready = wait_for_http_ready(HTTP_HOST, actual_http_port, timeout=3.0)
+    if is_ready:
+        print("  [Web Server]   Connection verified: 200 OK")
+    else:
+        print("  [Warning] HTTP server took longer than expected to respond.")
 
-    # 3. Start Companion WebSocket Server
-    server = await asyncio.start_server(handle_client, WS_HOST, WS_PORT)
+    # 3. Launch App Window (Edge/Chrome in standalone --app mode)
+    launch_app_window(f"http://{HTTP_HOST}:{actual_http_port}")
 
-    loop = asyncio.get_running_loop()
-    wheel_thread = threading.Thread(target=mouse_wheel_listener_thread, args=(loop,), daemon=True)
-    wheel_thread.start()
+    # 4. Start Companion WebSocket Server (failsafe)
+    server = None
+    try:
+        server = await asyncio.start_server(handle_client, WS_HOST, WS_PORT)
+        loop = asyncio.get_running_loop()
+        wheel_thread = threading.Thread(target=mouse_wheel_listener_thread, args=(loop,), daemon=True)
+        wheel_thread.start()
+        print(f"  [Companion]    ws://{WS_HOST}:{WS_PORT} (Active)")
+    except OSError as err:
+        print(f"  [Companion]    ws://{WS_HOST}:{WS_PORT} (Service already active: {err})")
 
     print("\n  [READY] Application window opened!")
     print("  Keep this console window open while playing or practicing.")
     print("  Press Ctrl+C to exit.\n")
 
-    async with server:
-        await asyncio.gather(
-            server.serve_forever(),
-            broadcaster_loop(),
-            unified_input_polling_loop(),
-        )
+    if server:
+        async with server:
+            await asyncio.gather(
+                server.serve_forever(),
+                broadcaster_loop(),
+                unified_input_polling_loop(),
+            )
+    else:
+        # If external companion already holds port 47999, keep HTTP server alive indefinitely
+        while True:
+            await asyncio.sleep(3600)
 
 
 if __name__ == "__main__":
@@ -634,3 +726,13 @@ if __name__ == "__main__":
         asyncio.run(main())
     except KeyboardInterrupt:
         print("\nWWM Calculator stopped.")
+    except Exception as e:
+        import traceback
+        print("\n" + "=" * 68)
+        print("  CRITICAL ERROR:")
+        traceback.print_exc()
+        print("=" * 68)
+        try:
+            input("\nPress Enter to exit...")
+        except Exception:
+            pass
