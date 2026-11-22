@@ -1318,7 +1318,6 @@ function AppInner() {
                     customDebuffs={customDebuffs}
                     onCreate={createProfile}
                     onSaveCurrentAsNew={handleSaveCurrentAsNew}
-                    onOverwrite={handleOverwriteProfile}
                     onSelect={selectProfile}
                     onRename={renameProfile}
                     onDuplicate={duplicateProfile}

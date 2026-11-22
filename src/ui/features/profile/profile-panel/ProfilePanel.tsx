@@ -24,7 +24,6 @@ interface Props {
   customDebuffs: Debuff[]
   onCreate: () => void
   onSaveCurrentAsNew: () => void
-  onOverwrite: (id: string) => void
   onSelect: (id: string) => void
   onRename: (id: string, name: string) => void
   onDuplicate: (id: string) => void
@@ -44,7 +43,6 @@ export function ProfilePanel({
   customDebuffs,
   onCreate,
   onSaveCurrentAsNew,
-  onOverwrite,
   onSelect,
   onRename,
   onDuplicate,
@@ -240,18 +238,6 @@ export function ProfilePanel({
                   disabled={isActive}
                 >
                   {t("profile.select")}
-                </button>
-                <button
-                  type="button"
-                  className={`btn ${isActive && (isDirty || hasSharedBanner) ? "primary" : ""}`}
-                  onClick={() => onOverwrite(profile.id)}
-                  title={
-                    isActive
-                      ? t("profile.overwriteActiveTooltip", "Перезаписать этот профиль текущей открытой сборкой")
-                      : t("profile.overwriteOtherTooltip", "Заменить данные этого профиля текущей открытой сборкой")
-                  }
-                >
-                  💾 {t("profile.overwrite", "Перезаписать")}
                 </button>
                 <button
                   type="button"
