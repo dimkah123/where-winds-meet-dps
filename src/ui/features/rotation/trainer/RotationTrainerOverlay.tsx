@@ -134,6 +134,8 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   }, [steps])
 
   const lastPressTimeRef = useRef<Record<string, number>>({})
+  const keyHeldStateRef = useRef<Record<string, boolean>>({})
+  const lastKeyUpTimeRef = useRef<Record<string, number>>({})
   const lastWrongTimeRef = useRef<{ key: string; time: number }>({ key: "", time: 0 })
   const lastHoldKeyRef = useRef<{ key: string; expiresAt: number }>({ key: "", expiresAt: 0 })
   const lastHitKeyRef = useRef<{ key: string; time: number }>({ key: "", time: 0 })
@@ -187,6 +189,8 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     setCastStartTime(0)
     setActiveCooldowns({})
     bufferedInputRef.current = null
+    keyHeldStateRef.current = {}
+    lastKeyUpTimeRef.current = {}
     triggerFeedback(t("trainer.feedback.reset", isRuLocale ? "СБРОС" : "RESET"), "perfect")
     if (settings.sound) playSwitchSound("reset")
     const firstCount = steps[0]?.remainingCount ?? steps[0]?.multiplier ?? 1
@@ -277,16 +281,14 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       if (isMatch) {
         bufferedInputRef.current = null
 
-        // Prevent ghost double-counting on multi-hit/charged skills (e.g. Mo Charged 2.37s hold):
-        // Physical key chatter, micro-releases, or holding wavers within the minimum charge/animation
-        // duration must NOT count as a separate charge.
-        const minRepIntervalMs = currentStep.isHold
-          ? Math.max(550, Math.min(1100, ((currentStep.durationSec || 2.0) * 1000 * 0.45) / settings.speed))
-          : Math.max(160, Math.min(450, ((currentStep.durationSec || 0.6) * 1000 * 0.35) / settings.speed))
+        // Prevent ghost double-counting on multi-hit/charged skills (e.g. Mo Charged repetitions):
+        // Enforce a tight debounce interval of ~240ms between discrete strikes, allowing fast or slow charges
+        // without dropping genuine human inputs or repeating while holding
+        const minRepIntervalMs = Math.max(160, Math.min(320, 240 / settings.speed))
 
         const timeSinceLastHit = now - lastHitKeyRef.current.time
         if (lastHitKeyRef.current.key === expected && timeSinceLastHit < minRepIntervalMs) {
-          // Key jitter / chatter / premature repeat while holding the current charge -> ignore!
+          // Key jitter / chatter within 240ms -> ignore!
           return
         }
 
@@ -451,14 +453,23 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         return
       }
 
+      const norm = normalizeKeyInput(e.key)
+      if (!norm) return
+
+      if (e.action === "up") {
+        keyHeldStateRef.current[norm] = false
+        lastKeyUpTimeRef.current[norm] = Date.now()
+        return
+      }
+
       if (e.action !== "down") return
 
       // F5 or Alt+R hotkey to reset combo to beginning
       if (
-        e.key.toLowerCase() === "f5" ||
-        e.key === "alt+r" ||
-        e.key === "reset" ||
-        ((e.key === "r" || e.key === "к") && altHeldRef.current)
+        norm === "f5" ||
+        norm === "alt+r" ||
+        norm === "reset" ||
+        ((norm === "r" || norm === "к") && altHeldRef.current)
       ) {
         if (!showRemap) {
           resetTrainer()
@@ -466,20 +477,26 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         }
       }
 
-      const norm = normalizeKeyInput(e.key)
-      if (!norm) return
-
       if (showRemap) {
         setRemapRecordedKey({ key: norm, time: Date.now() })
         return
       }
 
       const now = Date.now()
-      const last = lastPressTimeRef.current[norm] || 0
-      // Drop rapid OS repeats under 80ms
-      if (now - last < 80) {
+
+      // 1. If key is already registered as held down, ignore OS auto-repeats while holding:
+      if (keyHeldStateRef.current[norm]) {
         return
       }
+
+      // 2. Hardware switch contact bounce / micro-flutter debounce:
+      // If the key was released less than 90ms ago, treat as mechanical waver during a hold, not a new human press!
+      const lastUp = lastKeyUpTimeRef.current[norm] || 0
+      if (lastUp > 0 && now - lastUp < 90) {
+        return
+      }
+
+      keyHeldStateRef.current[norm] = true
       lastPressTimeRef.current[norm] = now
 
       handleKeyHit(norm)
@@ -538,11 +555,22 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       }
 
       const now = Date.now()
-      const last = lastPressTimeRef.current[norm] || 0
-      if (now - last < 80) return
+      if (keyHeldStateRef.current[norm]) return
+      const lastUp = lastKeyUpTimeRef.current[norm] || 0
+      if (lastUp > 0 && now - lastUp < 90) return
+
+      keyHeldStateRef.current[norm] = true
       lastPressTimeRef.current[norm] = now
 
       handleKeyHit(norm)
+    }
+
+    function onKeyUp(e: KeyboardEvent) {
+      const norm = normalizeKeyInput(e.key === " " ? "space" : e.key)
+      if (norm) {
+        keyHeldStateRef.current[norm] = false
+        lastKeyUpTimeRef.current[norm] = Date.now()
+      }
     }
 
     function onMouseDown(e: MouseEvent) {
@@ -562,11 +590,22 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       }
 
       const now = Date.now()
-      const last = lastPressTimeRef.current[btn] || 0
-      if (now - last < 80) return
+      if (keyHeldStateRef.current[btn]) return
+      const lastUp = lastKeyUpTimeRef.current[btn] || 0
+      if (lastUp > 0 && now - lastUp < 90) return
+
+      keyHeldStateRef.current[btn] = true
       lastPressTimeRef.current[btn] = now
 
       handleKeyHit(btn)
+    }
+
+    function onMouseUp(e: MouseEvent) {
+      const btn = getButtonName(e.button)
+      if (btn) {
+        keyHeldStateRef.current[btn] = false
+        lastKeyUpTimeRef.current[btn] = Date.now()
+      }
     }
 
     function onAuxClick(e: MouseEvent) {
@@ -604,7 +643,9 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
     for (const target of cleanTargets) {
       target.addEventListener("keydown", onKeyDown as EventListener)
+      target.addEventListener("keyup", onKeyUp as EventListener)
       target.addEventListener("mousedown", onMouseDown as EventListener)
+      target.addEventListener("mouseup", onMouseUp as EventListener)
       target.addEventListener("auxclick", onAuxClick as EventListener)
       target.addEventListener("wheel", onWheel as EventListener, { passive: false })
     }
@@ -612,7 +653,9 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     return () => {
       for (const target of cleanTargets) {
         target.removeEventListener("keydown", onKeyDown as EventListener)
+        target.removeEventListener("keyup", onKeyUp as EventListener)
         target.removeEventListener("mousedown", onMouseDown as EventListener)
+        target.removeEventListener("mouseup", onMouseUp as EventListener)
         target.removeEventListener("auxclick", onAuxClick as EventListener)
         target.removeEventListener("wheel", onWheel as EventListener)
       }
