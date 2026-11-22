@@ -74,5 +74,6 @@ describe("readableRotation", () => {
 
     const text = readableRotationText(rotation, result, skillsById)
     expect(text).toContain("Heng Q Stab > Mo Swap > Mo QQ")
+    expect(text).toContain("Mo Swap > Bursting Nine > Mo QQ")
   })
 })

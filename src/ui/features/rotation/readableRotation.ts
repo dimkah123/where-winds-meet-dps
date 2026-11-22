@@ -367,6 +367,25 @@ export function readableRotationFromSteps(
       drawnWeapon = weapon
     } else if (weapon) {
       drawnWeapon = weapon
+    } else if (drawnWeapon !== null) {
+      // Step has no weapon tag (e.g. mystic arts). Look ahead to the next weapon-bearing step:
+      // If the next weapon differs from drawnWeapon and isn't a weapon swap skill itself,
+      // perform the direct swap BEFORE this neutral skill.
+      let nextWeapon: string | null = null
+      let nextSkill: Skill | undefined
+      for (let j = i + 1; j < filteredSteps.length; j++) {
+        const s = skillsById.get(filteredSteps[j].skillId)
+        const w = s ? weaponTagOf(s) : ""
+        if (w) {
+          nextWeapon = w
+          nextSkill = s
+          break
+        }
+      }
+      if (nextWeapon && nextWeapon !== drawnWeapon && !nextSkill?.isWeaponSwap) {
+        entries.push(getWeaponSwapShortName(nextWeapon))
+        drawnWeapon = nextWeapon
+      }
     }
 
     const baseName = getSkillShortName(skill, skillId)

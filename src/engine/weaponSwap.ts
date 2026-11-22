@@ -35,16 +35,44 @@ export function expandStepsWithWeaponSwaps(
 ): ResolvedStep[] {
   const expanded: ResolvedStep[] = []
   let drawnWeapon: string | null = null
-  for (const resolvedStep of steps) {
+
+  for (let i = 0; i < steps.length; i++) {
+    const resolvedStep = steps[i]
     const weapon = weaponTagOf(resolvedStep.skill)
-    if (weapon && weapon !== drawnWeapon) {
-      if (drawnWeapon !== null && !resolvedStep.skill.isWeaponSwap) {
-        expanded.push(makeDirectSwapStep(weapon, isPrePullSkill(resolvedStep.skill)))
+
+    if (weapon) {
+      if (weapon !== drawnWeapon) {
+        if (drawnWeapon !== null && !resolvedStep.skill.isWeaponSwap) {
+          expanded.push(makeDirectSwapStep(weapon, isPrePullSkill(resolvedStep.skill)))
+        }
+        drawnWeapon = weapon
       }
-      drawnWeapon = weapon
+    } else if (drawnWeapon !== null) {
+      // Step has no weapon tag (e.g. mystic arts, universal skills).
+      // Look ahead to the next weapon-bearing step:
+      // If the next weapon differs from drawnWeapon and isn't a weapon swap skill itself,
+      // perform the direct swap BEFORE this neutral skill so that the player swaps early
+      // and the swap cooldown/transition overlaps with the neutral skill's cast.
+      let nextWeapon: string | null = null
+      let nextStep: ResolvedStep | null = null
+      for (let j = i + 1; j < steps.length; j++) {
+        const w = weaponTagOf(steps[j].skill)
+        if (w) {
+          nextWeapon = w
+          nextStep = steps[j]
+          break
+        }
+      }
+
+      if (nextWeapon && nextWeapon !== drawnWeapon && nextStep && !nextStep.skill.isWeaponSwap) {
+        expanded.push(makeDirectSwapStep(nextWeapon, isPrePullSkill(nextStep.skill)))
+        drawnWeapon = nextWeapon
+      }
     }
+
     expanded.push(resolvedStep)
   }
+
   return expanded
 }
 

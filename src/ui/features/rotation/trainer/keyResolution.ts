@@ -255,11 +255,33 @@ export function buildTrainerSteps(
   casts?: RotationCast[],
   isRuLocale = false,
 ): TrainerStep[] {
+  // Normalize token ordering: if a neutral mystic art (e.g. Bursting Nine / Toad) is immediately followed
+  // by a direct weapon swap (e.g. Mo Swap, Heng Swap), move the weapon swap BEFORE the mystic art.
+  const normalizedTokens: ParsedRotationToken[] = [...tokens]
+  for (let i = 0; i < normalizedTokens.length - 1; i++) {
+    const cur = normalizedTokens[i]
+    const next = normalizedTokens[i + 1]
+    const isNextSwap =
+      /\b(swap|switch)\b/i.test(next.cleanName) ||
+      next.cleanName.toLowerCase().includes("смен") ||
+      next.cleanName.toLowerCase().includes("переключ")
+    const isCurMystic =
+      /bursting|nine|toad|жаб/i.test(cur.cleanName) ||
+      cur.skillId?.startsWith("mystic-bursting") ||
+      cur.skillId?.startsWith("mystic-toad")
+
+    if (isCurMystic && isNextSwap) {
+      normalizedTokens[i] = next
+      normalizedTokens[i + 1] = cur
+      i++
+    }
+  }
+
   let currentCastIdx = 0
   const steps: TrainerStep[] = []
 
-  for (let index = 0; index < tokens.length; index++) {
-    const token = tokens[index]
+  for (let index = 0; index < normalizedTokens.length; index++) {
+    const token = normalizedTokens[index]
     const keyInfo = resolveSkillKey(token.cleanName, keyMap, isRuLocale)
     let simDuration: number | undefined
     let matchingCast: RotationCast | undefined

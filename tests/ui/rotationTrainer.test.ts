@@ -262,15 +262,32 @@ describe("Rotation Trainer Key Resolution", () => {
     expect(steps[5].durationSec).toBe(0.25)
     expect(steps[5].isHold).toBe(false)
 
-    // Bursting Nine (1.4s cast, 30s cooldown)
-    expect(steps[6].cleanName).toBe("Bursting Nine")
-    expect(steps[6].durationSec).toBe(1.4)
-    expect(steps[6].cooldownSec).toBe(30)
+    // Mo Swap via wheel moved BEFORE Bursting Nine so swap cooldown is hidden during mystic cast
+    expect(steps[6].cleanName).toBe("Mo Swap")
+    expect(steps[6].expectedKey).toBe("wheeldown")
+    expect(steps[6].durationSec).toBe(0)
+    expect(steps[6].cooldownSec).toBe(0.6)
 
-    // Mo Swap via wheel (instant cast 0s, 0.6s cooldown)
-    expect(steps[7].expectedKey).toBe("wheeldown")
-    expect(steps[7].durationSec).toBe(0)
-    expect(steps[7].cooldownSec).toBe(0.6)
+    // Bursting Nine (1.4s cast, 30s cooldown) follows Mo Swap
+    expect(steps[7].cleanName).toBe("Bursting Nine")
+    expect(steps[7].durationSec).toBe(1.4)
+    expect(steps[7].cooldownSec).toBe(30)
+  })
+
+  it("ensures weapon swap is positioned before Bursting Nine in prompter timeline", () => {
+    const tokens = [
+      { raw: "Heng VC", cleanName: "Heng VC", multiplier: 1, valid: true },
+      { raw: "Bursting Nine", cleanName: "Bursting Nine", multiplier: 1, valid: true },
+      { raw: "Mo Swap", cleanName: "Mo Swap", multiplier: 1, valid: true },
+      { raw: "Mo QQ", cleanName: "Mo QQ", multiplier: 1, valid: true },
+    ]
+    const steps = buildTrainerSteps(tokens, DEFAULT_KEY_MAP)
+    expect(steps.map((s) => s.cleanName)).toEqual([
+      "Heng VC",
+      "Mo Swap",
+      "Bursting Nine",
+      "Mo QQ",
+    ])
   })
 
   it("injects Deflect after cancel skills unless next step is already Deflect", () => {
