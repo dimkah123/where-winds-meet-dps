@@ -32,6 +32,35 @@ interface Props {
   onClose?: () => void
 }
 
+function isKeyMatch(expected: string, inputKey: string): boolean {
+  const normExpected = normalizeKeyInput(expected)
+  const normInput = normalizeKeyInput(inputKey)
+  if (normInput === normExpected) return true
+  if (normExpected === "lclick" && normInput === "lclick") return true
+  if (normExpected === "rclick" && normInput === "rclick") return true
+  if (
+    (normExpected === "wheeldown" || normExpected === "wheelup" || normExpected === "mclick") &&
+    (normInput === "wheeldown" ||
+      normInput === "wheelup" ||
+      normInput === "wheel" ||
+      normInput === "mclick" ||
+      normInput === "mouse3")
+  ) {
+    return true
+  }
+  if (normExpected === "mouse4" && (normInput === "mouse4" || normInput === "xbutton1")) return true
+  if (normExpected === "mouse5" && (normInput === "mouse5" || normInput === "xbutton2")) return true
+  return false
+}
+
+function isStepChargeHold(step?: TrainerStep): boolean {
+  if (!step) return false
+  return Boolean(
+    step.isHold ||
+      /charged|hold|тяж[её]л|заряж/i.test(step.cleanName)
+  )
+}
+
 export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }: Props) {
   const { t, locale } = useI18n()
   const isRuLocale = locale === "ru"
@@ -137,9 +166,10 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
   const keyHeldStateRef = useRef<Record<string, boolean>>({})
   const lastKeyUpTimeRef = useRef<Record<string, number>>({})
   const lastWrongTimeRef = useRef<{ key: string; time: number }>({ key: "", time: 0 })
-  const lastHoldKeyRef = useRef<{ key: string; expiresAt: number }>({ key: "", expiresAt: 0 })
   const lastHitKeyRef = useRef<{ key: string; time: number }>({ key: "", time: 0 })
   const altHeldRef = useRef(false)
+  const isHoldingChargeRef = useRef(false)
+  const chargeStartTimeRef = useRef(0)
 
   const triggerFeedback = useCallback((text: string, tone: "perfect" | "good" | "wrong" | "hit") => {
     setFeedback({ text, tone, id: Date.now() })
@@ -191,12 +221,83 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     bufferedInputRef.current = null
     keyHeldStateRef.current = {}
     lastKeyUpTimeRef.current = {}
+    isHoldingChargeRef.current = false
+    chargeStartTimeRef.current = 0
     triggerFeedback(t("trainer.feedback.reset", isRuLocale ? "СБРОС" : "RESET"), "perfect")
     if (settings.sound) playSwitchSound("reset")
     const firstCount = steps[0]?.remainingCount ?? steps[0]?.multiplier ?? 1
     remainingCountRef.current = firstCount
     setRemainingCount(firstCount)
   }, [settings.sound, steps, triggerFeedback, t, isRuLocale])
+
+  const handleKeyUp = useCallback(
+    (releasedKey: string) => {
+      if (!isPlaying || !currentStep) return
+
+      const expected = normalizeKeyInput(currentStep.expectedKey)
+      const released = normalizeKeyInput(releasedKey)
+      const isMatch = isKeyMatch(expected, released)
+
+      // Only handle release for charged/hold skills that are actively being charged
+      if (isStepChargeHold(currentStep) && isHoldingChargeRef.current && isMatch) {
+        const now = Date.now()
+        const holdDuration = now - chargeStartTimeRef.current
+        isHoldingChargeRef.current = false
+
+        // Micro-flutter on switch release debounce (< 60ms)
+        if (holdDuration < 60) {
+          return
+        }
+
+        lastHitKeyRef.current = { key: expected, time: now }
+
+        if (remainingCountRef.current > 1) {
+          remainingCountRef.current -= 1
+          const left = remainingCountRef.current
+          setRemainingCount(left)
+          triggerFeedback(`${left} ${t("trainer.feedback.left", isRuLocale ? "ост." : "left")}`, "hit")
+          if (settings.sound) playSwitchSound("subhit")
+
+          // Reset cast timing state for next charge, stay on this step waiting for player to charge again!
+          setCastStartTime(0)
+          setIsCasting(false)
+          setCastProgress(0)
+        } else {
+          setHits((h) => h + 1)
+          setCombo((c) => {
+            const next = c + 1
+            setMaxCombo((m) => Math.max(m, next))
+            return next
+          })
+          triggerFeedback(t("trainer.feedback.perfect", isRuLocale ? "ОТЛИЧНО" : "PERFECT"), "perfect")
+          if (settings.sound) playSwitchSound("perfect")
+
+          // Advance step ONLY when the key is released!
+          const currentIdx = stepIndexRef.current
+          const nextIdx = currentIdx + 1
+          if (nextIdx < steps.length) {
+            const nextStep = steps[nextIdx]
+            const nextCount = nextStep?.remainingCount ?? nextStep?.multiplier ?? 1
+            remainingCountRef.current = nextCount
+            setRemainingCount(nextCount)
+            stepIndexRef.current = nextIdx
+            setStepIndex(nextIdx)
+          } else {
+            setHasStarted(false)
+            const firstCount = steps[0]?.remainingCount ?? steps[0]?.multiplier ?? 1
+            remainingCountRef.current = firstCount
+            setRemainingCount(firstCount)
+            stepIndexRef.current = 0
+            setStepIndex(0)
+          }
+          setTimingProgress(0)
+          setIsCasting(false)
+          setCastProgress(0)
+        }
+      }
+    },
+    [isPlaying, currentStep, isRuLocale, settings.sound, steps, triggerFeedback, t],
+  )
 
   const handleKeyHit = useCallback(
     (pressedKey: string, fromBuffer = false) => {
@@ -209,36 +310,24 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
       const expected = normalizeKeyInput(currentStep.expectedKey)
       const pressed = normalizeKeyInput(pressedKey)
-
-      const isMatch =
-        pressed === expected ||
-        (expected === "lclick" && pressed === "lclick") ||
-        (expected === "rclick" && pressed === "rclick") ||
-        (expected === "wheeldown" &&
-          (pressed === "wheeldown" ||
-            pressed === "wheelup" ||
-            pressed === "wheel" ||
-            pressed === "mclick" ||
-            pressed === "mouse3")) ||
-        (expected === "wheelup" &&
-          (pressed === "wheelup" ||
-            pressed === "wheeldown" ||
-            pressed === "wheel" ||
-            pressed === "mclick" ||
-            pressed === "mouse3")) ||
-        (expected === "mclick" &&
-          (pressed === "mclick" ||
-            pressed === "mouse3" ||
-            pressed === "wheeldown" ||
-            pressed === "wheelup" ||
-            pressed === "wheel")) ||
-        (expected === "mouse4" && (pressed === "mouse4" || pressed === "xbutton1")) ||
-        (expected === "mouse5" && (pressed === "mouse5" || pressed === "xbutton2"))
+      const isMatch = isKeyMatch(expected, pressed)
 
       // 1. Rotation has not started yet -> wait for the FIRST skill!
       // Silently ignore any other keys (WASD, jumps, etc.) before the first skill is pressed.
       if (!hasStarted) {
         if (isMatch) {
+          if (isStepChargeHold(currentStep)) {
+            // First skill is a charged attack: initiate charge and wait for release!
+            setHasStarted(true)
+            isHoldingChargeRef.current = true
+            chargeStartTimeRef.current = Date.now()
+            startSkillCast(currentStep)
+            triggerFeedback(t("trainer.feedback.start", isRuLocale ? "СТАРТ! (УДЕРЖИВАЙ...)" : "START! (HOLDING...)"), "hit")
+            if (settings.sound) playSwitchSound("start")
+            return
+          }
+
+          // Instant first skill
           startSkillCast(currentStep)
           setHasStarted(true)
           setHits(1)
@@ -264,12 +353,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       const elapsed = now - castStartTime
       const remainingCastMs = castDurationMs - elapsed
 
-      // Only buffer when transitioning from a previous casting skill to a new one.
-      // For multi-hit repetitions of the CURRENT skill (e.g. Mo Charged x4), every hit registers immediately!
       const isMultiHitRepetition = remainingCountRef.current > 1
-
-      // Weapon swap actions (Wheel Down, Wheel Up, Tab, Swap, Switch) cancel and transition instantly in WWM.
-      // They must NOT be blocked by the previous skill's cast duration!
       const isSwapAction =
         currentStep.cleanName.toLowerCase().includes("swap") ||
         currentStep.cleanName.toLowerCase().includes("switch") ||
@@ -278,8 +362,6 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
       if (!fromBuffer && isCasting && remainingCastMs > 350 && !isMultiHitRepetition && !isSwapAction) {
         if (isMatch) {
-          // User pressed the correct next key, but the character is still mid-cast!
-          // Buffer it so it fires right when the cancel window opens!
           bufferedInputRef.current = { key: pressedKey, time: now }
           triggerFeedback(t("trainer.feedback.casting", isRuLocale ? "⌛ КАСТ..." : "⌛ CASTING..."), "hit")
           return
@@ -289,32 +371,29 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       if (isMatch) {
         bufferedInputRef.current = null
 
-        // Prevent ghost double-counting on multi-hit/charged skills (e.g. Mo Charged repetitions):
-        // Enforce a tight debounce interval of ~240ms between discrete strikes, allowing fast or slow charges
-        // without dropping genuine human inputs or repeating while holding
-        const minRepIntervalMs = Math.max(160, Math.min(320, 240 / settings.speed))
-
-        const timeSinceLastHit = now - lastHitKeyRef.current.time
-        if (lastHitKeyRef.current.key === expected && timeSinceLastHit < minRepIntervalMs) {
-          // Key jitter / chatter within 240ms -> ignore!
+        // CHARGED / HOLD ATTACKS:
+        // Key down initiates charge animation and visual feedback.
+        // It does NOT count hit or advance step until player RELEASES the key!
+        if (isStepChargeHold(currentStep)) {
+          isHoldingChargeRef.current = true
+          chargeStartTimeRef.current = now
+          startSkillCast(currentStep)
+          const left = remainingCountRef.current
+          const countInfo = left > 1 ? ` (${left} ${isRuLocale ? "ост." : "left"})` : ""
+          triggerFeedback(isRuLocale ? `⏳ ЗАРЯДКА${countInfo}...` : `⏳ CHARGING${countInfo}...`, "hit")
           return
         }
 
-        // If this skill was a charge/hold attack, allow a 500ms grace window for releasing the key
-        const skillLower = currentStep.cleanName.toLowerCase()
-        if (
-          skillLower.includes("charged") ||
-          skillLower.includes("hold") ||
-          skillLower.includes("heavy")
-        ) {
-          lastHoldKeyRef.current = { key: expected, expiresAt: Date.now() + 500 }
+        // INSTANT / NON-HOLD SKILLS:
+        const minRepIntervalMs = Math.max(160, Math.min(320, 240 / settings.speed))
+        const timeSinceLastHit = now - lastHitKeyRef.current.time
+        if (lastHitKeyRef.current.key === expected && timeSinceLastHit < minRepIntervalMs) {
+          return
         }
-        lastHitKeyRef.current = { key: expected, time: Date.now() }
 
-        // Start cast timer & cooldown for the newly executed skill
+        lastHitKeyRef.current = { key: expected, time: now }
         startSkillCast(currentStep)
 
-        // Success: check synchronous remaining count
         if (remainingCountRef.current > 1) {
           remainingCountRef.current -= 1
           const left = remainingCountRef.current
@@ -331,7 +410,6 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           triggerFeedback(t("trainer.feedback.perfect", isRuLocale ? "ОТЛИЧНО" : "PERFECT"), "perfect")
           if (settings.sound) playSwitchSound("perfect")
 
-          // Advance step synchronously
           const currentIdx = stepIndexRef.current
           const nextIdx = currentIdx + 1
           if (nextIdx < steps.length) {
@@ -367,18 +445,12 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
           return
         }
 
-        // C. Grace window for releasing hold key -> SILENTLY IGNORE
-        if (lastHoldKeyRef.current.key === pressed && now < lastHoldKeyRef.current.expiresAt) {
-          return
-        }
-
-        // D. In "strict" mode:
-        // Extra key mashing or buffer inputs should NOT reduce accuracy or cause misses.
+        // C. In "strict" mode:
         if (settings.mode === "strict") {
           return
         }
 
-        // E. In "timing" mode:
+        // D. In "timing" mode:
         if (lastWrongTimeRef.current.key === pressed && now - lastWrongTimeRef.current.time < 450) {
           return
         }
@@ -388,16 +460,13 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         setCombo(0)
         triggerFeedback(`✕ ${formatKeyDisplay(pressed, isRuLocale)}`, "wrong")
         if (settings.sound) playSwitchSound("miss")
-
-        // NOTE: We do NOT advance stepIndex on wrong key!
       }
     },
     [
       isPlaying,
       hasStarted,
       currentStep,
-      remainingCount,
-      steps.length,
+      steps,
       settings.sound,
       settings.mode,
       settings.speed,
@@ -407,6 +476,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       castDurationMs,
       castStartTime,
       startSkillCast,
+      resetTrainer,
       t,
     ],
   )
@@ -467,6 +537,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       if (e.action === "up") {
         keyHeldStateRef.current[norm] = false
         lastKeyUpTimeRef.current[norm] = Date.now()
+        handleKeyUp(norm)
         return
       }
 
@@ -521,7 +592,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
       handleKeyHit(norm)
     },
-    [handleKeyHit, resetTrainer, showRemap],
+    [handleKeyHit, handleKeyUp, resetTrainer, showRemap],
   )
 
   const { isConnected, isAdmin } = useCompanionSocket({
@@ -590,6 +661,9 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       if (norm) {
         keyHeldStateRef.current[norm] = false
         lastKeyUpTimeRef.current[norm] = Date.now()
+        if (!isConnected) {
+          handleKeyUp(norm)
+        }
       }
     }
 
@@ -625,6 +699,9 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       if (btn) {
         keyHeldStateRef.current[btn] = false
         lastKeyUpTimeRef.current[btn] = Date.now()
+        if (!isConnected) {
+          handleKeyUp(btn)
+        }
       }
     }
 
@@ -649,7 +726,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       }
       const now = Date.now()
       const last = lastPressTimeRef.current[direction] || 0
-      if (now - last < 80) return
+      if (now - last < 45) return
       lastPressTimeRef.current[direction] = now
 
       handleKeyHit(direction)
@@ -680,7 +757,7 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
         target.removeEventListener("wheel", onWheel as EventListener)
       }
     }
-  }, [handleKeyHit, showRemap])
+  }, [handleKeyHit, handleKeyUp, showRemap, isConnected])
 
   // Timing mode animation loop (uses actual step cast time)
   useEffect(() => {
@@ -691,6 +768,9 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
     const stepIncrement = (interval / stepDurationMs) * 100
 
     const timer = setInterval(() => {
+      // Do not auto-miss or advance while the player is actively holding a charge!
+      if (isHoldingChargeRef.current) return
+
       setTimingProgress((prev) => {
         const next = prev + stepIncrement
         if (next >= 100) {
