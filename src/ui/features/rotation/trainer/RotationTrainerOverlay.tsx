@@ -268,7 +268,15 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
       // For multi-hit repetitions of the CURRENT skill (e.g. Mo Charged x4), every hit registers immediately!
       const isMultiHitRepetition = remainingCountRef.current > 1
 
-      if (!fromBuffer && isCasting && remainingCastMs > 350 && !isMultiHitRepetition) {
+      // Weapon swap actions (Wheel Down, Wheel Up, Tab, Swap, Switch) cancel and transition instantly in WWM.
+      // They must NOT be blocked by the previous skill's cast duration!
+      const isSwapAction =
+        currentStep.cleanName.toLowerCase().includes("swap") ||
+        currentStep.cleanName.toLowerCase().includes("switch") ||
+        expected.startsWith("wheel") ||
+        expected === "tab"
+
+      if (!fromBuffer && isCasting && remainingCastMs > 350 && !isMultiHitRepetition && !isSwapAction) {
         if (isMatch) {
           // User pressed the correct next key, but the character is still mid-cast!
           // Buffer it so it fires right when the cancel window opens!
@@ -484,19 +492,31 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
 
       const now = Date.now()
 
-      // 1. If key is already registered as held down, ignore OS auto-repeats while holding:
-      if (keyHeldStateRef.current[norm]) {
-        return
+      // Mouse wheel inputs are instantaneous impulse scrolls without an 'up' event.
+      const isWheel = norm.startsWith("wheel")
+
+      if (!isWheel) {
+        // 1. If key is already registered as held down, ignore OS auto-repeats while holding:
+        if (keyHeldStateRef.current[norm]) {
+          return
+        }
+
+        // 2. Hardware switch contact bounce / micro-flutter debounce:
+        // If the key was released less than 90ms ago, treat as mechanical waver during a hold, not a new human press!
+        const lastUp = lastKeyUpTimeRef.current[norm] || 0
+        if (lastUp > 0 && now - lastUp < 90) {
+          return
+        }
+
+        keyHeldStateRef.current[norm] = true
+      } else {
+        // Debounce rapid wheel notches (under 45ms) to allow deliberate scrolls without noise
+        const lastWheel = lastPressTimeRef.current[norm] || 0
+        if (now - lastWheel < 45) {
+          return
+        }
       }
 
-      // 2. Hardware switch contact bounce / micro-flutter debounce:
-      // If the key was released less than 90ms ago, treat as mechanical waver during a hold, not a new human press!
-      const lastUp = lastKeyUpTimeRef.current[norm] || 0
-      if (lastUp > 0 && now - lastUp < 90) {
-        return
-      }
-
-      keyHeldStateRef.current[norm] = true
       lastPressTimeRef.current[norm] = now
 
       handleKeyHit(norm)
@@ -911,7 +931,13 @@ export function RotationTrainerOverlay({ tokens, casts, rotationTitle, onClose }
               </div>
 
               <div className={styles.keyPrompt}>
-                <span className={styles.keyTag}>{step.expectedKeyLabel}</span>
+                <span
+                  className={`${styles.keyTag} ${
+                    step.expectedKeyLabel.length > 7 ? styles.longKeyTag : ""
+                  }`}
+                >
+                  {step.expectedKeyLabel}
+                </span>
               </div>
 
               {/* Bottom Timings Row: Cooldown & Cast Time */}
