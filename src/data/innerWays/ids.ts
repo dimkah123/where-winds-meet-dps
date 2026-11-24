@@ -7,6 +7,7 @@ export const INNER_WAY_ID = {
   bitterSeason: "bitterSeason",
   blossomBarrage: "blossomBarrage",
   breakingPoint: "breakingPoint",
+  envigoratedWarrior: "envigoratedWarrior",
   eonpour: "eonpour",
   evasiveCharge: "evasiveCharge",
   frostCladNight: "frostCladNight",
@@ -62,6 +63,7 @@ export type InnerWayNode = (typeof INNER_WAY_NODE)[keyof typeof INNER_WAY_NODE]
 export const INNER_WAY_LADDER = {
   weaponAttackFourStar: "weaponAttackFourStar",
   weaponAttackFiveStar: "weaponAttackFiveStar",
+  weaponAttackMinFourStar: "weaponAttackMinFourStar",
   weaponAttackMinFiveStar: "weaponAttackMinFiveStar",
   weaponAttackMaxFiveStar: "weaponAttackMaxFiveStar",
   precisionFourStar: "precisionFourStar",

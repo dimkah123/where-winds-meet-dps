@@ -37,6 +37,7 @@ export const stonesplitStrength = defineClass({
     INNER_WAY_ID.steadfastDevotion,
     INNER_WAY_ID.bitterSeason,
     INNER_WAY_ID.breakingPoint,
+    INNER_WAY_ID.envigoratedWarrior,
     INNER_WAY_ID.evasiveCharge,
   ],
   classSpecificAttunements: [

@@ -16,6 +16,7 @@ import { blossomBarrage } from "./blossomBarrage"
 import { starReacher } from "./starReacher"
 import { thunderousBloom } from "./thunderousBloom"
 import { breakingPoint } from "./breakingPoint"
+import { envigoratedWarrior } from "./envigoratedWarrior"
 import { eonpour } from "./eonpour"
 import { skyspeak } from "./skyspeak"
 import { mistwing } from "./mistwing"
@@ -42,6 +43,7 @@ export const INNER_WAYS: readonly InnerWayDef[] = [
   starReacher,
   thunderousBloom,
   breakingPoint,
+  envigoratedWarrior,
   eonpour,
   skyspeak,
   mistwing,

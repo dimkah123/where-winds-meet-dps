@@ -41,6 +41,7 @@ export const bamboocutDraught = defineClass({
     INNER_WAY_ID.moraleChant,
     INNER_WAY_ID.bitterSeason,
     INNER_WAY_ID.breakingPoint,
+    INNER_WAY_ID.envigoratedWarrior,
     INNER_WAY_ID.evasiveCharge,
   ],
   classSpecificAttunements: [

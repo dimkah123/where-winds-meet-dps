@@ -29,6 +29,18 @@ export const INNER_WAY_LADDERS: Readonly<
     20: { "phys.max": 65.2, "phys.min": 32.6 },
     21: { "phys.max": 70.4, "phys.min": 35.2 },
   },
+  weaponAttackMinFourStar: {
+    12: { "phys.min": 42.3 },
+    13: { "phys.min": 49.3 },
+    14: { "phys.min": 57.5 },
+    15: { "phys.min": 63.8 },
+    16: { "phys.min": 66.9 },
+    17: { "phys.min": 70.1 },
+    18: { "phys.min": 75.6 },
+    19: { "phys.min": 81.6 },
+    20: { "phys.min": 88 },
+    21: { "phys.min": 95 },
+  },
   weaponAttackMinFiveStar: {
     12: { "phys.min": 47 },
     13: { "phys.min": 54.8 },
