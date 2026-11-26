@@ -265,3 +265,24 @@ export function effectiveEnhancementLevels(
   for (const slot of GEAR_SLOTS) effective[slot] = Math.min(levels[slot] ?? 0, ceiling)
   return effective
 }
+
+/** Raises slots that sit at the previous cap up to the new cap when breakthrough or gear rises. */
+export function syncEnhancementsAtCap(
+  enhancements: EnhancementLevels,
+  previousBreakthrough: number,
+  nextBreakthrough: number,
+  previousGear?: EnhancementGear,
+  nextGear: EnhancementGear | undefined = previousGear,
+): EnhancementLevels {
+  const prevDefaults = defaultEnhancementLevels(previousBreakthrough, previousGear)
+  const nextDefaults = defaultEnhancementLevels(nextBreakthrough, nextGear)
+  let changed = false
+  const synced = { ...enhancements }
+  for (const slot of GEAR_SLOTS) {
+    if (synced[slot] === prevDefaults[slot] && nextDefaults[slot] > prevDefaults[slot]) {
+      synced[slot] = nextDefaults[slot]
+      changed = true
+    }
+  }
+  return changed ? synced : enhancements
+}

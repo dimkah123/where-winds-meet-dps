@@ -12,6 +12,7 @@ import type {
 } from "../../../../engine/types"
 import { BOW_SLOTS, GEAR_SLOTS, isWeaponSlot } from "../../../../engine/types"
 import { gearLevelForBreakthrough } from "../../../../definitions/baseStats/breakthroughs"
+import { syncEnhancementsAtCap } from "../../../../definitions/baseStats"
 import { slotSetFor } from "../../../../engine/setBonuses"
 import { withSetChoice } from "../../../../engine/setChoice"
 import { equipGraduationGearToInputs } from "../../../../engine/graduation"
@@ -294,11 +295,19 @@ export function GearTab({
     const nextEquipped = equippedFromImported(imported)
 
     setImportOpen(false)
+    const nextInventory = [...kept, ...imported]
     const next: Inputs = {
       ...inputs,
-      inventory: [...kept, ...imported],
+      inventory: nextInventory,
       equipped: nextEquipped,
       bowGear: importedBowGear,
+      enhancements: syncEnhancementsAtCap(
+        inputs.enhancements,
+        inputs.breakthrough,
+        inputs.breakthrough,
+        { inventory, equipped },
+        { inventory: nextInventory, equipped: nextEquipped },
+      ),
     }
     onChange(mindMethods ? { ...next, mindMethods } : next)
     const first = imported[0]

@@ -2,7 +2,10 @@ import { useI18n } from "../../../../i18n/i18nContext"
 import { resistanceForInputs } from "../../../../engine/panel"
 import type { Inputs, Result } from "../../../../engine/types"
 import { syncClassPermanent } from "../../../utils/classSetup"
-import { resyncDefaultTalentsForBreakthrough } from "../../../../definitions/baseStats"
+import {
+  resyncDefaultTalentsForBreakthrough,
+  syncEnhancementsAtCap,
+} from "../../../../definitions/baseStats"
 import { slotInnerWayId } from "../../../../definitions/innerWays/registry"
 import { useItemRanking } from "../../../hooks/useItemRanking"
 import { ClassSelect } from "../class-select/ClassSelect"
@@ -52,9 +55,17 @@ export function OverviewTab({
           />
           <BreakthroughSelect
             value={inputs.breakthrough}
-            onChange={(breakthrough) =>
-              onChange(resyncDefaultTalentsForBreakthrough({ ...inputs, breakthrough }))
-            }
+            onChange={(breakthrough) => {
+              const enhancements = syncEnhancementsAtCap(
+                inputs.enhancements,
+                inputs.breakthrough,
+                breakthrough,
+                inputs,
+              )
+              onChange(
+                resyncDefaultTalentsForBreakthrough({ ...inputs, breakthrough, enhancements }),
+              )
+            }}
           />
           <SwordTrialBossSelect
             inputs={inputs}

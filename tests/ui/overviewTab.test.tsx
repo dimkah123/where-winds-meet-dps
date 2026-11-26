@@ -206,6 +206,23 @@ describe("the Sword Trial boss choice on the Overview tab", () => {
     expect(screen.getByRole("combobox", { name: "Sword Trial Boss" })).toHaveTextContent(
       "Yelu A'buli",
     )
-    expect(screen.getByText("Not fought at BT 13: scored as River Master")).toBeInTheDocument()
+    expect(
+      screen.getByText("Not fought at BT 13: scored as River Master"),
+    ).toBeInTheDocument()
+  })
+
+  it("raises standard 70 enhancements up to 75 when raising breakthrough from 18 to 19", () => {
+    const onChange = vi.fn()
+    const enhancements70 = Object.fromEntries(
+      Object.keys(defaultInputs.enhancements).map((slot) => [slot, 70]),
+    ) as Inputs["enhancements"]
+    renderTab({ breakthrough: 18, enhancements: { ...enhancements70, helm: 40 } }, onChange)
+    fireEvent.click(screen.getByRole("combobox", { name: "Breakthrough" }))
+    fireEvent.mouseDown(screen.getByRole("option", { name: /Lv\. 19/ }))
+    const next = onChange.mock.lastCall![0] as Inputs
+    expect(next.breakthrough).toBe(19)
+    expect(next.enhancements.leftWeapon).toBe(75)
+    expect(next.enhancements.bracer).toBe(75)
+    expect(next.enhancements.helm).toBe(40)
   })
 })

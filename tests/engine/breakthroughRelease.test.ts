@@ -181,4 +181,31 @@ describe("following a breakthrough release", () => {
     const [followed, untouched] = loadProfiles().profiles
     expect({ ...followed.inputs, breakthrough: 15 }).toEqual(untouched.inputs)
   })
+
+  it("upgrades slots sitting at the superseded default enhancement cap (70 -> 75) when following BT 19", () => {
+    const bt19Release = BREAKTHROUGH_RELEASES.find((release) => release.breakthrough === 19)!.at
+    vi.setSystemTime(bt19Release)
+    const enhancements70 = Object.fromEntries(
+      Object.keys(defaultInputs.enhancements).map((slot) => [slot, 70]),
+    ) as Inputs["enhancements"]
+    writeProfiles([
+      {
+        breakthrough: 18,
+        followedBreakthroughRelease: 18,
+        enhancements: { ...enhancements70, disc: 55 },
+      },
+    ])
+    const { profiles } = loadProfiles()
+    expect(profiles[0].inputs.breakthrough).toBe(19)
+    expect(profiles[0].inputs.enhancements).toEqual({
+      leftWeapon: 75,
+      rightWeapon: 75,
+      helm: 75,
+      armor: 75,
+      disc: 55,
+      pendant: 75,
+      greaves: 75,
+      bracer: 75,
+    })
+  })
 })

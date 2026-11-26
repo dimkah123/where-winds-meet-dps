@@ -12,6 +12,7 @@ import {
   enhancementStatsAtLevel,
   gearLevelUnlock,
   getConfiguredBase,
+  syncEnhancementsAtCap,
 } from "../../src/definitions/baseStats"
 import { defaultInputs } from "../../src/engine/defaults"
 import { GEAR_SLOTS } from "../../src/engine/types"
@@ -267,5 +268,23 @@ describe("the gear level that would unlock a higher enhancement cap", () => {
 
   it("offers nothing when the world level, not the gear level, is the limit", () => {
     expect(gearLevelUnlock(96, 17)).toBeUndefined()
+  })
+})
+
+describe("syncEnhancementsAtCap", () => {
+  it("upgrades slots sitting at the previous breakthrough default (70 -> 75) while preserving custom slots", () => {
+    const at18 = { ...defaultEnhancementLevels(18), disc: 30 }
+    expect(syncEnhancementsAtCap(at18, 18, 19)).toEqual({
+      ...defaultEnhancementLevels(19),
+      disc: 30,
+    })
+  })
+
+  it("upgrades slots capped by old gear when newer gear unlocks level 75", () => {
+    const prevGear = gearWith("disc", 96)
+    const nextGear = gearWith("disc", 100)
+    const levels = defaultEnhancementLevels(19, prevGear)
+    expect(levels.disc).toBe(65)
+    expect(syncEnhancementsAtCap(levels, 19, 19, prevGear, nextGear).disc).toBe(75)
   })
 })

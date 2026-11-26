@@ -91,4 +91,26 @@ describe("enhancement levels — the every-load hydrator", () => {
     const { profiles } = loadProfiles()
     expect(profiles[0].inputs.enhancements.bracer).toBe(70)
   })
+
+  it("upgrades slots at legacy level 70 (or 65) up to 75 when breakthrough is 19", () => {
+    const level70 = Object.fromEntries(
+      Object.keys(defaultInputs.enhancements).map((slot) => [slot, 70]),
+    ) as Inputs["enhancements"]
+    writeProfilesBlob({
+      breakthrough: 19,
+      followedBreakthroughRelease: 19,
+      enhancements: { ...level70, leftWeapon: 75, disc: 40 },
+    })
+    const { profiles } = loadProfiles()
+    expect(profiles[0].inputs.enhancements).toEqual({
+      leftWeapon: 75,
+      rightWeapon: 75,
+      helm: 75,
+      armor: 75,
+      disc: 40,
+      pendant: 75,
+      greaves: 75,
+      bracer: 75,
+    })
+  })
 })

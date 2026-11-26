@@ -50,6 +50,7 @@ import {
   closeUnclaimedOddityNodes,
   defaultEnhancementLevels,
   resyncDefaultTalentsForBreakthrough,
+  syncEnhancementsAtCap,
 } from "./definitions/baseStats"
 import { ARSENAL_STORES } from "./data/baseStats"
 import { DEFAULT_SWORD_TRIAL_BOSS_ID } from "./definitions/baseStats/swordTrialBosses"
@@ -608,6 +609,10 @@ export function hydrateInputs(inputs: Inputs): Inputs {
         ? (stored as Record<string, unknown>)
         : {}
     const defaults = defaultEnhancementLevels(next.breakthrough as number, next)
+    const supersededCapUpgrades = [
+      { legacyLevel: 65, minBreakthrough: 18, minDefault: 70 },
+      { legacyLevel: 70, minBreakthrough: 19, minDefault: 75 },
+    ] as const
     const healed = {} as EnhancementLevels
     for (const slot of GEAR_SLOTS) {
       const value = bySlot[slot]
@@ -615,10 +620,13 @@ export function hydrateInputs(inputs: Inputs): Inputs {
         typeof value === "number" && Number.isFinite(value) && value >= 0
           ? Math.round(value)
           : defaults[slot]
-      healed[slot] =
-        level === 65 && (next.breakthrough as number) >= 18 && defaults[slot] >= 70
-          ? defaults[slot]
-          : level
+      const isSupersededDefault = supersededCapUpgrades.some(
+        (rule) =>
+          level === rule.legacyLevel &&
+          (next.breakthrough as number) >= rule.minBreakthrough &&
+          defaults[slot] >= rule.minDefault,
+      )
+      healed[slot] = isSupersededDefault ? defaults[slot] : level
     }
     next.enhancements = healed
   }
@@ -709,7 +717,12 @@ function followBreakthroughReleases(inputs: Inputs, now: number): Inputs {
     const supersededDefault = defaultBreakthrough(release.at - 1)
     if (breakthrough === supersededDefault) breakthrough = release.breakthrough
   }
-  const followed = { ...inputs, breakthrough, followedBreakthroughRelease: newestRelease }
+  const followed = {
+    ...inputs,
+    breakthrough,
+    followedBreakthroughRelease: newestRelease,
+    enhancements: syncEnhancementsAtCap(inputs.enhancements, inputs.breakthrough, breakthrough, inputs),
+  }
   return breakthrough === inputs.breakthrough
     ? followed
     : resyncDefaultTalentsForBreakthrough(followed)
