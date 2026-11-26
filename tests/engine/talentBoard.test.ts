@@ -29,9 +29,9 @@ function cellGranting(stat: string) {
 }
 
 describe("talent board authoring", () => {
-  it("carries 132 nodes, one point each", () => {
-    expect(TALENT_BOARD).toHaveLength(132)
-    expect(TALENT_POINT_BUDGET).toBe(132)
+  it("carries 142 nodes, one point each", () => {
+    expect(TALENT_BOARD).toHaveLength(142)
+    expect(TALENT_POINT_BUDGET).toBe(142)
     expect(new Set(TALENT_BOARD.map((node) => node.id)).size).toBe(TALENT_BOARD.length)
   })
 
@@ -55,18 +55,18 @@ describe("talent board authoring", () => {
     }
   })
 
-  it("grants all five attributes, not just power/agility/momentum, on all 23 of its nodes", () => {
+  it("grants all five attributes, not just power/agility/momentum, on all 27 of its nodes", () => {
     const allFive = TALENT_BOARD.filter((node) => Object.keys(node.effects ?? {}).length === 5)
-    expect(allFive).toHaveLength(23)
+    expect(allFive).toHaveLength(27)
     for (const node of allFive) {
       expect(Object.keys(node.effects ?? {}).sort()).toEqual(ATTRIBUTE_STATS)
     }
   })
 
-  it("totals +8000 Max HP and +105.6 Physical Defense over the whole board", () => {
+  it("totals +8500 Max HP and +112.2 Physical Defense over the whole board", () => {
     const totals = talentBoardTotals([])
-    expect(totals.maxHp).toBe(8000)
-    expect(totals.physDef).toBeCloseTo(105.6, 9)
+    expect(totals.maxHp).toBe(8500)
+    expect(totals.physDef).toBeCloseTo(112.2, 9)
   })
 
   it("keeps a min/max attack pair as two separate nodes", () => {
@@ -136,20 +136,32 @@ describe("the breakthrough the profile stands at", () => {
     expect(takenTalentPoints(effectiveDisabledTalentNodes([], 16))).toBeLessThan(
       TALENT_POINT_BUDGET,
     )
-    expect(takenTalentPoints(effectiveDisabledTalentNodes([], 18))).toBe(TALENT_POINT_BUDGET)
+    expect(takenTalentPoints(effectiveDisabledTalentNodes([], 18))).toBeLessThan(
+      TALENT_POINT_BUDGET,
+    )
+    expect(takenTalentPoints(effectiveDisabledTalentNodes([], 19))).toBe(TALENT_POINT_BUDGET)
   })
 
   it("holds the whole season 5 block back below breakthrough 18", () => {
-    const season5 = TALENT_BOARD.filter((node) => node.id >= 105011).map((node) => node.id)
+    const season5 = TALENT_BOARD.filter((node) => node.id >= 105011 && node.id <= 105101).map((node) => node.id)
     expect(season5).toHaveLength(10)
     expect(talentNodesAboveBreakthrough(17)).toEqual(expect.arrayContaining(season5))
     expect(talentNodesAboveBreakthrough(18)).not.toEqual(expect.arrayContaining([105011]))
   })
 
+  it("holds the world level 19 block back below breakthrough 19", () => {
+    const wl19 = TALENT_BOARD.filter((node) => node.id >= 105111).map((node) => node.id)
+    expect(wl19).toHaveLength(10)
+    expect(talentNodesAboveBreakthrough(18)).toEqual(expect.arrayContaining(wl19))
+    expect(talentNodesAboveBreakthrough(19)).not.toEqual(expect.arrayContaining([105111]))
+  })
+
   it("keeps the nodes the user switched off when the breakthrough rises", () => {
     const own = [101071]
-    expect(effectiveDisabledTalentNodes(own, 18)).toEqual(own)
+    expect(effectiveDisabledTalentNodes(own, 19)).toEqual(own)
     expect(effectiveDisabledTalentNodes(own, 16)).toContain(101071)
+    expect(effectiveDisabledTalentNodes(own, 18)).toContain(101071)
+    expect(effectiveDisabledTalentNodes(own, 18)).toContain(105111)
   })
 
   it("reaches the engine, so a lower breakthrough scores fewer nodes", () => {
